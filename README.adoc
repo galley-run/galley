@@ -1,0 +1,66 @@
+= Galley
+
+image:https://img.shields.io/github/v/tag/galley-run/galley?include_prereleases&sort=semver&style=flat&label=Latest%20release&color=4F75A3[GitHub Tag]
+
+== About Galley
+
+**Galley** is a developer-friendly **sovereign Platform-as-a-Service (PaaS)**.
+It lets you **push code → deploy apps and databases** in minutes — without the complexity of Kubernetes or the risks of the Big Tech.
+
+> Deploy with confidence. Sovereignty, compliancy and GDPR by design.
+
+== Why would you use Galley?
+
+Infrastructure should not be a full-time job for small teams and sole developers.
+With Galley, you can focus on **building software**.
+
+- **Sovereignty & GDPR** – Your apps and data can stay in the region of your choice.
+- **Simple workflow** – Sign up → Push → Deploy.
+- **Predictable costs** – No hidden usage traps.
+- **Developer-first** – Lightweight, open-source, fast and easy to adopt.
+
+== Development
+
+To get the application running you need a keystore which I would place in `src/main/resources/`.
+
+You can generate a keystore by running the following command:
+
+[shell]
+----
+keytool -genseckey -keystore keystore.jceks -storetype JCEKS -storepass "secret" -keyalg HmacSHA256 -keysize 2048 -alias HS256 -keypass "secret"
+----
+
+In the root folder you also need to copy `_config.json` into `config.json` and change the variables as you need. Make sure the `jwt.secret` aligns with the secret you've put in when creating the keystore.
+
+To run the test-suite:
+
+[shell]
+----
+./mvnw clean test
+----
+
+To package the application:
+
+[shell]
+----
+./mvnw clean package
+----
+
+To run the application:
+
+[shell]
+----
+./mvnw clean compile exec:java
+----
+
+== Help
+
+Galley is built with Kotlin and upon *Eclipse Vert.x™*, a reactive framework which runs on the JVM.
+The frontend is built with Vue.js and Typescript.
+
+* https://vertx.io/docs/[Vert.x Documentation]
+* https://stackoverflow.com/questions/tagged/vert.x?sort=newest&pageSize=15[Vert.x Stack Overflow]
+* https://groups.google.com/forum/?fromgroups#!forum/vertx[Vert.x User Group]
+* https://discord.gg/6ry7aqPWXy[Vert.x Discord]
+
+

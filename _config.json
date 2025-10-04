@@ -1,0 +1,14 @@
+{
+  "http": {
+    "port": 9233
+  },
+  "jwt": {
+    "secret": "secret",
+    "keystore": "keystore.jceks",
+    "type": "jceks"
+  },
+  "api": {
+    "openApiFile": "openapi.yaml",
+    "cors": [".*"]
+  }
+}

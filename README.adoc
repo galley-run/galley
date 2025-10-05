@@ -32,12 +32,15 @@ keytool -genseckey -keystore keystore.jceks -storetype JCEKS -storepass "secret"
 
 In the root folder you also need to copy `_config.json` into `config.json` and change the variables as you need. Make sure the `jwt.secret` aligns with the secret you've put in when creating the keystore.
 
+=== Running Tests
 To run the test-suite:
 
 [shell]
 ----
 ./mvnw clean test
 ----
+
+=== Package the application
 
 To package the application:
 
@@ -46,11 +49,23 @@ To package the application:
 ./mvnw clean package
 ----
 
-To generate Jooq classes from your DB connection:
+=== Jooq Code Generation
+
+To generate Jooq XML Structure from your DB connection:
+
 [shell]
 ----
-./mvwn clean jooq-codegen:generate@jooq-codegen-xml jooq-codegen:generate@jooq-codegen-xml
+./mvwn clean jooq-codegen:generate@jooq-codegen-xml
 ----
+
+Then generate Jooq Kotlin Classes from that XML file:
+
+[shell]
+----
+./mvwn clean jooq-codegen:generate@jooq-codegen-xml
+----
+
+=== Run the application
 
 To run the application:
 

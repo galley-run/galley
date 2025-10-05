@@ -20,7 +20,7 @@
     <vertx.version>5.0.4</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
     <flyway.version>11.13.2</flyway.version>
-    <jooq.version>3.20.7</jooq.version>
+    <jooq.version>3.20.8</jooq.version>
 
     <main.verticle>run.galley.cloud.MainVerticle</main.verticle>
     <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>
@@ -263,25 +263,21 @@
         <executions>
           <execution>
             <id>jooq-codegen-kotlin</id>
-            <phase>generate-sources</phase>
+            <phase>none</phase>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
-              <jdbc>
-                <driver>org.postgresql.Driver</driver>
-                <url>jdbc:postgresql://localhost:54332/galley</url>
-                <user>postgres</user>
-                <password>postgres</password>
-              </jdbc>
               <generator>
                 <name>org.jooq.codegen.KotlinGenerator</name>
                 <database>
-                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
-                  <inputSchema>public</inputSchema>
-                  <includes>.*</includes>
-                  <excludes>regexp_.*</excludes>
-                  <includeRoutines>false</includeRoutines>
+                  <name>org.jooq.meta.xml.XMLDatabase</name>
+                  <properties>
+                    <property>
+                      <key>xmlFile</key>
+                      <value>db-schema/information_schema.xml</value>
+                    </property>
+                  </properties>
                 </database>
                 <target>
                   <packageName>run.galley.cloud.db.generated</packageName>
@@ -297,7 +293,7 @@
           </execution>
           <execution>
             <id>jooq-codegen-xml</id>
-            <phase>generate-sources</phase>
+            <phase>none</phase>
             <goals>
               <goal>generate</goal>
             </goals>

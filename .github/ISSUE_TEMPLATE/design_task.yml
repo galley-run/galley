@@ -1,7 +1,7 @@
-name: Development Task
+name: Design Task
 description: Track features or tasks you're planning to implement yourself
-title: "[Dev]: "
-labels: ["✨ New Feature", "🧑‍💻 Core Team only"]
+title: "[Design]: "
+labels: ["🎨 Design", "🧑‍💻 Core Team only"]
 body:
   - type: markdown
     attributes:
@@ -26,38 +26,6 @@ body:
         - Must support JWT tokens
         - Need to implement refresh token logic
         - Add rate limiting
-    validations:
-      required: false
-
-  - type: textarea
-    id: approach
-    attributes:
-      label: Technical Approach
-      description: How do you plan to implement this?
-      placeholder: |
-        - Use Vert.x Auth module for JWT handling
-        - Create AuthController with login/logout endpoints
-        - Add middleware for protected routes
-    validations:
-      required: false
-
-  - type: textarea
-    id: dependencies
-    attributes:
-      label: Dependencies
-      description: What dependencies or libraries will you need?
-      placeholder: |
-        - io.vertx:vertx-auth-jwt:4.5.0
-        - org.mindrot:jbcrypt:0.4
-    validations:
-      required: false
-
-  - type: textarea
-    id: testing
-    attributes:
-      label: Testing Strategy
-      description: How will you test this feature?
-      placeholder: Unit tests, integration tests, manual testing steps
     validations:
       required: false
 

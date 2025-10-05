@@ -20,7 +20,7 @@
     <vertx.version>5.0.4</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
     <flyway.version>11.13.2</flyway.version>
-    <jooq.version>3.20.7</jooq.version>
+    <jooq.version>3.20.8</jooq.version>
 
     <main.verticle>run.galley.cloud.MainVerticle</main.verticle>
     <launcher.class>io.vertx.launcher.application.VertxApplication</launcher.class>

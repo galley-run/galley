@@ -111,8 +111,23 @@
       <version>${flyway.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.jooq</groupId>
       <artifactId>jooq</artifactId>
+      <version>${jooq.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-codegen</artifactId>
       <version>${jooq.version}</version>
     </dependency>
 
@@ -139,6 +154,25 @@
       <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
       <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>src/main/generated/jooq</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
@@ -201,6 +235,102 @@
             <argument>${main.verticle}</argument>
           </arguments>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>${flyway.version}</version>
+        <configuration>
+          <url>jdbc:postgresql://localhost:54332/galley</url>
+          <user>postgres</user>
+          <password>postgres</password>
+          <locations>
+            <location>filesystem:src/main/resources/db/migration</location>
+          </locations>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq-codegen-maven</artifactId>
+        <version>${jooq.version}</version>
+        <executions>
+          <execution>
+            <id>jooq-codegen-kotlin</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <jdbc>
+                <driver>org.postgresql.Driver</driver>
+                <url>jdbc:postgresql://localhost:54332/galley</url>
+                <user>postgres</user>
+                <password>postgres</password>
+              </jdbc>
+              <generator>
+                <name>org.jooq.codegen.KotlinGenerator</name>
+                <database>
+                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                  <inputSchema>public</inputSchema>
+                  <includes>.*</includes>
+                  <excludes>regexp_.*</excludes>
+                  <includeRoutines>false</includeRoutines>
+                </database>
+                <target>
+                  <packageName>run.galley.cloud.db.generated</packageName>
+                  <directory>src/main/generated/jooq</directory>
+                </target>
+                <generate>
+                  <pojos>true</pojos>
+                  <daos>true</daos>
+                  <javaTimeTypes>true</javaTimeTypes>
+                </generate>
+              </generator>
+            </configuration>
+          </execution>
+          <execution>
+            <id>jooq-codegen-xml</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <jdbc>
+                <driver>org.postgresql.Driver</driver>
+                <url>jdbc:postgresql://localhost:54332/galley</url>
+                <user>postgres</user>
+                <password>postgres</password>
+              </jdbc>
+              <generator>
+                <name>org.jooq.codegen.XMLGenerator</name>
+                <database>
+                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                  <inputSchema>public</inputSchema>
+                  <includes>.*</includes>
+                  <excludes>regexp_.*</excludes>
+                  <includeRoutines>false</includeRoutines>
+                </database>
+                <target>
+                  <directory>db-schema</directory>
+                </target>
+              </generator>
+            </configuration>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>

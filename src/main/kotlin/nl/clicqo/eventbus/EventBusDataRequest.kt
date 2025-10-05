@@ -4,9 +4,9 @@ import io.vertx.core.json.JsonObject
 import io.vertx.openapi.validation.RequestParameter
 
 class EventBusDataRequest(
-  val identifiers: MutableMap<String, RequestParameter>,
-  val body: JsonObject?,
-  val query: MutableMap<String, RequestParameter>,
+  val identifiers: MutableMap<String, RequestParameter>? = null,
+  val body: JsonObject? = null,
+  val query: MutableMap<String, RequestParameter>? = null,
   // TODO: Add filter support for searching
   //  val filter: MutableMap<String, RequestParameter>,
   // TODO: Add pagination and sorting support

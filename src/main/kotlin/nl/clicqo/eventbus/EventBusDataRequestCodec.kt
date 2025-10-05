@@ -9,12 +9,12 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
 
   override fun encodeToWire(buffer: Buffer, s: EventBusDataRequest) {
     val identifiersJson = JsonObject()
-    s.identifiers.forEach { (key, value) ->
+    s.identifiers?.forEach { (key, value) ->
       identifiersJson.put(key, value.toString())
     }
 
     val queryJson = JsonObject()
-    s.query.forEach { (key, value) ->
+    s.query?.forEach { (key, value) ->
       queryJson.put(key, value.toString())
     }
 

@@ -263,7 +263,7 @@
         <executions>
           <execution>
             <id>jooq-codegen-kotlin</id>
-            <phase>generate-sources</phase>
+            <phase>none</phase>
             <goals>
               <goal>generate</goal>
             </goals>
@@ -297,7 +297,7 @@
           </execution>
           <execution>
             <id>jooq-codegen-xml</id>
-            <phase>generate-sources</phase>
+            <phase>none</phase>
             <goals>
               <goal>generate</goal>
             </goals>

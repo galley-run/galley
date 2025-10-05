@@ -46,6 +46,12 @@ To package the application:
 ./mvnw clean package
 ----
 
+To generate Jooq classes from your DB connection:
+[shell]
+----
+./mvwn clean jooq-codegen:generate@jooq-codegen-xml jooq-codegen:generate@jooq-codegen-xml
+----
+
 To run the application:
 
 [shell]

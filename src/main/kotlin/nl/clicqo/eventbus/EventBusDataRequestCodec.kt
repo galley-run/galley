@@ -3,6 +3,7 @@ package nl.clicqo.eventbus
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.auth.User
 import io.vertx.openapi.validation.RequestParameter
 
 class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataRequest> {
@@ -22,6 +23,7 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
       .put("identifiers", identifiersJson)
       .put("body", s.body)
       .put("query", queryJson)
+      .put("user", s.user?.principal())
       .put("version", s.version)
 
     val bytes = jsonObject.toBuffer()
@@ -46,6 +48,7 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
       identifiers = identifiers,
       body = json.getJsonObject("body"),
       query = query,
+      user = User.create(json.getJsonObject("user")),
       version = json.getString("version", "v1")
     )
   }

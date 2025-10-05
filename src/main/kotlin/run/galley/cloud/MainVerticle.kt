@@ -1,3 +1,8 @@
+// Galley – https://galley.run
+// Copyright (c) 2025 Clicqo
+// Licensed under the Business Source License 1.1 (BUSL-1.1)
+// See LICENSE.adoc for details.
+
 package run.galley.cloud
 
 import io.vertx.config.ConfigRetriever

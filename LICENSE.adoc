@@ -1,0 +1,101 @@
+= Business Source License 1.1 (BUSL-1.1)
+Clicqo
+October 5, 2025
+
+:project_name: Galley
+:company_name: Clicqo
+:website: https://galley.run
+:license_date: October 5, 2025
+:change_date: October 5, 2029
+:change_license: GNU General Public License v2.0 or later (GPL-2.0-or-later)
+
+[.lead]
+This file contains the Business Source License 1.1 terms for the {project_name} project by {company_name}.
+
+== Preamble
+
+*Licensor:* {company_name} +
+*Licensed Work:* {project_name} +
+*Copyright:* (c) 2025 {company_name} +
+*Website:* {website} +
+*License Date:* {license_date} +
+*Change Date:* {change_date} +
+*Change License:* {change_license}
+
+== Terms
+
+Subject to the terms below, the Licensor grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work. The Licensor may also grant limited production use as described in the *Additional Use Grant* section.
+
+=== Additional Use Grant (Production Use)
+
+You may use the Licensed Work in production, provided that such use:
+
+- is *not* offered as a commercial PaaS, SaaS, hosting, or orchestration service to third parties; and
+- does *not* compete with {project_name} or any hosted or managed service offered by {company_name} at {website}.
+
+For clarity, “compete” means providing managed container orchestration, Git-based deployment, hosting environments, or similar PaaS features substantially equivalent to {project_name} as offered by {company_name}.
+
+For the avoidance of doubt, use within your own company or organization to deploy internal applications or environments is permitted under this Additional Use Grant.
+
+=== Fair Use Clause
+
+Use by individuals, small teams (up to 5 developers), educational institutions, or research purposes is *always permitted* under this license, provided that such use does not offer {project_name} or a derivative as a paid hosted service.
+
+=== Commercial License Availability
+
+If you wish to offer {project_name} (or a modified version) to third parties as a hosted platform, managed service, or embedded product, you must obtain a *commercial license* from {company_name}. +
+Commercial licenses are available for companies that want to:
+- include {project_name} in proprietary software, or
+- offer {project_name}-based hosting or PaaS/SaaS solutions. +
+Please contact us at *contact@clicqo.nl* for commercial licensing terms.
+
+=== Change License
+
+On the *Change Date* specified above, the Licensed Work will automatically become available under the *Change License* specified above, without the need for additional action by the Licensor or licensees.
+
+=== Notices
+
+You must include a copy of this license and the above copyright and change information with all copies or substantial portions of the Licensed Work and any derivative works.
+
+== Definitions (for clarity only; non-exhaustive)
+
+*Licensed Work:* The software and associated materials distributed under this license. +
+*Non-production use:* Development, testing, evaluation, and other uses that do not provide the Licensed Work (or a derivative) as a service to third parties. +
+*Production use:* Use in live systems or environments serving real users or business operations. +
+*Compete:* To provide a product or service substantially similar to, and substitutable for, {project_name} as offered by {company_name}.
+
+== Warranty Disclaimer
+
+THE LICENSED WORK IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+
+== Limitation of Liability
+
+IN NO EVENT WILL THE LICENSOR BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES OF ANY KIND ARISING OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THIS LICENSE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+== Trademarks
+
+This license does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Licensed Work.
+
+== Source File Header (example)
+
+Add the following notice to the top of source files where appropriate:
+
+[source, subs="attributes"]
+----
+// {project_name} – {website}
+// Copyright (c) 2025 {company_name}
+// Licensed under the Business Source License 1.1 (BUSL-1.1)
+// See LICENSE.adoc for details.
+----
+
+== Human-Friendly Summary (Non-Binding)
+
+- Free to use, modify, and redistribute for non-production purposes. +
+- Internal production use is permitted. +
+- Use by small teams, education, and research is always allowed. +
+- Offering {project_name} (or derivatives) as a hosted/managed service or competing platform requires a commercial license. +
+- On {change_date}, the license converts to {change_license}.
+
+== Contact
+
+For commercial licensing or questions, contact *{company_name}* at *contact@clicqo.nl* or visit {website}.

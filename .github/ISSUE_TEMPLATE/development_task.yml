@@ -1,0 +1,97 @@
+name: Development Task
+description: Track features or tasks you're planning to implement yourself
+title: "[Dev]: "
+labels: ["development"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Plan and track features or tasks you're implementing.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What do you want to accomplish?
+      placeholder: Implement authentication system, refactor database layer, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: What are the technical requirements and acceptance criteria?
+      placeholder: |
+        - Must support JWT tokens
+        - Need to implement refresh token logic
+        - Add rate limiting
+    validations:
+      required: false
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Technical Approach
+      description: How do you plan to implement this?
+      placeholder: |
+        - Use Vert.x Auth module for JWT handling
+        - Create AuthController with login/logout endpoints
+        - Add middleware for protected routes
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: What dependencies or libraries will you need?
+      placeholder: |
+        - io.vertx:vertx-auth-jwt:4.5.0
+        - org.mindrot:jbcrypt:0.4
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Strategy
+      description: How will you test this feature?
+      placeholder: Unit tests, integration tests, manual testing steps
+    validations:
+      required: false
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Task Breakdown
+      description: Break down the work into smaller tasks
+      placeholder: |
+        - [ ] Set up authentication routes
+        - [ ] Implement JWT token generation
+        - [ ] Add token validation middleware
+        - [ ] Write tests
+        - [ ] Update documentation
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this task?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Any additional notes, references, or documentation links
+    validations:
+      required: false

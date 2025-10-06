@@ -8,10 +8,16 @@ import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.ext.getScope
 import nl.kleilokaal.queue.modules.coroutineConsumer
+import org.slf4j.LoggerFactory
+
+import run.galley.cloud.data.VesselDataVerticle
 import run.galley.cloud.model.Vessel
 
 class VesselControllerVerticle : CoroutineVerticle() {
+  private val logger = LoggerFactory.getLogger(this::class.java)
+
   companion object {
     const val ADDRESS_LIST = "vessel.query.list"
     const val ADDRESS_GET = "vessel.query.get"
@@ -27,17 +33,23 @@ class VesselControllerVerticle : CoroutineVerticle() {
   }
 
   private suspend fun list(message: Message<EventBusDataRequest>) {
-    if (message.body().version == "v1") {
-      message.reply(
-        EventBusDataResponse(
-          payload = DataPayload.many(
-            Vessel(UUID.randomUUID(), "Henk"),
-            Vessel(name = "Bert", desk = "Kantoor")
-          ),
-          version = "v1",
+    message.body().user
+
+    val scope = message.body().user?.getScope()
+
+    logger.info("Scope: $scope")
+    logger.warn("Scope: $scope")
+    logger.error("Scope: $scope")
+    val response = vertx.eventBus().request<EventBusDataResponse>(VesselDataVerticle.ADDRESS_LIST, message.body())
+
+    message.reply(
+      EventBusDataResponse(
+        payload = DataPayload.many(
+          Vessel(UUID.randomUUID(), "Henk"),
+          Vessel(name = "Bert", desk = "Kantoor")
         )
       )
-    }
+    )
   }
 
   private suspend fun get(message: Message<EventBusDataRequest>) {

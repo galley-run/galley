@@ -10,6 +10,7 @@ import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
@@ -41,12 +42,16 @@ class MainVerticle : CoroutineVerticle() {
     vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
-    val router = OpenApiBridge(config).buildRouter(vertx)
+    val openApiBridge = OpenApiBridge(vertx, config).initialize()
+    val router = openApiBridge.buildRouter()
       .createRouter()
       .setupCorsHandler(config)
       .setupDefaultResponse()
       .setupDefaultOptionsHandler()
       .setupFailureHandler()
+
+    // @TODO: Delete this line, temp JWT generation for testing
+    println(openApiBridge.authProvider.generateToken(JsonObject().put("scope", "vesselCaptain")))
 
     // Deploy verticles
     val deploymentOptions = DeploymentOptions()
@@ -63,7 +68,6 @@ class MainVerticle : CoroutineVerticle() {
     vertx
       .deployVerticle(VesselControllerVerticle(), deploymentOptions)
       .coAwait()
-
 
     val httpPort = config
       .getJsonObject("http", JsonObject())

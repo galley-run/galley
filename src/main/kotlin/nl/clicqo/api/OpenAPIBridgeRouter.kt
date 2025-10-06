@@ -5,34 +5,34 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.KeyStoreOptions
 import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
-import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.openapi.contract.OpenAPIContract
 
-open class OpenAPIBridgeRouter(open val config: JsonObject) {
+abstract class OpenAPIBridgeRouter(open val vertx: Vertx, open val config: JsonObject) {
   protected lateinit var openAPIRouterBuilder: RouterBuilder
-  protected lateinit var authProvider: JWTAuth
+  lateinit var authProvider: JWTAuth
+  protected lateinit var authConfig: JWTAuthOptions
 
-  open suspend fun buildRouter(vertx: Vertx): RouterBuilder {
+  suspend fun initialize(): OpenAPIBridgeRouter {
     val openAPIFile = config.getJsonObject("api").getString("openapiFile", "openapi.yaml")
     val contract = OpenAPIContract.from(vertx, openAPIFile).coAwait()
     this.openAPIRouterBuilder = RouterBuilder.create(vertx, contract)
+    this.authConfig = JWTAuthOptions()
+      .setKeyStore(
+        KeyStoreOptions()
+          .setType(config.getJsonObject("jwt", JsonObject()).getString("type", "jceks"))
+          .setPath(config.getJsonObject("jwt", JsonObject()).getString("keystore", "keystore.jceks"))
+          .setPassword(config.getJsonObject("jwt", JsonObject()).getString("secret", ""))
+      )
     this.authProvider = JWTAuth.create(vertx, authConfig)
 
-    return openAPIRouterBuilder
+    return this
   }
 
-  open fun createRouter(): Router = openAPIRouterBuilder.createRouter()
 
-  protected val authConfig: JWTAuthOptions = JWTAuthOptions()
-    .setKeyStore(
-      KeyStoreOptions()
-        .setType(config.getJsonObject("jwt", JsonObject()).getString("type", "jceks"))
-        .setPath(config.getJsonObject("jwt", JsonObject()).getString("keystore", "keystore.jceks"))
-        .setPassword(config.getJsonObject("jwt", JsonObject()).getString("secret", ""))
-    )
+  abstract suspend fun buildRouter(): RouterBuilder
 
   suspend fun catchAll(routingContext: RoutingContext, fn: suspend () -> Unit) {
     try {

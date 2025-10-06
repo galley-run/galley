@@ -3,7 +3,7 @@ package run.galley.cloud.sql
 import java.util.UUID
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.SortDirection
+import nl.clicqo.api.SortDirection
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.applyIdentifier
 import nl.clicqo.ext.applyPagination
@@ -53,7 +53,7 @@ object VesselSql {
     }
   }
 
-  private fun buildSortField(sortField: nl.clicqo.eventbus.SortField): SortField<*> {
+  private fun buildSortField(sortField: nl.clicqo.api.SortField): SortField<*> {
     val field = when (sortField.field) {
       "id" -> VESSELS.ID
       "name" -> VESSELS.NAME

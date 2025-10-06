@@ -1,4 +1,8 @@
-package nl.clicqo.eventbus
+package nl.clicqo.api
+
+/**
+ * Todo merge with ApiPagination
+ */
 
 data class Pagination(
   val offset: Int = 0,

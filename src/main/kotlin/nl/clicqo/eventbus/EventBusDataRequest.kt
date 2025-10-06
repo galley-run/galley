@@ -1,6 +1,8 @@
 package nl.clicqo.eventbus
 
 import io.vertx.core.json.JsonObject
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortField
 
 /**
  * Request object for EventBus communication between Controller and Data Verticles.

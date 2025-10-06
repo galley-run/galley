@@ -4,6 +4,9 @@ import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortDirection
+import nl.clicqo.api.SortField
 
 class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataRequest> {
 

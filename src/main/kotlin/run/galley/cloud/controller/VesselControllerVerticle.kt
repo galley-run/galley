@@ -7,9 +7,9 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
-import nl.clicqo.eventbus.Pagination
-import nl.clicqo.eventbus.SortDirection
-import nl.clicqo.eventbus.SortField
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortDirection
+import nl.clicqo.api.SortField
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import org.slf4j.LoggerFactory
 import run.galley.cloud.ApiStatus

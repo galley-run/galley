@@ -1,4 +1,4 @@
-package nl.clicqo.eventbus
+package nl.clicqo.api
 
 data class SortField(
   val field: String,

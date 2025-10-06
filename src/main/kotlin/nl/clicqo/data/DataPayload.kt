@@ -21,6 +21,7 @@ data class DataPayload(
   companion object {
     fun one(item: DataModel): JsonObject = DataPayload(listOf(item)).toJsonObject()
 
+    fun many(items: List<DataModel>?): JsonObject = DataPayload(items ?: emptyList()).toJsonObject()
     fun many(vararg items: DataModel): JsonObject = DataPayload(items.asList()).toJsonObject()
   }
 }

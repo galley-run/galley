@@ -4,10 +4,10 @@ import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.ApiStatusReplyExceptionMessageCodec
-import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.EventBusDataRequestCodec
-import nl.clicqo.eventbus.EventBusDataResponse
-import nl.clicqo.eventbus.EventBusDataResponseCodec
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiRequestCodec
+import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.eventbus.EventBusApiResponseCodec
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -17,8 +17,8 @@ open class TestVerticle {
     @JvmStatic
     @BeforeAll
     fun setup(vertx: Vertx) {
-      vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
-      vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
+      vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
+      vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }
   }

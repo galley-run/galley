@@ -1,6 +1,7 @@
 package nl.clicqo.api
 
 import io.vertx.core.Vertx
+import io.vertx.core.eventbus.ReplyException
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.KeyStoreOptions
 import io.vertx.ext.auth.jwt.JWTAuth

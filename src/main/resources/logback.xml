@@ -1,11 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <property name="jooq.no-logo" value="true"/>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%blue(%d{HH:mm:ss.SSS}) [%yellow(%thread)] [%highlight(%level)] %cyan(%logger{36}): %msg%n</pattern>
     </encoder>
   </appender>
 
+  <logger name="org.jooq.Constants" level="OFF"/>
   <root level="INFO">
-    <appender-ref ref="STDOUT" />
+    <appender-ref ref="STDOUT"/>
   </root>
 </configuration>

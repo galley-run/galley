@@ -9,9 +9,8 @@ import io.vertx.openapi.validation.ValidatedRequest
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.OpenAPIBridgeRouter
-import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.EventBusDataResponse
-import nl.clicqo.eventbus.fromEventBusDataResponse
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
 class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) : OpenAPIBridgeRouter(vertx, config) {
@@ -21,22 +20,22 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
      */
     openAPIRouterBuilder
       .security("vesselCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("vesselCaptain"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("VESSEL_CAPTAIN"))
 
       .security("charterCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("charterCaptain"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_CAPTAIN"))
 
       .security("charterPurser")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("charterPurser"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_PURSER"))
 
       .security("charterBoatswain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("charterBoatswain"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_BOATSWAIN"))
 
       .security("charterDeckhand")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("charterDeckhand"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_DECKHAND"))
 
       .security("charterSteward")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("charterSteward"))
+      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_STEWARD"))
 
     /**
      * Add eventbus handlers for each operation.
@@ -73,9 +72,9 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
 
           val eb = routingContext.vertx().eventBus()
 
-          val response = eb.request<EventBusDataResponse>(
+          val response = eb.request<EventBusApiResponse>(
             address,
-            EventBusDataRequest(
+            EventBusApiRequest(
               user = routingContext.user(),
               identifiers = params,
               body = body,
@@ -91,7 +90,7 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
             routingContext,
             apiResponseOptions
           )
-            .fromEventBusDataResponse(response)
+            .fromEventBusApiResponse(response)
             .end()
         }
       }

@@ -3,23 +3,15 @@ package nl.clicqo.api
 import io.vertx.core.eventbus.ReplyException
 import io.vertx.core.eventbus.ReplyFailure
 
-class ApiStatusReplyException(val apiStatus: ApiStatus, val customMessage: String = "") : ReplyException(
+class ApiStatusReplyException(val apiStatus: ApiStatus, override val message: String = "") : ReplyException(
   ReplyFailure.RECIPIENT_FAILURE,
   apiStatus.code,
-  customMessage.ifEmpty { apiStatus.message },
+  message.ifEmpty { apiStatus.message },
 ) {
-  constructor(e: ApiStatusException) : this(e.apiStatus, e.customMessage) {
-    initCause(e)
-  }
-
-  constructor(e: Throwable) : this(ApiStatus.THROWABLE_EXCEPTION, e.message ?: "Exception: ${e.javaClass.name}") {
-    initCause(e)
-  }
-
-  override val message: String = ""
+  constructor(e: Exception) : this(ApiStatus.THROWABLE_EXCEPTION, e.message ?: "Exception: ${e.javaClass.name}")
 
   override fun toString(): String {
-    return customMessage.ifEmpty {
+    return message.ifEmpty {
       apiStatus.message
     }
   }

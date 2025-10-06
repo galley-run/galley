@@ -2,18 +2,20 @@ package run.galley.cloud.controller
 
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.CoroutineVerticle
-import java.util.UUID
-import nl.clicqo.api.ApiStatus
-import nl.clicqo.api.ApiStatusReplyException
-import nl.clicqo.data.DataPayload
+import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
-import nl.clicqo.ext.getScope
+import nl.clicqo.eventbus.Pagination
+import nl.clicqo.eventbus.SortDirection
+import nl.clicqo.eventbus.SortField
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import org.slf4j.LoggerFactory
-
+import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.VesselDataVerticle
-import run.galley.cloud.model.Vessel
+import run.galley.cloud.model.UserRole
+import run.galley.cloud.model.getUserRole
 
 class VesselControllerVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -32,39 +34,74 @@ class VesselControllerVerticle : CoroutineVerticle() {
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
   }
 
-  private suspend fun list(message: Message<EventBusDataRequest>) {
-    message.body().user
+  private suspend fun list(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val userRole = apiRequest.user?.getUserRole()
 
-    val scope = message.body().user?.getScope()
+    val isAllowed = when (userRole) {
+//      UserRole.VESSEL_CAPTAIN -> true
+      UserRole.CHARTER_CAPTAIN -> true
+      else -> false
+    }
 
-    logger.info("Scope: $scope")
-    logger.warn("Scope: $scope")
-    logger.error("Scope: $scope")
-    val response = vertx.eventBus().request<EventBusDataResponse>(VesselDataVerticle.ADDRESS_LIST, message.body())
+    if (!isAllowed) {
+      throw ApiStatus.USER_ROLE_FORBIDDEN
+    }
 
+    // Convert API query params to filters
+    val filters = mutableMapOf<String, List<String>>()
+    apiRequest.query?.forEach { (key, value) ->
+      filters[key] = listOf(value.string)
+    }
+
+    // Build data request with filters, sort, and pagination
+    val dataRequest = EventBusDataRequest(
+      filters = filters,
+      sort = listOf(SortField("name", SortDirection.ASC)),
+      pagination = Pagination(offset = 0, limit = 50),
+      user = apiRequest.user?.principal()
+    )
+
+    val dataResponse = vertx.eventBus()
+      .request<EventBusDataResponse>(VesselDataVerticle.ADDRESS_LIST, dataRequest)
+      .coAwait()
+      .body()
+
+    // Convert back to API response
     message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.many(
-          Vessel(UUID.randomUUID(), "Henk"),
-          Vessel(name = "Bert", desk = "Kantoor")
-        )
+      EventBusApiResponse(
+        payload = dataResponse.payload
       )
     )
   }
 
-  private suspend fun get(message: Message<EventBusDataRequest>) {
-    if (message.body().version == "v1") {
-      message.reply(
-        EventBusDataResponse(
-          payload = DataPayload.one(
-            Vessel(UUID.randomUUID(), "Henk")
-          )
-        )
+  private suspend fun get(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+
+    // Extract vesselId from path identifiers
+    val vesselId = apiRequest.identifiers?.get("vesselId")?.string
+      ?: throw IllegalArgumentException("vesselId is required")
+
+    // Build data request with identifier
+    val dataRequest = EventBusDataRequest(
+      identifiers = mapOf("vesselId" to vesselId),
+      user = apiRequest.user?.principal()
+    )
+
+    val dataResponse = vertx.eventBus()
+      .request<EventBusDataResponse>(VesselDataVerticle.ADDRESS_GET, dataRequest)
+      .coAwait()
+      .body()
+
+    // Convert back to API response
+    message.reply(
+      EventBusApiResponse(
+        payload = dataResponse.payload
       )
-    }
+    )
   }
 
-  private suspend fun create(message: Message<EventBusDataRequest>) {
-    throw ApiStatusReplyException(ApiStatus.FAILED_INSERT)
+  private suspend fun create(message: Message<EventBusApiRequest>) {
+    throw ApiStatus.VESSEL_INSERT_FAILED
   }
 }

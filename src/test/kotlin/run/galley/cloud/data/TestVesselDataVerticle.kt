@@ -3,8 +3,8 @@ package run.galley.cloud.data
 import io.vertx.core.Vertx
 import io.vertx.junit5.VertxExtension
 import io.vertx.junit5.VertxTestContext
-import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -27,13 +27,13 @@ class TestVesselDataVerticle: TestVerticle() {
 
   @Test
   fun test_list_function(vertx: Vertx, testContext: VertxTestContext) {
-    vertx.eventBus().request<EventBusDataResponse>(
+    vertx.eventBus().request<EventBusApiResponse>(
       VesselDataVerticle.ADDRESS_LIST,
-      EventBusDataRequest()
+      EventBusApiRequest()
     ).onComplete(testContext.succeeding { response ->
       val body = response.body()
       assertNotNull(body)
-      assertInstanceOf(EventBusDataResponse::class.java, body)
+      assertInstanceOf(EventBusApiResponse::class.java, body)
 
       testContext.completeNow()
     })

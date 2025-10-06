@@ -2,7 +2,6 @@ package run.galley.cloud.web
 
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
@@ -15,13 +14,8 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.fromEventBusDataResponse
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
-class OpenApiBridge(override val config: JsonObject) : OpenAPIBridgeRouter(config) {
-  override suspend fun buildRouter(vertx: Vertx): RouterBuilder {
-    super.buildRouter(vertx)
-
-    // @TODO: Delete this line, temp JWT generation for testing
-    println(JWTAuth.create(vertx, authConfig).generateToken(JsonObject().put("scope", "vesselCaptain")))
-
+class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) : OpenAPIBridgeRouter(vertx, config) {
+  override suspend fun buildRouter(): RouterBuilder {
     /**
      * Add security handlers for each scope.
      */

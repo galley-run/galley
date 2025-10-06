@@ -9,28 +9,26 @@ import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
-import io.vertx.core.http.HttpMethod
-import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
-import nl.clicqo.api.APIResponse
-import nl.clicqo.api.APIResponseOptions
-import nl.clicqo.api.ApiStatus
-import nl.clicqo.api.ApiStatusException
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.ApiStatusReplyExceptionMessageCodec
+import nl.clicqo.ext.setupCorsHandler
+import nl.clicqo.ext.setupDefaultOptionsHandler
+import nl.clicqo.ext.setupDefaultResponse
+import nl.clicqo.ext.setupFailureHandler
 import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataRequestCodec
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusDataResponseCodec
+import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.VesselControllerVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
-import run.galley.cloud.web.OpenAPIBridge
-
+import run.galley.cloud.web.OpenApiBridge
 
 class MainVerticle : CoroutineVerticle() {
+  private val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun start() {
     val configRetriever = ConfigRetriever.create(
@@ -43,59 +41,12 @@ class MainVerticle : CoroutineVerticle() {
     vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
-    val router = OpenAPIBridge(config).buildRouter(vertx)
-      .apply {
-        route()
-          .handler(
-            CorsHandler
-              .create()
-              .addOriginsWithRegex(
-                config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")).map { it.toString() })
-              .allowedMethod(HttpMethod.GET)
-              .allowedMethod(HttpMethod.DELETE)
-              .allowedMethod(HttpMethod.OPTIONS)
-              .allowedMethod(HttpMethod.PATCH)
-              .allowedMethod(HttpMethod.PUT)
-              .allowedMethod(HttpMethod.POST)
-              .allowedHeader("Origin")
-              .allowedHeader("Depth")
-              .allowedHeader("User-Agent")
-              .allowedHeader("X-Requested-With")
-              .allowedHeader("X-Permissions")
-              .allowedHeader("Content-Type")
-              .allowedHeader("Accept")
-              .allowedHeader("Authorization")
-              .allowedHeader("Cache-Control")
-              .allowedHeader("X-File-Name")
-              .allowedHeader("If-Modified-Since")
-              .maxAgeSeconds(6000),
-          )
-        route().failureHandler {
-          val error =
-            when (it.failure()) {
-              is ClassCastException -> ApiStatusException(ApiStatus.HTTP_CLASS_CAST_EXCEPTION)
-              else -> it.failure()
-            }
-
-          val apiResponseOptions = APIResponseOptions(contentType = "application/vnd.galley.v1+json")
-
-          APIResponse(
-            it,
-            apiResponseOptions
-          )
-            .addError(
-              when (error) {
-                is ApiStatusException -> error.apiStatus
-                is ApiStatusReplyException -> error.apiStatus
-                else -> ApiStatus.FAILED
-              }
-            )
-            .end()
-        }
-        options().handler {
-          APIResponse(it).end()
-        }
-      }
+    val router = OpenApiBridge(config).buildRouter(vertx)
+      .createRouter()
+      .setupCorsHandler(config)
+      .setupDefaultResponse()
+      .setupDefaultOptionsHandler()
+      .setupFailureHandler()
 
     // Deploy verticles
     val deploymentOptions = DeploymentOptions()
@@ -114,16 +65,22 @@ class MainVerticle : CoroutineVerticle() {
       .coAwait()
 
 
-    // Setup HTTP server
     val httpPort = config
       .getJsonObject("http", JsonObject())
       .getInteger("port", 9233)
-    vertx
-      .createHttpServer()
-      .requestHandler(router)
-      .listen(httpPort).onSuccess { http ->
-        println("HTTP server started on port $httpPort")
-      }
-      .coAwait()
+
+    try {
+      // Start to run the HTTP server
+      vertx
+        .createHttpServer()
+        .requestHandler(router)
+        .listen(httpPort)
+        .coAwait()
+
+      logger.info("HTTP server started on port $httpPort")
+    } catch (e: Exception) {
+      logger.error("HTTP server failed to start on port $httpPort", e)
+      throw e
+    }
   }
 }

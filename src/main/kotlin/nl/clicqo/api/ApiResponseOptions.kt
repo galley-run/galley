@@ -1,5 +1,5 @@
 package nl.clicqo.api
 
-data class APIResponseOptions(
+data class ApiResponseOptions(
   val contentType: String = "application/json"
 )

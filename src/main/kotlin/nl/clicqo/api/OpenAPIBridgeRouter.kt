@@ -1,13 +1,38 @@
 package nl.clicqo.api
 
 import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.auth.KeyStoreOptions
+import io.vertx.ext.auth.jwt.JWTAuth
+import io.vertx.ext.auth.jwt.JWTAuthOptions
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
+import io.vertx.ext.web.openapi.router.RouterBuilder
+import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.openapi.contract.OpenAPIContract
 
-abstract class OpenAPIBridgeRouter {
-  protected var timeoutMs: Long = 5_000
+open class OpenAPIBridgeRouter(open val config: JsonObject) {
+  protected lateinit var openAPIRouterBuilder: RouterBuilder
+  protected lateinit var authProvider: JWTAuth
 
-  abstract suspend fun buildRouter(vertx: Vertx): Router
+  open suspend fun buildRouter(vertx: Vertx): RouterBuilder {
+    val openAPIFile = config.getJsonObject("api").getString("openapiFile", "openapi.yaml")
+    val contract = OpenAPIContract.from(vertx, openAPIFile).coAwait()
+    this.openAPIRouterBuilder = RouterBuilder.create(vertx, contract)
+    this.authProvider = JWTAuth.create(vertx, authConfig)
+
+    return openAPIRouterBuilder
+  }
+
+  open fun createRouter(): Router = openAPIRouterBuilder.createRouter()
+
+  protected val authConfig: JWTAuthOptions = JWTAuthOptions()
+    .setKeyStore(
+      KeyStoreOptions()
+        .setType(config.getJsonObject("jwt", JsonObject()).getString("type", "jceks"))
+        .setPath(config.getJsonObject("jwt", JsonObject()).getString("keystore", "keystore.jceks"))
+        .setPassword(config.getJsonObject("jwt", JsonObject()).getString("secret", ""))
+    )
 
   suspend fun catchAll(routingContext: RoutingContext, fn: suspend () -> Unit) {
     try {

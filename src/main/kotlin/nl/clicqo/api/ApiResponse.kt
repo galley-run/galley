@@ -5,21 +5,21 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import nl.clicqo.web.HttpStatus
 
-class APIResponse(
+class ApiResponse(
   val routingContext: RoutingContext,
-  apiResponseOptions: APIResponseOptions = APIResponseOptions()
+  apiResponseOptions: ApiResponseOptions = ApiResponseOptions()
 ) {
   var body: JsonObject? = null
   var httpStatus: HttpStatus = HttpStatus.NoContent
   var contentType: String = apiResponseOptions.contentType
   var errors: JsonArray? = null
 
-  fun setHttpStatus(httpStatus: HttpStatus): APIResponse {
+  fun setHttpStatus(httpStatus: HttpStatus): ApiResponse {
     this.httpStatus = httpStatus
     return this
   }
 
-  fun addError(error: ApiStatus): APIResponse {
+  fun addError(error: ApiStatus): ApiResponse {
     if (errors == null) {
       errors = JsonArray()
     }

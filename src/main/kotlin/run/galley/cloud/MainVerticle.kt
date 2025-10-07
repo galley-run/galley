@@ -9,6 +9,7 @@ import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
+import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.kotlin.core.deploymentOptionsOf
@@ -35,6 +36,7 @@ import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
+import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
 
 class MainVerticle : CoroutineVerticle() {
@@ -50,7 +52,11 @@ class MainVerticle : CoroutineVerticle() {
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
     vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
-    vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
+    @Suppress("UNCHECKED_CAST")
+    vertx.eventBus().registerDefaultCodec(
+      EventBusDataResponse::class.java,
+      EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>
+    )
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
     val openApiBridge = OpenApiBridge(vertx, config).initialize()

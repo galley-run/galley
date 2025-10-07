@@ -15,6 +15,7 @@ import nl.kleilokaal.queue.modules.coroutineConsumer
 import org.slf4j.LoggerFactory
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CharterDataVerticle
+import run.galley.cloud.db.generated.tables.pojos.Charters
 import run.galley.cloud.model.UserRole
 import run.galley.cloud.model.getUserRole
 
@@ -31,7 +32,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     super.start()
 
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST, ::list)
-//    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
+    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
 //    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
   }
 
@@ -62,7 +63,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     )
 
     val dataResponse = vertx.eventBus()
-      .request<EventBusDataResponse>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
+      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
       .coAwait()
       .body()
 
@@ -78,17 +79,18 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val apiRequest = message.body()
 
     // Extract charterId from path identifiers
-    val charterId = apiRequest.identifiers?.get("charterId")?.string
+    val charterId = apiRequest.identifiers?.get("charter_id")?.string
       ?: throw IllegalArgumentException("charterId is required")
 
     // Build data request with identifier
     val dataRequest = EventBusDataRequest(
-      identifiers = mapOf("charterId" to charterId),
+      identifiers = mapOf("id" to charterId),
+      filters = mapOf("vessel_id" to listOf(apiRequest.identifiers["vessel_id"]?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT)),
       user = apiRequest.user?.principal()
     )
 
     val dataResponse = vertx.eventBus()
-      .request<EventBusDataResponse>(CharterDataVerticle.ADDRESS_GET, dataRequest)
+      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_GET, dataRequest)
       .coAwait()
       .body()
 

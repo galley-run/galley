@@ -4,66 +4,54 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import run.galley.cloud.model.BaseModel
 
-data class DataPayload(
-  val items: List<BaseModel>
+data class DataPayload<T: BaseModel>(
+  val item: T? = null,
+  val items: List<T>? = null,
 ) {
-  fun isSingle(): Boolean = items.size == 1
+  fun toSingle(): T? = item
 
-  fun isMany(): Boolean = items.size > 1
+  fun toMany(): List<T>? = items
 
-  @Suppress("UNCHECKED_CAST")
-  fun <T> toSingle(): T? = items.first() as T?
-
-  @Suppress("UNCHECKED_CAST")
-  fun <T> toMany(): List<T> = items as List<T>
-
-  fun toJsonObject(): JsonObject {
+  fun toCodec(): JsonObject {
     val payload = JsonObject()
-    if (isSingle()) {
+    if (item != null) {
       payload
-        .put("data", items.first().toJsonAPIResourceObject())
+        .put("item", item.toJsonAPIResourceObject())
     } else {
       payload
-        .put("data", JsonArray(items.map { it.toJsonAPIResourceObject() }))
+        .put("items", JsonArray(items?.map { it.toJsonAPIResourceObject() }))
     }
 
     return payload
   }
 
-  fun toCodec(): JsonObject {
+  fun toJsonObject(): JsonObject {
     val payload = JsonObject()
-      .put("type", items.first()::class.simpleName)
-
-    if (isSingle()) {
+    if (item != null) {
       payload
-        .put("data", items.first().toJsonAPIResourceObject())
+        .put("data", item.toJsonAPIResourceObject())
     } else {
       payload
-        .put("data", JsonArray(items.map { it.toJsonAPIResourceObject() }))
+        .put("data", JsonArray(items?.map { it.toJsonAPIResourceObject() }))
     }
 
     return payload
   }
 
   companion object {
-    fun one(item: BaseModel): DataPayload = DataPayload(listOf(item))
+    fun <T: BaseModel> one(item: T): DataPayload<T> = DataPayload(item = item)
 
-    fun many(items: List<BaseModel>?): DataPayload = DataPayload(items ?: emptyList())
-    fun many(vararg items: BaseModel): DataPayload = DataPayload(items.asList())
+    fun <T: BaseModel> many(items: List<T>?): DataPayload<T> = DataPayload(items = items ?: emptyList())
+    fun <T: BaseModel> many(vararg items: T): DataPayload<T> = DataPayload(items = items.asList())
 
-    fun from(payload: JsonObject): DataPayload {
-      val clazz = Class.forName(payload.getString("type"))
-      val modelClass = (clazz.getDeclaredConstructor().newInstance() as BaseModel)
-      val data = payload.getValue("data")
-      val items = when (data) {
-        is JsonObject -> listOf(modelClass.fromJsonAPIResourceObject(data))
-        is JsonArray -> data.map {
-          modelClass.fromJsonAPIResourceObject(it as JsonObject)
-        }
+    inline fun <reified T : BaseModel> from(payload: JsonObject): DataPayload<T> {
+      val clazz = T::class.java
+      val modelClass = clazz.getDeclaredConstructor().newInstance()
 
-        else -> emptyList()
-      }
-      return DataPayload(items)
+      val item = payload.getJsonObject("item")?.let { modelClass.fromJsonAPIResourceObject<T>(it) }
+      val items = payload.getJsonArray("items")?.map { modelClass.fromJsonAPIResourceObject<T>(it as JsonObject) }
+
+      return DataPayload(item = item, items = items)
     }
   }
 }

@@ -11,6 +11,7 @@ import java.util.UUID
 import org.jooq.JSONB
 
 import run.galley.cloud.db.generated.enums.DeliveryStatus
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -31,7 +32,7 @@ data class WebhookDeliveries(
     var responseBody: String? = null,
     var error: String? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

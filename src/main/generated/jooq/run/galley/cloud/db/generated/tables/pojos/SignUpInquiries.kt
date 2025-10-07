@@ -12,6 +12,7 @@ import org.jooq.JSONB
 
 import run.galley.cloud.db.generated.enums.SignUpIntent
 import run.galley.cloud.db.generated.enums.TechnicalExperience
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -26,7 +27,7 @@ data class SignUpInquiries(
     var technicalExperience: TechnicalExperience? = null,
     var questions: JSONB? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

@@ -36,9 +36,9 @@ open class UserIdentitiesRecord() : UpdatableRecordImpl<UserIdentitiesRecord>(Us
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
-    open var email: Any?
+    open var email: String?
         set(value): Unit = set(4, value)
-        get(): Any? = get(4) as Any?
+        get(): String? = get(4) as String?
 
     open var rawProfile: JSONB?
         set(value): Unit = set(5, value)
@@ -57,7 +57,7 @@ open class UserIdentitiesRecord() : UpdatableRecordImpl<UserIdentitiesRecord>(Us
     /**
      * Create a detached, initialised UserIdentitiesRecord
      */
-    constructor(id: UUID? = null, userId: UUID? = null, provider: String? = null, subject: String? = null, email: Any? = null, rawProfile: JSONB? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, userId: UUID? = null, provider: String? = null, subject: String? = null, email: String? = null, rawProfile: JSONB? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.userId = userId
         this.provider = provider

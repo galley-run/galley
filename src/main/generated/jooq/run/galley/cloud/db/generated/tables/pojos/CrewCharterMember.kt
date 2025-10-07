@@ -9,6 +9,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.CharterRole
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -22,7 +23,7 @@ data class CrewCharterMember(
     var charterRole: CharterRole? = null,
     var createdAt: OffsetDateTime? = null,
     var deletedAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

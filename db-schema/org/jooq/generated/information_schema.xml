@@ -852,7 +852,7 @@
             <numeric_precision>0</numeric_precision>
             <numeric_scale>0</numeric_scale>
             <ordinal_position>5</ordinal_position>
-            <is_nullable>false</is_nullable>
+            <is_nullable>true</is_nullable>
             <comment></comment>
             <hidden>false</hidden>
             <readonly>false</readonly>

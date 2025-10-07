@@ -16,7 +16,7 @@ import run.galley.cloud.TestVerticle
 class TestVesselDataVerticle: TestVerticle() {
   @BeforeEach
   fun deploy_verticle(vertx: Vertx, testContext: VertxTestContext) {
-    vertx.deployVerticle(VesselDataVerticle())
+    vertx.deployVerticle(CharterDataVerticle())
       .onComplete(testContext.succeeding<String> { _ -> testContext.completeNow() })
   }
 
@@ -28,7 +28,7 @@ class TestVesselDataVerticle: TestVerticle() {
   @Test
   fun test_list_function(vertx: Vertx, testContext: VertxTestContext) {
     vertx.eventBus().request<EventBusApiResponse>(
-      VesselDataVerticle.ADDRESS_LIST,
+      CharterDataVerticle.ADDRESS_LIST,
       EventBusApiRequest()
     ).onComplete(testContext.succeeding { response ->
       val body = response.body()

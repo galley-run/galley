@@ -10,34 +10,6 @@ import org.jooq.TableField
 import org.jooq.UpdateConditionStep
 import org.jooq.UpdateWhereStep
 
-fun <R : Record?> SelectWhereStep<R>.applyIdentifier(
-  field: TableField<R, String?>,
-  identifier: String,
-): SelectConditionStep<R> {
-  return this.where(field.eq(identifier))
-}
-
-fun <R : Record?> SelectWhereStep<R>.applyIdentifier(
-  field: TableField<R, UUID?>,
-  identifier: UUID,
-): SelectConditionStep<R> {
-  return this.where(field.eq(identifier))
-}
-
-fun <R : Record?> UpdateWhereStep<R>.applyIdentifier(
-  field: TableField<R, UUID?>,
-  identifier: UUID,
-): UpdateConditionStep<R> {
-  return this.where(field.eq(identifier))
-}
-
-fun <R : Record?> SelectWhereStep<R>.applyIdentifier(
-  field: TableField<R, Int?>,
-  identifier: Int,
-): SelectConditionStep<R> {
-  return this.where(field.eq(identifier))
-}
-
 fun <R : Record?> SelectWhereStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> {
   return this.where().applyPagination(pagination)
 }
@@ -53,18 +25,27 @@ fun <R : Record?> SelectConditionStep<R>.applyPagination(pagination: ApiPaginati
 }
 
 // Overload for type-safe JOOQ Condition objects
-fun <R : Record?> SelectWhereStep<R>.applyConditions(conditions: List<Condition>): SelectConditionStep<R> {
+fun <R : Record?> SelectWhereStep<R>.applyConditions(vararg conditions: Condition): SelectConditionStep<R> {
   if (conditions.isEmpty()) {
     return this.where()
   }
-  return this.where(conditions)
+  return this.where(*conditions)
 }
 
-fun <R : Record?> SelectConditionStep<R>.applyConditions(conditions: List<Condition>): SelectConditionStep<R> {
+fun <R : Record?> SelectConditionStep<R>.applyConditions(vararg conditions: Condition): SelectConditionStep<R> {
   conditions.forEach {
     this.and(it)
   }
   return this
+}
+
+// Overload for type-safe JOOQ Condition objects
+fun <R : Record?> SelectWhereStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> {
+  return this.where(condition)
+}
+
+fun <R : Record?> SelectConditionStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> {
+  return this.and(condition)
 }
 
 // Apply sorting with type-safe JOOQ SortField objects

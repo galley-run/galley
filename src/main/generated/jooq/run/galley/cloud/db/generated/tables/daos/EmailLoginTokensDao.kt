@@ -11,6 +11,7 @@ import kotlin.collections.List
 
 import org.jooq.Configuration
 import org.jooq.impl.DAOImpl
+import org.jooq.postgres.extensions.types.Inet
 
 import run.galley.cloud.db.generated.tables.EmailLoginTokens
 import run.galley.cloud.db.generated.tables.records.EmailLoginTokensRecord
@@ -55,10 +56,17 @@ open class EmailLoginTokensDao(configuration: Configuration?) : DAOImpl<EmailLog
      * Fetch records that have <code>user_id IN (values)</code>
      */
     fun fetchByUserId(vararg values: UUID): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.USER_ID, *values)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchRangeOfEmail(lowerInclusive: Any?, upperInclusive: Any?): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetchRange(EmailLoginTokens.EMAIL_LOGIN_TOKENS.EMAIL, lowerInclusive, upperInclusive)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchByEmail(vararg values: Any): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.EMAIL, *values)
+
+    /**
+     * Fetch records that have <code>email BETWEEN lowerInclusive AND
+     * upperInclusive</code>
+     */
+    fun fetchRangeOfEmail(lowerInclusive: String?, upperInclusive: String?): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetchRange(EmailLoginTokens.EMAIL_LOGIN_TOKENS.EMAIL, lowerInclusive, upperInclusive)
+
+    /**
+     * Fetch records that have <code>email IN (values)</code>
+     */
+    fun fetchByEmail(vararg values: String): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.EMAIL, *values)
 
     /**
      * Fetch records that have <code>token_hash BETWEEN lowerInclusive AND
@@ -86,10 +94,17 @@ open class EmailLoginTokensDao(configuration: Configuration?) : DAOImpl<EmailLog
      * Fetch records that have <code>purpose IN (values)</code>
      */
     fun fetchByPurpose(vararg values: String): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.PURPOSE, *values)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchRangeOfIp(lowerInclusive: Any?, upperInclusive: Any?): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetchRange(EmailLoginTokens.EMAIL_LOGIN_TOKENS.IP, lowerInclusive, upperInclusive)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchByIp(vararg values: Any): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.IP, *values)
+
+    /**
+     * Fetch records that have <code>ip BETWEEN lowerInclusive AND
+     * upperInclusive</code>
+     */
+    fun fetchRangeOfIp(lowerInclusive: Inet?, upperInclusive: Inet?): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetchRange(EmailLoginTokens.EMAIL_LOGIN_TOKENS.IP, lowerInclusive, upperInclusive)
+
+    /**
+     * Fetch records that have <code>ip IN (values)</code>
+     */
+    fun fetchByIp(vararg values: Inet): List<run.galley.cloud.db.generated.tables.pojos.EmailLoginTokens> = fetch(EmailLoginTokens.EMAIL_LOGIN_TOKENS.IP, *values)
 
     /**
      * Fetch records that have <code>user_agent BETWEEN lowerInclusive AND

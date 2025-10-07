@@ -1,48 +1,36 @@
 package run.galley.cloud.sql
 
 import java.util.UUID
+import nl.clicqo.api.SortDirection
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.api.SortDirection
 import nl.clicqo.ext.applyConditions
-import nl.clicqo.ext.applyPagination
-import nl.clicqo.ext.applySorting
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
 import org.jooq.SortField
+import run.galley.cloud.ApiStatus
+import run.galley.cloud.db.generated.tables.references.USERS
 import run.galley.cloud.db.generated.tables.references.VESSELS
 
-object VesselSql {
-  fun listVessels(request: EventBusDataRequest): Query {
-    val conditions = buildConditions(request.filters)
-    val sortFields = request.sort.map { buildSortField(it) }
-
-    val query = Jooq.postgres
-      .selectFrom(VESSELS)
-      .applyConditions(*conditions)
-      .applySorting(sortFields)
-      .let { q ->
-        request.pagination?.run {
-          return@run q.applyPagination(this.offset, this.limit)
-        }
-
-        return@let q
-      }
-
-    return query
-  }
-
-  fun getVessel(request: EventBusDataRequest): Query {
-    val id = request.identifiers["vesselId"]
-      ?: throw IllegalArgumentException("vesselId is required")
+object UserSql {
+  fun getUser(request: EventBusDataRequest): Query {
+    val id = request.identifiers["id"]?.toUUID() ?: throw ApiStatus.ID_MISSING
 
     return Jooq.postgres
-      .selectFrom(VESSELS)
-      .where(VESSELS.ID.eq(id.toUUID()))
+      .selectFrom(USERS)
+      .where(USERS.ID.eq(id))
   }
 
-  private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> {
+  fun getUserByEmail(request: EventBusDataRequest): Query {
+    val email = request.filters["email"]?.firstOrNull() ?: throw ApiStatus.FILTER_MISSING
+
+    return Jooq.postgres
+      .selectFrom(USERS)
+      .where(USERS.EMAIL.eq(email))
+  }
+
+  private fun buildConditions(filters: Map<String, List<String>>): List<Condition> {
     return filters.mapNotNull { (field, values) ->
       when (field) {
         "id" -> VESSELS.ID.`in`(values.map { UUID.fromString(it) })
@@ -50,7 +38,7 @@ object VesselSql {
         "userId" -> VESSELS.USER_ID.`in`(values.map { UUID.fromString(it) })
         else -> null
       }
-    }.toTypedArray()
+    }
   }
 
   private fun buildSortField(sortField: nl.clicqo.api.SortField): SortField<*> {

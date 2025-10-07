@@ -9,6 +9,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.GeoRegion
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -24,7 +25,7 @@ data class VesselEngineRegions(
     var geoRegion: GeoRegion? = null,
     var location: String? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

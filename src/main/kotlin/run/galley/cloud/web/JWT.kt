@@ -4,8 +4,11 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.JWTOptions
 import io.vertx.ext.auth.KeyStoreOptions
+import io.vertx.ext.auth.User
 import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
+import java.util.UUID
+import nl.clicqo.ext.getUUID
 import run.galley.cloud.model.UserRole
 
 object JWT {
@@ -47,6 +50,8 @@ object JWT {
       .setHeader(JsonObject().put("typ", "rt+jwt"))
       .setExpiresInSeconds(TTL_REFRESH_TOKEN)
   }
+
+  fun claims(vesselId: UUID): JsonObject = JsonObject().put("vesselId", vesselId.toString())
 }
 
 fun JWTAuth.issueAccessToken(userId: String, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
@@ -54,3 +59,11 @@ fun JWTAuth.issueAccessToken(userId: String, userRole: UserRole, extraClaims: Js
 
 fun JWTAuth.issueRefreshToken(userId: String, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
   generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.refreshToken(userId))
+
+fun JWTAuth.issueAccessToken(userId: UUID, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
+  generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId.toString()))
+
+fun JWTAuth.issueRefreshToken(userId: UUID, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
+  generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.refreshToken(userId.toString()))
+
+fun User.getVesselId(): UUID? = this.principal().getUUID("vesselId")

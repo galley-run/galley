@@ -1,6 +1,7 @@
 package nl.clicqo.eventbus
 
 import io.vertx.core.json.JsonObject
+import nl.clicqo.data.DataPayload
 
 /**
  * Response object for EventBus communication from Data Verticles to Controller Verticles.
@@ -16,6 +17,12 @@ import io.vertx.core.json.JsonObject
  *     .put("hasMore", true)
  */
 data class EventBusDataResponse(
-  val payload: JsonObject,
+  val payload: DataPayload,
   val metadata: JsonObject? = null
-)
+) {
+  companion object {
+    fun from(payload: JsonObject, metadata: JsonObject? = null): EventBusDataResponse {
+      return EventBusDataResponse(DataPayload.from(payload), metadata)
+    }
+  }
+}

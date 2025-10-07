@@ -27,6 +27,7 @@ import run.galley.cloud.db.generated.tables.ProjectApplications
 import run.galley.cloud.db.generated.tables.ProjectConfigs
 import run.galley.cloud.db.generated.tables.ProjectDatabases
 import run.galley.cloud.db.generated.tables.ProjectSecrets
+import run.galley.cloud.db.generated.tables.Sessions
 import run.galley.cloud.db.generated.tables.SignUpInquiries
 import run.galley.cloud.db.generated.tables.UserIdentities
 import run.galley.cloud.db.generated.tables.Users
@@ -54,6 +55,7 @@ import run.galley.cloud.db.generated.tables.records.ProjectApplicationsRecord
 import run.galley.cloud.db.generated.tables.records.ProjectConfigsRecord
 import run.galley.cloud.db.generated.tables.records.ProjectDatabasesRecord
 import run.galley.cloud.db.generated.tables.records.ProjectSecretsRecord
+import run.galley.cloud.db.generated.tables.records.SessionsRecord
 import run.galley.cloud.db.generated.tables.records.SignUpInquiriesRecord
 import run.galley.cloud.db.generated.tables.records.UserIdentitiesRecord
 import run.galley.cloud.db.generated.tables.records.UsersRecord
@@ -96,6 +98,8 @@ val UQ_PROJECT_SLUG: UniqueKey<ProjectApplicationsRecord> = Internal.createUniqu
 val PROJECT_CONFIGS_PKEY: UniqueKey<ProjectConfigsRecord> = Internal.createUniqueKey(ProjectConfigs.PROJECT_CONFIGS, DSL.name("project_configs_pkey"), arrayOf(ProjectConfigs.PROJECT_CONFIGS.ID), true)
 val PROJECT_DATABASES_PKEY: UniqueKey<ProjectDatabasesRecord> = Internal.createUniqueKey(ProjectDatabases.PROJECT_DATABASES, DSL.name("project_databases_pkey"), arrayOf(ProjectDatabases.PROJECT_DATABASES.ID), true)
 val PROJECT_SECRETS_PKEY: UniqueKey<ProjectSecretsRecord> = Internal.createUniqueKey(ProjectSecrets.PROJECT_SECRETS, DSL.name("project_secrets_pkey"), arrayOf(ProjectSecrets.PROJECT_SECRETS.ID), true)
+val SESSIONS_PKEY: UniqueKey<SessionsRecord> = Internal.createUniqueKey(Sessions.SESSIONS, DSL.name("sessions_pkey"), arrayOf(Sessions.SESSIONS.ID), true)
+val SESSIONS_USER_ID_REFRESH_TOKEN_HASH_KEY: UniqueKey<SessionsRecord> = Internal.createUniqueKey(Sessions.SESSIONS, DSL.name("sessions_user_id_refresh_token_hash_key"), arrayOf(Sessions.SESSIONS.USER_ID, Sessions.SESSIONS.REFRESH_TOKEN_HASH), true)
 val SIGN_UP_INQUIRIES_PKEY: UniqueKey<SignUpInquiriesRecord> = Internal.createUniqueKey(SignUpInquiries.SIGN_UP_INQUIRIES, DSL.name("sign_up_inquiries_pkey"), arrayOf(SignUpInquiries.SIGN_UP_INQUIRIES.ID), true)
 val UQ_USER_IDENTITIES_PROVIDER_SUBJECT: UniqueKey<UserIdentitiesRecord> = Internal.createUniqueKey(UserIdentities.USER_IDENTITIES, DSL.name("uq_user_identities_provider_subject"), arrayOf(UserIdentities.USER_IDENTITIES.PROVIDER, UserIdentities.USER_IDENTITIES.SUBJECT), true)
 val USER_IDENTITIES_PKEY: UniqueKey<UserIdentitiesRecord> = Internal.createUniqueKey(UserIdentities.USER_IDENTITIES, DSL.name("user_identities_pkey"), arrayOf(UserIdentities.USER_IDENTITIES.ID), true)
@@ -154,6 +158,8 @@ val PROJECT_SECRETS__FK_SECRETS_CHARTER: ForeignKey<ProjectSecretsRecord, Charte
 val PROJECT_SECRETS__FK_SECRETS_CREW: ForeignKey<ProjectSecretsRecord, CrewRecord> = Internal.createForeignKey(ProjectSecrets.PROJECT_SECRETS, DSL.name("fk_secrets_crew"), arrayOf(ProjectSecrets.PROJECT_SECRETS.CREW_ID), run.galley.cloud.db.generated.keys.CREW_PKEY, arrayOf(Crew.CREW.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val PROJECT_SECRETS__FK_SECRETS_PROJECT: ForeignKey<ProjectSecretsRecord, CharterProjectsRecord> = Internal.createForeignKey(ProjectSecrets.PROJECT_SECRETS, DSL.name("fk_secrets_project"), arrayOf(ProjectSecrets.PROJECT_SECRETS.PROJECT_ID), run.galley.cloud.db.generated.keys.CHARTER_PROJECTS_PKEY, arrayOf(CharterProjects.CHARTER_PROJECTS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
 val PROJECT_SECRETS__FK_SECRETS_VESSEL: ForeignKey<ProjectSecretsRecord, VesselsRecord> = Internal.createForeignKey(ProjectSecrets.PROJECT_SECRETS, DSL.name("fk_secrets_vessel"), arrayOf(ProjectSecrets.PROJECT_SECRETS.VESSEL_ID), run.galley.cloud.db.generated.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val SESSIONS__SESSIONS_REPLACED_BY_ID_FKEY: ForeignKey<SessionsRecord, SessionsRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_replaced_by_id_fkey"), arrayOf(Sessions.SESSIONS.REPLACED_BY_ID), run.galley.cloud.db.generated.keys.SESSIONS_PKEY, arrayOf(Sessions.SESSIONS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
+val SESSIONS__SESSIONS_USER_ID_FKEY: ForeignKey<SessionsRecord, UsersRecord> = Internal.createForeignKey(Sessions.SESSIONS, DSL.name("sessions_user_id_fkey"), arrayOf(Sessions.SESSIONS.USER_ID), run.galley.cloud.db.generated.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val SIGN_UP_INQUIRIES__FK_SIGNUPS_USER: ForeignKey<SignUpInquiriesRecord, UsersRecord> = Internal.createForeignKey(SignUpInquiries.SIGN_UP_INQUIRIES, DSL.name("fk_signups_user"), arrayOf(SignUpInquiries.SIGN_UP_INQUIRIES.USER_ID), run.galley.cloud.db.generated.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val SIGN_UP_INQUIRIES__FK_SIGNUPS_VESSEL: ForeignKey<SignUpInquiriesRecord, VesselsRecord> = Internal.createForeignKey(SignUpInquiries.SIGN_UP_INQUIRIES, DSL.name("fk_signups_vessel"), arrayOf(SignUpInquiries.SIGN_UP_INQUIRIES.VESSEL_ID), run.galley.cloud.db.generated.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val USER_IDENTITIES__FK_USER_IDENTITIES_USER: ForeignKey<UserIdentitiesRecord, UsersRecord> = Internal.createForeignKey(UserIdentities.USER_IDENTITIES, DSL.name("fk_user_identities_user"), arrayOf(UserIdentities.USER_IDENTITIES.USER_ID), run.galley.cloud.db.generated.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)

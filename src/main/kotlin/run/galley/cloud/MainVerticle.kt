@@ -10,11 +10,9 @@ import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.auth.JWTOptions
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
-import io.vertx.kotlin.coroutines.setPeriodicAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.ApiStatusReplyExceptionMessageCodec
 import nl.clicqo.eventbus.EventBusApiRequest
@@ -31,12 +29,12 @@ import nl.clicqo.ext.setupDefaultResponse
 import nl.clicqo.ext.setupFailureHandler
 import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
-import run.galley.cloud.controller.VesselControllerVerticle
-import run.galley.cloud.data.BootstrapDataVerticle
+import run.galley.cloud.controller.CharterControllerVerticle
+import run.galley.cloud.data.CharterDataVerticle
+import run.galley.cloud.data.CrewDataVerticle
+import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
-import run.galley.cloud.model.UserRole
 import run.galley.cloud.web.OpenApiBridge
-import run.galley.cloud.web.issueAccessToken
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -66,7 +64,6 @@ class MainVerticle : CoroutineVerticle() {
       put().handler(BodyHandler.create())
     }
 
-
     // Deploy verticles
     val deploymentOptions = DeploymentOptions()
       .setConfig(config)
@@ -80,10 +77,12 @@ class MainVerticle : CoroutineVerticle() {
     vertx.undeploy(flywayMigrationVerticleId).coAwait()
 
     // Setup Postgres DB Pool and deploy all data verticles
-    vertx.deployVerticle(BootstrapDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CrewDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles
-    vertx.deployVerticle(VesselControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort = config

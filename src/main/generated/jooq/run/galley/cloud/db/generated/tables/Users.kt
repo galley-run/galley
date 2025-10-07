@@ -33,6 +33,7 @@ import org.jooq.impl.DefaultDataType
 import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
+import org.jooq.postgres.extensions.bindings.CitextBinding
 
 import run.galley.cloud.db.generated.Public
 import run.galley.cloud.db.generated.indexes.IDX_USERS_EMAIL_TRGM
@@ -41,6 +42,7 @@ import run.galley.cloud.db.generated.keys.CHARTERS__FK_CHARTERS_USER
 import run.galley.cloud.db.generated.keys.CREW__FK_CREW_USER
 import run.galley.cloud.db.generated.keys.EMAIL_LOGIN_TOKENS__FK_EMAIL_LOGIN_USER
 import run.galley.cloud.db.generated.keys.LOGBOOK__FK_LOGBOOK_USER
+import run.galley.cloud.db.generated.keys.SESSIONS__SESSIONS_USER_ID_FKEY
 import run.galley.cloud.db.generated.keys.SIGN_UP_INQUIRIES__FK_SIGNUPS_USER
 import run.galley.cloud.db.generated.keys.USERS_EMAIL_KEY
 import run.galley.cloud.db.generated.keys.USERS_PKEY
@@ -52,6 +54,7 @@ import run.galley.cloud.db.generated.tables.Charters.ChartersPath
 import run.galley.cloud.db.generated.tables.Crew.CrewPath
 import run.galley.cloud.db.generated.tables.EmailLoginTokens.EmailLoginTokensPath
 import run.galley.cloud.db.generated.tables.Logbook.LogbookPath
+import run.galley.cloud.db.generated.tables.Sessions.SessionsPath
 import run.galley.cloud.db.generated.tables.SignUpInquiries.SignUpInquiriesPath
 import run.galley.cloud.db.generated.tables.UserIdentities.UserIdentitiesPath
 import run.galley.cloud.db.generated.tables.Vessels.VesselsPath
@@ -100,8 +103,11 @@ open class Users(
      * The column <code>public.users.id</code>.
      */
     val ID: TableField<UsersRecord, UUID?> = createField(DSL.name("id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuid_generate_v4()"), SQLDataType.UUID)), this, "")
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    val EMAIL: TableField<UsersRecord, Any?> = createField(DSL.name("email"), DefaultDataType.getDefaultDataType("\"public\".\"citext\"").nullable(false), this, "")
+
+    /**
+     * The column <code>public.users.email</code>.
+     */
+    val EMAIL: TableField<UsersRecord, String?> = createField(DSL.name("email"), DefaultDataType.getDefaultDataType("\"public\".\"citext\"").nullable(false), this, "", CitextBinding())
 
     /**
      * The column <code>public.users.first_name</code>.
@@ -296,6 +302,22 @@ open class Users(
 
     val webauthnCredentials: WebauthnCredentialsPath
         get(): WebauthnCredentialsPath = webauthnCredentials()
+
+    private lateinit var _sessions: SessionsPath
+
+    /**
+     * Get the implicit to-many join path to the <code>public.sessions</code>
+     * table
+     */
+    fun sessions(): SessionsPath {
+        if (!this::_sessions.isInitialized)
+            _sessions = SessionsPath(this, null, SESSIONS__SESSIONS_USER_ID_FKEY.inverseKey)
+
+        return _sessions;
+    }
+
+    val sessions: SessionsPath
+        get(): SessionsPath = sessions()
     override fun `as`(alias: String): Users = Users(DSL.name(alias), this)
     override fun `as`(alias: Name): Users = Users(alias, this)
     override fun `as`(alias: Table<*>): Users = Users(alias.qualifiedName, this)

@@ -11,6 +11,7 @@ import java.util.UUID
 import org.jooq.JSONB
 
 import run.galley.cloud.db.generated.enums.OutboxStatus
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -32,7 +33,7 @@ data class VOutboxAudit(
     var charterName: String? = null,
     var projectName: String? = null,
     var projectEnv: String? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

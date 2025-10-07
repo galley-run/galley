@@ -3,6 +3,7 @@ package nl.clicqo.eventbus
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
+import nl.clicqo.data.DataPayload
 
 class EventBusDataResponseCodec : MessageCodec<EventBusDataResponse, EventBusDataResponse> {
 
@@ -24,9 +25,12 @@ class EventBusDataResponseCodec : MessageCodec<EventBusDataResponse, EventBusDat
     val jsonBytes = buffer.getBuffer(position, position + length)
     val json = JsonObject(jsonBytes)
 
+    val payload = json.getJsonObject("payload", JsonObject())
+    val metadata = json.getJsonObject("metadata")
+
     return EventBusDataResponse(
-      payload = json.getJsonObject("payload", JsonObject()),
-      metadata = json.getJsonObject("metadata")
+      payload = DataPayload.from(payload),
+      metadata = metadata
     )
   }
 

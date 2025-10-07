@@ -44,12 +44,22 @@ open class UsersDao(configuration: Configuration?) : DAOImpl<UsersRecord, run.ga
      * Fetch a unique record that has <code>id = value</code>
      */
     fun fetchOneById(value: UUID): run.galley.cloud.db.generated.tables.pojos.Users? = fetchOne(Users.USERS.ID, value)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchRangeOfEmail(lowerInclusive: Any?, upperInclusive: Any?): List<run.galley.cloud.db.generated.tables.pojos.Users> = fetchRange(Users.USERS.EMAIL, lowerInclusive, upperInclusive)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchByEmail(vararg values: Any): List<run.galley.cloud.db.generated.tables.pojos.Users> = fetch(Users.USERS.EMAIL, *values)
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    fun fetchOneByEmail(value: Any): run.galley.cloud.db.generated.tables.pojos.Users? = fetchOne(Users.USERS.EMAIL, value)
+
+    /**
+     * Fetch records that have <code>email BETWEEN lowerInclusive AND
+     * upperInclusive</code>
+     */
+    fun fetchRangeOfEmail(lowerInclusive: String?, upperInclusive: String?): List<run.galley.cloud.db.generated.tables.pojos.Users> = fetchRange(Users.USERS.EMAIL, lowerInclusive, upperInclusive)
+
+    /**
+     * Fetch records that have <code>email IN (values)</code>
+     */
+    fun fetchByEmail(vararg values: String): List<run.galley.cloud.db.generated.tables.pojos.Users> = fetch(Users.USERS.EMAIL, *values)
+
+    /**
+     * Fetch a unique record that has <code>email = value</code>
+     */
+    fun fetchOneByEmail(value: String): run.galley.cloud.db.generated.tables.pojos.Users? = fetchOne(Users.USERS.EMAIL, value)
 
     /**
      * Fetch records that have <code>first_name BETWEEN lowerInclusive AND

@@ -10,6 +10,7 @@ import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.NodeDeployMode
 import run.galley.cloud.db.generated.enums.NodeType
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -33,7 +34,7 @@ data class VesselEngineNodes(
     var provisioningSecurityUpdates: Boolean? = null,
     var provisioningSecurityUpdatesSchedule: String? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

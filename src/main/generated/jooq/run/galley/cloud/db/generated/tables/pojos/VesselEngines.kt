@@ -9,6 +9,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.EngineMode
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -21,7 +22,7 @@ data class VesselEngines(
     var name: String? = null,
     var mode: EngineMode? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

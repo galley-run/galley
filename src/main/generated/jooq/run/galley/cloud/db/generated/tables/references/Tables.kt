@@ -28,6 +28,7 @@ import run.galley.cloud.db.generated.tables.ProjectApplications
 import run.galley.cloud.db.generated.tables.ProjectConfigs
 import run.galley.cloud.db.generated.tables.ProjectDatabases
 import run.galley.cloud.db.generated.tables.ProjectSecrets
+import run.galley.cloud.db.generated.tables.Sessions
 import run.galley.cloud.db.generated.tables.SignUpInquiries
 import run.galley.cloud.db.generated.tables.UserIdentities
 import run.galley.cloud.db.generated.tables.Users
@@ -167,6 +168,11 @@ val PROJECT_DATABASES: ProjectDatabases = ProjectDatabases.PROJECT_DATABASES
  * The table <code>public.project_secrets</code>.
  */
 val PROJECT_SECRETS: ProjectSecrets = ProjectSecrets.PROJECT_SECRETS
+
+/**
+ * The table <code>public.sessions</code>.
+ */
+val SESSIONS: Sessions = Sessions.SESSIONS
 
 /**
  * The table <code>public.sign_up_inquiries</code>.

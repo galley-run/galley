@@ -45,11 +45,12 @@ class CharterControllerVerticle : CoroutineVerticle() {
       filters[key] = listOf(value.string)
     }
 
-    val vesselId = apiRequest.identifiers?.get("vesselId")?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val vesselId = apiRequest.identifiers?.get("vessel_id")?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
     filters["vesselId"] = listOf(vesselId.toString())
     if (userRole != UserRole.VESSEL_CAPTAIN) {
       filters["id"] = apiRequest.user?.get<List<String>>("charterIds") ?: throw ApiStatus.CHARTER_NO_ACCESS
+      TODO("Not implemented")
     }
 
     // Build data request with filters, sort, and pagination

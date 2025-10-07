@@ -11,6 +11,7 @@ import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.kotlin.core.deploymentOptionsOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
@@ -71,7 +72,7 @@ class MainVerticle : CoroutineVerticle() {
     // Start the DB migration
     // MainVerticle will fail to deploy if the migration fails
     val flywayMigrationVerticleId = vertx
-      .deployVerticle(FlywayMigrationVerticle(), deploymentOptions)
+      .deployVerticle(FlywayMigrationVerticle(), deploymentOptionsOf(config.getJsonObject("db")))
       .coAwait()
     // Undeploy once the migration is done
     vertx.undeploy(flywayMigrationVerticleId).coAwait()

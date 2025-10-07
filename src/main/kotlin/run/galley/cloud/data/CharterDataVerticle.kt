@@ -8,6 +8,7 @@ import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.model.Charter
+import run.galley.cloud.sql.CharterSql
 import run.galley.cloud.sql.VesselSql
 
 class CharterDataVerticle() : PostgresDataVerticle() {
@@ -26,7 +27,7 @@ class CharterDataVerticle() : PostgresDataVerticle() {
 
   private suspend fun list(message: Message<EventBusDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(VesselSql.listVessels(request))
+    val results = pool.executePreparedQuery(CharterSql.listCharters(request))
 
     val charters = results?.map(Charter::from) ?: emptyList()
 

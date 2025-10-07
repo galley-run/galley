@@ -1,5 +1,6 @@
 package run.galley.cloud.sql
 
+import java.time.OffsetDateTime
 import java.util.UUID
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusDataRequest
@@ -20,6 +21,7 @@ object CrewSql {
         CREW.USER_ID.eq(userId.toUUID()),
         CREW.VESSEL_ID.eq(vesselId.toUUID())
       )
+      .and(CREW.DELETED_AT.isNull.or(CREW.DELETED_AT.gt(OffsetDateTime.now())))
   }
 
   fun listActive(request: EventBusDataRequest): Query {
@@ -27,6 +29,7 @@ object CrewSql {
     return Jooq.postgres.selectFrom(CREW)
       .applyConditions(*conditions)
       .and(CREW.STATUS.eq(MemberStatus.active))
+      .and(CREW.DELETED_AT.isNull.or(CREW.DELETED_AT.gt(OffsetDateTime.now())))
   }
 
   private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> {

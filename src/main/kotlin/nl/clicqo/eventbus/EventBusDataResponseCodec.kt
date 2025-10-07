@@ -9,7 +9,7 @@ class EventBusDataResponseCodec : MessageCodec<EventBusDataResponse, EventBusDat
 
   override fun encodeToWire(buffer: Buffer, response: EventBusDataResponse) {
     val jsonObject = JsonObject()
-      .put("payload", response.payload)
+      .put("payload", response.payload.toJsonObject())
       .put("metadata", response.metadata)
 
     val bytes = jsonObject.toBuffer()

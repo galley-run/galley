@@ -7,16 +7,17 @@ interface BaseModel {
     val attributes = JsonObject()
       .put(
         "id", this::class.java.getDeclaredFields()
-        .firstOrNull { it.name == "id" }
-        ?.let { it.isAccessible = true; it.get(this) })
+          .firstOrNull { it.name == "id" }
+          ?.let { it.isAccessible = true; it.get(this) })
       .apply {
         this@BaseModel::class.java.getDeclaredFields()
           .filter { it.name != "id" }
           .forEach { field ->
             field.isAccessible = true
-            put(field.name, field.get(this@BaseModel))
-                }
-        }
+            val value = field.get(this@BaseModel) ?: return@forEach
+            put(field.name, value)
+          }
+      }
     val id = attributes.getString("id")
     attributes.remove("id")
     return JsonObject()

@@ -63,14 +63,16 @@ class AuthControllerVerticle : CoroutineVerticle() {
       )
     ).coAwait().body().payload.toSingle<Crew>() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
-    val userRole = when (crewResponse.vesselRole) {
+    when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
       else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
     }
 
+    // We don't need to add the user role into the refresh token, since the refresh token is only here to create
+    // an access token and roles may change over time.
+
     val newToken = JWT.authProvider(vertx, config).issueRefreshToken(
       user.id!!,
-      userRole,
       JWT.claims(vesselId)
     )
 
@@ -83,20 +85,51 @@ class AuthControllerVerticle : CoroutineVerticle() {
     )
   }
 
+  /**
+   * Currently the JWT claims of accessToken are the same as the claims of refreshToken.
+   * In the future the Access Token will get more info like the user's name and email etc.
+   * These are things the refreshToken will not contain since the access tokens are short-lived.
+   */
   private suspend fun issueAccessToken(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val refreshToken = apiRequest.body?.getString("refreshToken") ?: throw ApiStatus.REFRESH_TOKEN_INVALID
+    val refreshToken = apiRequest.body?.getString("refreshToken") ?: throw ApiStatus.REFRESH_TOKEN_MISSING
 
-    // Check if refresh token is valid
+    val refreshTokenUser = JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
+      ?: throw ApiStatus.REFRESH_TOKEN_INVALID
+
+    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatus.REFRESH_TOKEN_INVALID
+    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+
+    val user = vertx.eventBus().request<EventBusDataResponse>(
+      UserDataVerticle.ADDRESS_GET, EventBusDataRequest(
+        identifiers = mapOf("id" to userId.toString()),
+      )
+    ).coAwait().body().payload.toSingle<Users>() ?: throw ApiStatus.USER_NOT_FOUND
+
+    val crewResponse = vertx.eventBus().request<EventBusDataResponse>(
+      CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL, EventBusDataRequest(
+        identifiers = mapOf(
+          "userId" to user.id.toString(),
+          "vesselId" to vesselId.toString()
+        ),
+      )
+    ).coAwait().body().payload.toSingle<Crew>() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+
+    val userRole = when (crewResponse.vesselRole) {
+      VesselRole.captain -> UserRole.VESSEL_CAPTAIN
+      else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
+    }
+
+    val newToken = JWT.authProvider(vertx, config).issueAccessToken(
+      user.id!!,
+      userRole,
+      JWT.claims(vesselId)
+    )
 
     message.reply(
       EventBusApiResponse(
         payload = JsonObject().put(
-          "accessToken", JWT.authProvider(vertx, config).issueAccessToken(
-            "5d4fbdef-21fa-4cff-8d20-b6c74d55b9c0",
-            UserRole.VESSEL_CAPTAIN,
-            JWT.claims("bdd4a902-b497-4260-b12b-99fc8aa76c07".toUUID())
-          )
+          "accessToken", newToken
         )
       )
     )
@@ -122,7 +155,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
 
     val crewMembership = crewMemberships.firstOrNull() ?: throw ApiStatus.VESSEL_NOT_FOUND
 
-    val userRole = when (crewMembership.vesselRole) {
+    when (crewMembership.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
       else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
     }
@@ -133,7 +166,6 @@ class AuthControllerVerticle : CoroutineVerticle() {
           "refreshToken",
           JWT.authProvider(vertx, config).issueRefreshToken(
             user.id!!,
-            userRole,
             JWT.claims(crewMembership.vesselId!!),
           )
         )

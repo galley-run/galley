@@ -13,10 +13,24 @@ data class DataPayload(
 
   @Suppress("UNCHECKED_CAST")
   fun <T> toSingle(): T? = items.first() as T?
+
   @Suppress("UNCHECKED_CAST")
   fun <T> toMany(): List<T> = items as List<T>
 
   fun toJsonObject(): JsonObject {
+    val payload = JsonObject()
+    if (isSingle()) {
+      payload
+        .put("data", items.first().toJsonAPIResourceObject())
+    } else {
+      payload
+        .put("data", JsonArray(items.map { it.toJsonAPIResourceObject() }))
+    }
+
+    return payload
+  }
+
+  fun toCodec(): JsonObject {
     val payload = JsonObject()
       .put("type", items.first()::class.simpleName)
 

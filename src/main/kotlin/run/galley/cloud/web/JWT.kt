@@ -57,13 +57,13 @@ object JWT {
 fun JWTAuth.issueAccessToken(userId: String, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
   generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId))
 
-fun JWTAuth.issueRefreshToken(userId: String, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
-  generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.refreshToken(userId))
-
 fun JWTAuth.issueAccessToken(userId: UUID, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
   generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId.toString()))
 
-fun JWTAuth.issueRefreshToken(userId: UUID, userRole: UserRole, extraClaims: JsonObject = JsonObject()): String =
-  generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.refreshToken(userId.toString()))
+fun JWTAuth.issueRefreshToken(userId: String, extraClaims: JsonObject = JsonObject()): String =
+  generateToken(extraClaims, JWT.refreshToken(userId))
+
+fun JWTAuth.issueRefreshToken(userId: UUID, extraClaims: JsonObject = JsonObject()): String =
+  generateToken(extraClaims, JWT.refreshToken(userId.toString()))
 
 fun User.getVesselId(): UUID? = this.principal().getUUID("vesselId")

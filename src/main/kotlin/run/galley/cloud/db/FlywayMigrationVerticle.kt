@@ -7,11 +7,10 @@ class FlywayMigrationVerticle : CoroutineVerticle() {
   override suspend fun start() {
     super.start()
 
-    val dbConfig = config.getJsonObject("db")
     val jdbcUrl =
       "jdbc:postgresql://${config.getString("host")}:${config.getInteger("port")}/${config.getString("database")}"
-    val dbUsername = dbConfig.getString("username", "galley")
-    val dbPassword = dbConfig.getString("password", "")
+    val dbUsername = config.getString("username", "galley")
+    val dbPassword = config.getString("password", "")
 
     val flyway = Flyway.configure()
       .dataSource(jdbcUrl, dbUsername, dbPassword)

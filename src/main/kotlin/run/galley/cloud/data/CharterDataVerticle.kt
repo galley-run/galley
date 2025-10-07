@@ -7,9 +7,7 @@ import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.kleilokaal.queue.modules.coroutineConsumer
-import run.galley.cloud.db.generated.tables.pojos.Vessels
 import run.galley.cloud.model.Charter
-import run.galley.cloud.model.Vessel
 import run.galley.cloud.sql.VesselSql
 
 class CharterDataVerticle() : PostgresDataVerticle() {

@@ -1,6 +1,7 @@
 package run.galley.cloud
 
 import io.vertx.core.Vertx
+import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.ApiStatusReplyExceptionMessageCodec
@@ -8,17 +9,49 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiRequestCodec
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusApiResponseCodec
+import nl.clicqo.eventbus.EventBusDataRequest
+import nl.clicqo.eventbus.EventBusDataRequestCodec
+import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusDataResponseCodec
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(VertxExtension::class)
 open class TestVerticle {
+  val config = JsonObject(
+    """{
+  "http": {
+    "port": 9233
+  },
+  "jwt": {
+    "secret": "secret",
+    "keystore": "keystore.jceks",
+    "type": "jceks",
+    "pepper": "long-and-random-string"
+  },
+  "api": {
+    "openApiFile": "openapi.yaml",
+    "cors": [".*"]
+  },
+  "db": {
+    "port": 5432,
+    "database": "galley",
+    "host": "localhost",
+    "pool_size": 5,
+    "username": "username",
+    "password": "password"
+  }
+}"""
+  )
+
   companion object {
     @JvmStatic
     @BeforeAll
     fun setup(vertx: Vertx) {
       vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
       vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
+      vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
+      vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }
   }

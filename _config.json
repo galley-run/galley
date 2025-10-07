@@ -11,5 +11,13 @@
   "api": {
     "openApiFile": "openapi.yaml",
     "cors": [".*"]
+  },
+  "db": {
+    "port": 5432,
+    "database": "galley",
+    "host": "localhost",
+    "pool_size": 5,
+    "username": "username",
+    "password": "password"
   }
 }

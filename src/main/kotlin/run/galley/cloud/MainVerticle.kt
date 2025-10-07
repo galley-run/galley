@@ -10,8 +10,11 @@ import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.auth.JWTOptions
+import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.kotlin.coroutines.setPeriodicAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.ApiStatusReplyExceptionMessageCodec
 import nl.clicqo.eventbus.EventBusApiRequest
@@ -27,10 +30,13 @@ import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
 import nl.clicqo.ext.setupFailureHandler
 import org.slf4j.LoggerFactory
+import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.VesselControllerVerticle
 import run.galley.cloud.data.BootstrapDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
+import run.galley.cloud.model.UserRole
 import run.galley.cloud.web.OpenApiBridge
+import run.galley.cloud.web.issueAccessToken
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -49,15 +55,17 @@ class MainVerticle : CoroutineVerticle() {
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
     val openApiBridge = OpenApiBridge(vertx, config).initialize()
-    val router = openApiBridge.buildRouter()
-      .createRouter()
-      .setupCorsHandler(config)
-      .setupDefaultResponse()
-      .setupDefaultOptionsHandler()
-      .setupFailureHandler()
+    val router = openApiBridge.buildRouter().createRouter()
+    router.run {
+      setupCorsHandler(config)
+      setupDefaultOptionsHandler()
+      setupDefaultResponse()
+      setupFailureHandler()
+      post().handler(BodyHandler.create())
+      patch().handler(BodyHandler.create())
+      put().handler(BodyHandler.create())
+    }
 
-    // @TODO: Delete this line, temp JWT generation for testing
-    println(openApiBridge.authProvider.generateToken(JsonObject().put("scope", "VESSEL_CAPTAIN")))
 
     // Deploy verticles
     val deploymentOptions = DeploymentOptions()
@@ -76,6 +84,7 @@ class MainVerticle : CoroutineVerticle() {
 
     // Deploy the controller verticles
     vertx.deployVerticle(VesselControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort = config
       .getJsonObject("http", JsonObject())

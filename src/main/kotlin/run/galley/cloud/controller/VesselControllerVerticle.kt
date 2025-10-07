@@ -39,7 +39,7 @@ class VesselControllerVerticle : CoroutineVerticle() {
     val userRole = apiRequest.user?.getUserRole()
 
     val isAllowed = when (userRole) {
-//      UserRole.VESSEL_CAPTAIN -> true
+      UserRole.VESSEL_CAPTAIN -> true
       UserRole.CHARTER_CAPTAIN -> true
       else -> false
     }
@@ -47,6 +47,8 @@ class VesselControllerVerticle : CoroutineVerticle() {
     if (!isAllowed) {
       throw ApiStatus.USER_ROLE_FORBIDDEN
     }
+
+    // Charter captains may only see their own vessels
 
     // Convert API query params to filters
     val filters = mutableMapOf<String, List<String>>()

@@ -54,11 +54,11 @@ open class ApiStatus: Throwable {
       )
     val UUID_PARSE_EXCEPTION = ApiStatus(103, "A UUID couldn't be processed")
     val DATE_PARSE_EXCEPTION = ApiStatus(104, "A local date string couldn't be processed")
-    val FAILED_FIND = ApiStatus(110, "The requested resource could not be found")
-    val FAILED_VALIDATION = ApiStatus(111, "The resource failed on validation")
+    val FAILED_FIND = ApiStatus(110, "The requested resource could not be found", HttpStatus.NotFound)
+    val FAILED_VALIDATION = ApiStatus(111, "The resource failed on validation", HttpStatus.BadRequest)
     val FAILED_INSERT = ApiStatus(112, "Inserting the resource failed")
     val FAILED_UPDATE = ApiStatus(113, "Updating the resource failed")
     val FAILED_DELETE = ApiStatus(114, "Deleting the resource failed")
-    val FAILED_AUTHENTICATION = ApiStatus(115, FAILED)
+    val FAILED_AUTHORIZATION = ApiStatus(115, "Authorization failed", HttpStatus.Unauthorized)
   }
 }

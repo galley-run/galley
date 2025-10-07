@@ -36,9 +36,9 @@ enum class HttpStatus(val code: Int, val statusMessage: String) {
   ;
 
   init {
-    if (code < 0) {
+    if (code < 100 || code > 999) {
       throw IllegalArgumentException(
-        "code: $code (expected: 0+)",
+        "code: $code (expected: 100-999)",
       )
     }
 

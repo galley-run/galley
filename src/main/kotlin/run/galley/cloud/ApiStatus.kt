@@ -8,4 +8,6 @@ object ApiStatus {
     ApiStatus(1100, "You don't have the required role to perform this action", HttpStatus.Forbidden)
   val VESSEL_INSERT_FAILED =
     ApiStatus(1201, "The vessel could not be inserted")
+  val REFRESH_TOKEN_INVALID =
+    ApiStatus(1301, "The refresh token is invalid or expired", HttpStatus.Unauthorized)
 }

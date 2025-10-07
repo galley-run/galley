@@ -24,11 +24,8 @@ object Jooq {
   }
 
   fun prepareBindValues(values: List<Any?>) =
-    values.map {
-      if (it != null && it.javaClass.isEnum) {
-        return@map (it.javaClass.enumConstants as Array<Enum<*>>).first { enum -> enum == it }.name
-      }
-      return@map it
+    values.map { v ->
+      if (v is Enum<*>) v.name else v
     }
 }
 

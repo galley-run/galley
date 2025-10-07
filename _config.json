@@ -5,7 +5,8 @@
   "jwt": {
     "secret": "secret",
     "keystore": "keystore.jceks",
-    "type": "jceks"
+    "type": "jceks",
+    "pepper": "long-and-random-string"
   },
   "api": {
     "openApiFile": "openapi.yaml",

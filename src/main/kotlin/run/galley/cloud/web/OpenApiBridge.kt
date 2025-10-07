@@ -1,7 +1,9 @@
 package run.galley.cloud.web
 
 import io.vertx.core.Vertx
+import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
@@ -14,6 +16,7 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
 class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) : OpenAPIBridgeRouter(vertx, config) {
+  val logger = LoggerFactory.getLogger(this::class.java)
   override suspend fun buildRouter(): RouterBuilder {
     /**
      * Add security handlers for each scope.
@@ -42,14 +45,16 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
      */
     openAPIRouterBuilder.routes.forEach { route ->
       val operation = route.operation
-      val address = createAddress(operation.operationId)
+      // Here we'll remove the prefix (if any) of the eventbus address to avoid direct access into Data Verticles
+      val address = operation.operationId.removePrefix("data.")
+      logger.info("Registered eventbus address: $address")
 
       route.addCoroutineHandler(vertx) { routingContext ->
         catchAll(routingContext) {
           val validatedRequest = routingContext.get<ValidatedRequest>(RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST)
 
           val params = validatedRequest.pathParameters
-          val body = validatedRequest.body as? JsonObject
+          val body = validatedRequest.body.get() as? JsonObject
           val query = validatedRequest.query
 
           /**

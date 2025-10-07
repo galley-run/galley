@@ -33,6 +33,7 @@ import run.galley.cloud.db.generated.tables.ProjectApplications
 import run.galley.cloud.db.generated.tables.ProjectConfigs
 import run.galley.cloud.db.generated.tables.ProjectDatabases
 import run.galley.cloud.db.generated.tables.ProjectSecrets
+import run.galley.cloud.db.generated.tables.Sessions
 import run.galley.cloud.db.generated.tables.SignUpInquiries
 import run.galley.cloud.db.generated.tables.UserIdentities
 import run.galley.cloud.db.generated.tables.Users
@@ -186,6 +187,11 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
     val PROJECT_SECRETS: ProjectSecrets get() = ProjectSecrets.PROJECT_SECRETS
 
     /**
+     * The table <code>public.sessions</code>.
+     */
+    val SESSIONS: Sessions get() = Sessions.SESSIONS
+
+    /**
      * The table <code>public.sign_up_inquiries</code>.
      */
     val SIGN_UP_INQUIRIES: SignUpInquiries get() = SignUpInquiries.SIGN_UP_INQUIRIES
@@ -272,6 +278,7 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
         ProjectConfigs.PROJECT_CONFIGS,
         ProjectDatabases.PROJECT_DATABASES,
         ProjectSecrets.PROJECT_SECRETS,
+        Sessions.SESSIONS,
         SignUpInquiries.SIGN_UP_INQUIRIES,
         UserIdentities.USER_IDENTITIES,
         Users.USERS,

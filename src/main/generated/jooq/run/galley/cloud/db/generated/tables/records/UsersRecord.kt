@@ -23,9 +23,9 @@ open class UsersRecord() : UpdatableRecordImpl<UsersRecord>(Users.USERS) {
         set(value): Unit = set(0, value)
         get(): UUID? = get(0) as UUID?
 
-    open var email: Any?
+    open var email: String?
         set(value): Unit = set(1, value)
-        get(): Any? = get(1) as Any?
+        get(): String? = get(1) as String?
 
     open var firstName: String?
         set(value): Unit = set(2, value)
@@ -48,7 +48,7 @@ open class UsersRecord() : UpdatableRecordImpl<UsersRecord>(Users.USERS) {
     /**
      * Create a detached, initialised UsersRecord
      */
-    constructor(id: UUID? = null, email: Any? = null, firstName: String? = null, lastName: String? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, email: String? = null, firstName: String? = null, lastName: String? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.email = email
         this.firstName = firstName

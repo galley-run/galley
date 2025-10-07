@@ -1,18 +1,28 @@
 package nl.clicqo.eventbus
 
 import io.vertx.core.json.JsonObject
-import nl.clicqo.api.ApiResponse
-import nl.clicqo.web.HttpStatus
+import nl.clicqo.data.DataPayload
 
-class EventBusDataResponse(
-  val payload: JsonObject? = null,
-  val version: String = "v1",
-  val format: String = "json"
-)
-
-fun ApiResponse.fromEventBusDataResponse(eventBusDataResponse: EventBusDataResponse): ApiResponse {
-  this.httpStatus = HttpStatus.Ok
-  this.body = eventBusDataResponse.payload
-
-  return this
+/**
+ * Response object for EventBus communication from Data Verticles to Controller Verticles.
+ *
+ * @property payload The actual data payload (typically JSON:API formatted)
+ * @property metadata Optional metadata for pagination info, totals, etc.
+ *
+ * Example metadata for pagination:
+ *   JsonObject()
+ *     .put("total", 150)
+ *     .put("offset", 0)
+ *     .put("limit", 50)
+ *     .put("hasMore", true)
+ */
+data class EventBusDataResponse(
+  val payload: DataPayload,
+  val metadata: JsonObject? = null
+) {
+  companion object {
+    fun from(payload: JsonObject, metadata: JsonObject? = null): EventBusDataResponse {
+      return EventBusDataResponse(DataPayload.from(payload), metadata)
+    }
+  }
 }

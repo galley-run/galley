@@ -11,6 +11,7 @@ import java.util.UUID
 import org.jooq.JSONB
 
 import run.galley.cloud.db.generated.enums.OutboxStatus
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -35,7 +36,7 @@ data class OutboxEvents(
     var processedAt: OffsetDateTime? = null,
     var error: String? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

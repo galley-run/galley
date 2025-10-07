@@ -129,7 +129,7 @@ open class Charters(
     /**
      * The column <code>public.charters.description</code>.
      */
-    val DESCRIPTION: TableField<ChartersRecord, String?> = createField(DSL.name("description"), SQLDataType.CLOB.nullable(false), this, "")
+    val DESCRIPTION: TableField<ChartersRecord, String?> = createField(DSL.name("description"), SQLDataType.CLOB, this, "")
 
     /**
      * The column <code>public.charters.created_at</code>.

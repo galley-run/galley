@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>run.galley</groupId>
@@ -100,11 +100,11 @@
       <artifactId>kotlin-stdlib</artifactId>
       <version>${kotlin.version}</version>
     </dependency>
-  <dependency>
-    <groupId>com.ongres.scram</groupId>
-    <artifactId>scram-client</artifactId>
-    <version>3.1</version>
-  </dependency>
+    <dependency>
+      <groupId>com.ongres.scram</groupId>
+      <artifactId>scram-client</artifactId>
+      <version>3.1</version>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -140,6 +140,11 @@
       <artifactId>jooq-codegen</artifactId>
       <version>${jooq.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq-postgres-extensions</artifactId>
+      <version>${jooq.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>io.vertx</groupId>
@@ -161,8 +166,8 @@
   </dependencies>
 
   <build>
-      <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-      <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+    <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -278,16 +283,162 @@
               <goal>generate</goal>
             </goals>
             <configuration>
+              <jdbc>
+                <driver>org.postgresql.Driver</driver>
+                <url>jdbc:postgresql://localhost:54332/galley</url>
+                <user>postgres</user>
+                <password>postgres</password>
+              </jdbc>
               <generator>
                 <name>org.jooq.codegen.KotlinGenerator</name>
                 <database>
-                  <name>org.jooq.meta.xml.XMLDatabase</name>
-                  <properties>
-                    <property>
-                      <key>xmlFile</key>
-                      <value>db-schema/information_schema.xml</value>
-                    </property>
-                  </properties>
+                  <name>org.jooq.meta.postgres.PostgresDatabase</name>
+                  <inputSchema>public</inputSchema>
+                  <includes>.*</includes>
+                  <excludes>regexp_.*</excludes>
+                  <includeRoutines>false</includeRoutines>
+                  <forcedTypes>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.BigDecimalRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.BigDecimalRangeBinding</binding>
+                      <includeTypes>numrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.BigDecimalRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.BigDecimalRangeArrayBinding</binding>
+                      <includeTypes>_numrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Cidr</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CidrBinding</binding>
+                      <includeTypes>cidr</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Cidr[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CidrArrayBinding</binding>
+                      <includeTypes>_cidr</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>java.lang.String</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CitextBinding</binding>
+                      <includeTypes>citext</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>java.lang.String[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CitextArrayBinding</binding>
+                      <includeTypes>_citext</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Hstore</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.HstoreBinding</binding>
+                      <includeTypes>hstore</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Hstore[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.HstoreArrayBinding</binding>
+                      <includeTypes>_hstore</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Inet</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.InetBinding</binding>
+                      <includeTypes>inet</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Inet[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.InetArrayBinding</binding>
+                      <includeTypes>_inet</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.IntegerRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.IntegerRangeBinding</binding>
+                      <includeTypes>int4range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.IntegerRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.IntegerRangeArrayBinding</binding>
+                      <includeTypes>_int4range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to DateRange instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateRangeBinding</binding>
+                      <includeTypes>daterange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to DateRange[] instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateRangeArrayBinding</binding>
+                      <includeTypes>_daterange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to TimestampRange instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateTimeRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateTimeRangeBinding</binding>
+                      <includeTypes>tsrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to TimestampRange[] instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateTimeRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateTimeRangeArrayBinding</binding>
+                      <includeTypes>_tsrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LongRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LongRangeBinding</binding>
+                      <includeTypes>int8range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LongRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LongRangeArrayBinding</binding>
+                      <includeTypes>_int8range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Ltree</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LtreeBinding</binding>
+                      <includeTypes>ltree</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Ltree[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LtreeArrayBinding</binding>
+                      <includeTypes>_ltree</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.OffsetDateTimeRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.OffsetDateTimeRangeBinding</binding>
+                      <includeTypes>tstzrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.OffsetDateTimeRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.OffsetDateTimeRangeArrayBinding</binding>
+                      <includeTypes>_tstzrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                  </forcedTypes>
                 </database>
                 <target>
                   <packageName>run.galley.cloud.db.generated</packageName>
@@ -296,8 +447,19 @@
                 <generate>
                   <pojos>true</pojos>
                   <daos>true</daos>
+                  <interfaces>false</interfaces>
                   <javaTimeTypes>true</javaTimeTypes>
                 </generate>
+                <strategy>
+                  <name>org.jooq.codegen.DefaultGeneratorStrategy</name>
+                  <matchers>
+                    <tables>
+                      <table>
+                        <pojoExtends>run.galley.cloud.model.BaseModel</pojoExtends>
+                      </table>
+                    </tables>
+                  </matchers>
+                </strategy>
               </generator>
             </configuration>
           </execution>
@@ -322,6 +484,148 @@
                   <includes>.*</includes>
                   <excludes>regexp_.*</excludes>
                   <includeRoutines>false</includeRoutines>
+                  <forcedTypes>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.BigDecimalRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.BigDecimalRangeBinding</binding>
+                      <includeTypes>numrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.BigDecimalRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.BigDecimalRangeArrayBinding</binding>
+                      <includeTypes>_numrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Cidr</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CidrBinding</binding>
+                      <includeTypes>cidr</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Cidr[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CidrArrayBinding</binding>
+                      <includeTypes>_cidr</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>java.lang.String</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CitextBinding</binding>
+                      <includeTypes>citext</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>java.lang.String[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.CitextArrayBinding</binding>
+                      <includeTypes>_citext</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Hstore</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.HstoreBinding</binding>
+                      <includeTypes>hstore</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Hstore[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.HstoreArrayBinding</binding>
+                      <includeTypes>_hstore</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Inet</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.InetBinding</binding>
+                      <includeTypes>inet</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Inet[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.InetArrayBinding</binding>
+                      <includeTypes>_inet</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.IntegerRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.IntegerRangeBinding</binding>
+                      <includeTypes>int4range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.IntegerRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.IntegerRangeArrayBinding</binding>
+                      <includeTypes>_int4range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to DateRange instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateRangeBinding</binding>
+                      <includeTypes>daterange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to DateRange[] instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateRangeArrayBinding</binding>
+                      <includeTypes>_daterange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to TimestampRange instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateTimeRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateTimeRangeBinding</binding>
+                      <includeTypes>tsrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+
+                    <!-- Depending on <javaTimeTypes/>, this may map to TimestampRange[] instead -->
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LocalDateTimeRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LocalDateTimeRangeArrayBinding</binding>
+                      <includeTypes>_tsrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LongRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LongRangeBinding</binding>
+                      <includeTypes>int8range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.LongRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LongRangeArrayBinding</binding>
+                      <includeTypes>_int8range</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Ltree</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LtreeBinding</binding>
+                      <includeTypes>ltree</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.Ltree[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.LtreeArrayBinding</binding>
+                      <includeTypes>_ltree</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.OffsetDateTimeRange</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.OffsetDateTimeRangeBinding</binding>
+                      <includeTypes>tstzrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                    <forcedType>
+                      <userType>org.jooq.postgres.extensions.types.OffsetDateTimeRange[]</userType>
+                      <binding>org.jooq.postgres.extensions.bindings.OffsetDateTimeRangeArrayBinding</binding>
+                      <includeTypes>_tstzrange</includeTypes>
+                      <priority>-2147483648</priority>
+                    </forcedType>
+                  </forcedTypes>
                 </database>
                 <target>
                   <directory>db-schema</directory>

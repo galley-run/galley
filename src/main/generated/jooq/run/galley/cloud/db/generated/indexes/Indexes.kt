@@ -27,6 +27,7 @@ import run.galley.cloud.db.generated.tables.ProjectApplications
 import run.galley.cloud.db.generated.tables.ProjectConfigs
 import run.galley.cloud.db.generated.tables.ProjectDatabases
 import run.galley.cloud.db.generated.tables.ProjectSecrets
+import run.galley.cloud.db.generated.tables.Sessions
 import run.galley.cloud.db.generated.tables.SignUpInquiries
 import run.galley.cloud.db.generated.tables.UserIdentities
 import run.galley.cloud.db.generated.tables.Users
@@ -127,6 +128,9 @@ val IDX_WEBHOOK_DELIVERIES_SUB_TIME: Index = Internal.createIndex(DSL.name("idx_
 val IDX_WEBHOOK_DELIVERIES_SUBSCRIPTION: Index = Internal.createIndex(DSL.name("idx_webhook_deliveries_subscription"), WebhookDeliveries.WEBHOOK_DELIVERIES, arrayOf(WebhookDeliveries.WEBHOOK_DELIVERIES.SUBSCRIPTION_ID), false)
 val IDX_WEBHOOK_SCOPE: Index = Internal.createIndex(DSL.name("idx_webhook_scope"), WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS, arrayOf(WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS.VESSEL_ID, WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS.CHARTER_ID, WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS.PROJECT_ID), false)
 val IDX_WEBHOOK_SUBSCRIPTIONS_ACTIVE: Index = Internal.createIndex(DSL.name("idx_webhook_subscriptions_active"), WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS, arrayOf(WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS.ACTIVE), false)
+val SESSIONS_EXPIRES_AT_IDX: Index = Internal.createIndex(DSL.name("sessions_expires_at_idx"), Sessions.SESSIONS, arrayOf(Sessions.SESSIONS.EXPIRES_AT), false)
+val SESSIONS_REVOKED_AT_IDX: Index = Internal.createIndex(DSL.name("sessions_revoked_at_idx"), Sessions.SESSIONS, arrayOf(Sessions.SESSIONS.REVOKED_AT), false)
+val SESSIONS_USER_ID_IDX: Index = Internal.createIndex(DSL.name("sessions_user_id_idx"), Sessions.SESSIONS, arrayOf(Sessions.SESSIONS.USER_ID), false)
 val UQ_CHARTERS_VESSEL_NAME: Index = Internal.createIndex(DSL.name("uq_charters_vessel_name"), Charters.CHARTERS, arrayOf(Charters.CHARTERS.VESSEL_ID, Charters.CHARTERS.NAME), true)
 val UQ_CONFIGS_PROJECT_KEY: Index = Internal.createIndex(DSL.name("uq_configs_project_key"), ProjectConfigs.PROJECT_CONFIGS, arrayOf(ProjectConfigs.PROJECT_CONFIGS.PROJECT_ID, ProjectConfigs.PROJECT_CONFIGS.KEY), true)
 val UQ_LOCKER_VESSEL_NAME: Index = Internal.createIndex(DSL.name("uq_locker_vessel_name"), Locker.LOCKER, arrayOf(Locker.LOCKER.VESSEL_ID, Locker.LOCKER.NAME), true)

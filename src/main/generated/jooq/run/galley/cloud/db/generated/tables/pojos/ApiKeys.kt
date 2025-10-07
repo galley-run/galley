@@ -10,6 +10,7 @@ import java.util.Arrays
 import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.ApiKeyStatus
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -25,7 +26,7 @@ data class ApiKeys(
     var status: ApiKeyStatus? = null,
     var lastUsedAt: OffsetDateTime? = null,
     var createdAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

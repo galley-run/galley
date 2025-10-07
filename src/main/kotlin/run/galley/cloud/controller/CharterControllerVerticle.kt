@@ -1,0 +1,105 @@
+package run.galley.cloud.controller
+
+import io.vertx.core.eventbus.Message
+import io.vertx.kotlin.coroutines.CoroutineVerticle
+import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortDirection
+import nl.clicqo.api.SortField
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.eventbus.EventBusDataRequest
+import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.ext.toUUID
+import nl.kleilokaal.queue.modules.coroutineConsumer
+import org.slf4j.LoggerFactory
+import run.galley.cloud.ApiStatus
+import run.galley.cloud.data.CharterDataVerticle
+import run.galley.cloud.model.UserRole
+import run.galley.cloud.model.getUserRole
+
+class CharterControllerVerticle : CoroutineVerticle() {
+  private val logger = LoggerFactory.getLogger(this::class.java)
+
+  companion object {
+    const val ADDRESS_LIST = "charter.query.list"
+    const val ADDRESS_GET = "charter.query.get"
+    const val ADDRESS_CREATE = "charter.cmd.create"
+  }
+
+  override suspend fun start() {
+    super.start()
+
+    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST, ::list)
+//    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
+//    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
+  }
+
+  private suspend fun list(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val userRole = apiRequest.user?.getUserRole()
+
+    // Convert API query params to filters
+    val filters = mutableMapOf<String, List<String>>()
+    apiRequest.query?.forEach { (key, value) ->
+      filters[key] = listOf(value.string)
+    }
+
+    val vesselId = apiRequest.identifiers?.get("vesselId")?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+
+    filters["vesselId"] = listOf(vesselId.toString())
+    if (userRole != UserRole.VESSEL_CAPTAIN) {
+      filters["id"] = apiRequest.user?.get<List<String>>("charterIds") ?: throw ApiStatus.CHARTER_NO_ACCESS
+    }
+
+    // Build data request with filters, sort, and pagination
+    val dataRequest = EventBusDataRequest(
+      filters = filters,
+      sort = listOf(SortField("id", SortDirection.ASC)),
+      pagination = Pagination(offset = 0, limit = 10),
+      user = apiRequest.user.principal()
+    )
+
+    val dataResponse = vertx.eventBus()
+      .request<EventBusDataResponse>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
+      .coAwait()
+      .body()
+
+    // Convert back to API response
+    message.reply(
+      EventBusApiResponse(
+        payload = dataResponse.payload.toJsonObject()
+      )
+    )
+  }
+
+  private suspend fun get(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+
+    // Extract charterId from path identifiers
+    val charterId = apiRequest.identifiers?.get("charterId")?.string
+      ?: throw IllegalArgumentException("charterId is required")
+
+    // Build data request with identifier
+    val dataRequest = EventBusDataRequest(
+      identifiers = mapOf("charterId" to charterId),
+      user = apiRequest.user?.principal()
+    )
+
+    val dataResponse = vertx.eventBus()
+      .request<EventBusDataResponse>(CharterDataVerticle.ADDRESS_GET, dataRequest)
+      .coAwait()
+      .body()
+
+    // Convert back to API response
+    message.reply(
+      EventBusApiResponse(
+        payload = dataResponse.payload.toJsonObject()
+      )
+    )
+  }
+
+  private suspend fun create(message: Message<EventBusApiRequest>) {
+    throw ApiStatus.VESSEL_INSERT_FAILED
+  }
+}

@@ -2,29 +2,42 @@ package nl.clicqo.eventbus
 
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.auth.User
-import io.vertx.openapi.validation.RequestParameter
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortDirection
+import nl.clicqo.api.SortField
 
 class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataRequest> {
 
-  override fun encodeToWire(buffer: Buffer, s: EventBusDataRequest) {
-    val identifiersJson = JsonObject()
-    s.identifiers?.forEach { (key, value) ->
-      identifiersJson.put(key, value.toString())
+  override fun encodeToWire(buffer: Buffer, request: EventBusDataRequest) {
+    val identifiersJson = JsonObject(request.identifiers)
+
+    val filtersJson = JsonObject()
+    request.filters.forEach { (key, values) ->
+      filtersJson.put(key, JsonArray(values))
     }
 
-    val queryJson = JsonObject()
-    s.query?.forEach { (key, value) ->
-      queryJson.put(key, value.toString())
+    val sortJson = JsonArray(
+      request.sort.map { sortField ->
+        JsonObject()
+          .put("field", sortField.field)
+          .put("direction", sortField.direction.name)
+      }
+    )
+
+    val paginationJson = request.pagination?.let {
+      JsonObject()
+        .put("offset", it.offset)
+        .put("limit", it.limit)
     }
 
     val jsonObject = JsonObject()
       .put("identifiers", identifiersJson)
-      .put("body", s.body)
-      .put("query", queryJson)
-      .put("user", s.user?.principal())
-      .put("version", s.version)
+      .put("filters", filtersJson)
+      .put("sort", sortJson)
+      .put("pagination", paginationJson)
+      .put("user", request.user)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -39,21 +52,44 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
     val jsonBytes = buffer.getBuffer(position, position + length)
     val json = JsonObject(jsonBytes)
 
-    // Note: This is a simplified deserialization. You may need to properly
-    // reconstruct RequestParameter objects based on your requirements.
-    val identifiers = mutableMapOf<String, RequestParameter>()
-    val query = mutableMapOf<String, RequestParameter>()
+    val identifiers = json.getJsonObject("identifiers", JsonObject()).map
+      .mapValues { it.value.toString() }
+
+    val filters = mutableMapOf<String, List<String>>()
+    json.getJsonObject("filters", JsonObject()).forEach { (key, value) ->
+      if (value is JsonArray) {
+        filters[key] = value.map { it.toString() }
+      }
+    }
+
+    val sort = json.getJsonArray("sort", JsonArray()).mapNotNull {
+      if (it is JsonObject) {
+        SortField(
+          field = it.getString("field"),
+          direction = SortDirection.valueOf(it.getString("direction"))
+        )
+      } else null
+    }
+
+    val pagination = json.getJsonObject("pagination")?.let {
+      Pagination(
+        offset = it.getInteger("offset", 0),
+        limit = it.getInteger("limit", Pagination.DEFAULT_LIMIT)
+      )
+    }
+
+    val user = json.getJsonObject("user")
 
     return EventBusDataRequest(
       identifiers = identifiers,
-      body = json.getJsonObject("body"),
-      query = query,
-      user = User.create(json.getJsonObject("user")),
-      version = json.getString("version", "v1")
+      filters = filters,
+      sort = sort,
+      pagination = pagination,
+      user = user
     )
   }
 
-  override fun transform(s: EventBusDataRequest): EventBusDataRequest = s
+  override fun transform(request: EventBusDataRequest): EventBusDataRequest = request
 
   override fun name(): String = "EventBusDataRequestCodec"
 

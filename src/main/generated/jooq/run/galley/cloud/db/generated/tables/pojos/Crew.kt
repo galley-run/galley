@@ -10,6 +10,7 @@ import java.util.UUID
 
 import run.galley.cloud.db.generated.enums.MemberStatus
 import run.galley.cloud.db.generated.enums.VesselRole
+import run.galley.cloud.model.BaseModel
 
 
 /**
@@ -25,7 +26,7 @@ data class Crew(
     var createdAt: OffsetDateTime? = null,
     var activatedAt: OffsetDateTime? = null,
     var deletedAt: OffsetDateTime? = null
-): Serializable {
+): BaseModel, Serializable {
 
 
     override fun equals(other: Any?): Boolean {

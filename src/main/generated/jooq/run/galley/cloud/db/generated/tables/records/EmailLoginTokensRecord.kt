@@ -9,6 +9,7 @@ import java.util.UUID
 
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
+import org.jooq.postgres.extensions.types.Inet
 
 import run.galley.cloud.db.generated.tables.EmailLoginTokens
 
@@ -27,9 +28,9 @@ open class EmailLoginTokensRecord() : UpdatableRecordImpl<EmailLoginTokensRecord
         set(value): Unit = set(1, value)
         get(): UUID? = get(1) as UUID?
 
-    open var email: Any?
+    open var email: String?
         set(value): Unit = set(2, value)
-        get(): Any? = get(2) as Any?
+        get(): String? = get(2) as String?
 
     open var tokenHash: ByteArray?
         set(value): Unit = set(3, value)
@@ -39,9 +40,9 @@ open class EmailLoginTokensRecord() : UpdatableRecordImpl<EmailLoginTokensRecord
         set(value): Unit = set(4, value)
         get(): String? = get(4) as String?
 
-    open var ip: Any?
+    open var ip: Inet?
         set(value): Unit = set(5, value)
-        get(): Any? = get(5) as Any?
+        get(): Inet? = get(5) as Inet?
 
     open var userAgent: String?
         set(value): Unit = set(6, value)
@@ -68,7 +69,7 @@ open class EmailLoginTokensRecord() : UpdatableRecordImpl<EmailLoginTokensRecord
     /**
      * Create a detached, initialised EmailLoginTokensRecord
      */
-    constructor(id: UUID? = null, userId: UUID? = null, email: Any? = null, tokenHash: ByteArray? = null, purpose: String? = null, ip: Any? = null, userAgent: String? = null, expiresAt: OffsetDateTime? = null, usedAt: OffsetDateTime? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, userId: UUID? = null, email: String? = null, tokenHash: ByteArray? = null, purpose: String? = null, ip: Inet? = null, userAgent: String? = null, expiresAt: OffsetDateTime? = null, usedAt: OffsetDateTime? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.userId = userId
         this.email = email

@@ -8,7 +8,8 @@ class FlywayMigrationVerticle : CoroutineVerticle() {
     super.start()
 
     val dbConfig = config.getJsonObject("db")
-    val jdbcUrl = dbConfig.getString("jdbc", "jdbc:postgresql://localhost:5432/galley")
+    val jdbcUrl =
+      "jdbc:postgresql://${config.getString("host")}:${config.getInteger("port")}/${config.getString("database")}"
     val dbUsername = dbConfig.getString("username", "galley")
     val dbPassword = dbConfig.getString("password", "")
 

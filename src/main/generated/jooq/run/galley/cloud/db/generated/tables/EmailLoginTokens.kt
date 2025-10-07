@@ -33,6 +33,9 @@ import org.jooq.impl.DefaultDataType
 import org.jooq.impl.Internal
 import org.jooq.impl.SQLDataType
 import org.jooq.impl.TableImpl
+import org.jooq.postgres.extensions.bindings.CitextBinding
+import org.jooq.postgres.extensions.bindings.InetBinding
+import org.jooq.postgres.extensions.types.Inet
 
 import run.galley.cloud.db.generated.Public
 import run.galley.cloud.db.generated.indexes.IDX_EMAIL_LOGIN_TOKENS_ACTIVE
@@ -94,8 +97,11 @@ open class EmailLoginTokens(
      * The column <code>public.email_login_tokens.user_id</code>.
      */
     val USER_ID: TableField<EmailLoginTokensRecord, UUID?> = createField(DSL.name("user_id"), SQLDataType.UUID, this, "")
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    val EMAIL: TableField<EmailLoginTokensRecord, Any?> = createField(DSL.name("email"), DefaultDataType.getDefaultDataType("\"public\".\"citext\"").nullable(false), this, "")
+
+    /**
+     * The column <code>public.email_login_tokens.email</code>.
+     */
+    val EMAIL: TableField<EmailLoginTokensRecord, String?> = createField(DSL.name("email"), DefaultDataType.getDefaultDataType("\"public\".\"citext\"").nullable(false), this, "", CitextBinding())
 
     /**
      * The column <code>public.email_login_tokens.token_hash</code>.
@@ -106,8 +112,11 @@ open class EmailLoginTokens(
      * The column <code>public.email_login_tokens.purpose</code>.
      */
     val PURPOSE: TableField<EmailLoginTokensRecord, String?> = createField(DSL.name("purpose"), SQLDataType.CLOB.nullable(false).defaultValue(DSL.field(DSL.raw("'magic_link'::text"), SQLDataType.CLOB)), this, "")
-    @Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
-    val IP: TableField<EmailLoginTokensRecord, Any?> = createField(DSL.name("ip"), DefaultDataType.getDefaultDataType("\"pg_catalog\".\"inet\""), this, "")
+
+    /**
+     * The column <code>public.email_login_tokens.ip</code>.
+     */
+    val IP: TableField<EmailLoginTokensRecord, Inet?> = createField(DSL.name("ip"), DefaultDataType.getDefaultDataType("\"pg_catalog\".\"inet\""), this, "", InetBinding())
 
     /**
      * The column <code>public.email_login_tokens.user_agent</code>.

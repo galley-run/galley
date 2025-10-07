@@ -5,11 +5,12 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
+import io.vertx.ext.web.handler.HttpException
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.ApiStatus
-import nl.clicqo.api.ApiStatusException
 import nl.clicqo.api.ApiStatusReplyException
+import org.slf4j.LoggerFactory
 
 fun Router.setupCorsHandler(config: JsonObject): Router {
   route()
@@ -49,14 +50,43 @@ fun Router.setupDefaultOptionsHandler(): Router {
 }
 
 fun Router.setupFailureHandler(): Router {
+  val logger = LoggerFactory.getLogger(this::class.java)
+
   route().failureHandler {
-    val error =
+    var error =
       when (it.failure()) {
-        is ClassCastException -> ApiStatusException(ApiStatus.Companion.HTTP_CLASS_CAST_EXCEPTION)
+        is ClassCastException -> ApiStatus.HTTP_CLASS_CAST_EXCEPTION
         else -> it.failure()
       }
 
     val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.v1+json")
+
+    when (error) {
+      is ApiStatus -> error.takeIf { apiStatus -> apiStatus == ApiStatus.THROWABLE_EXCEPTION }?.message?.run {
+        logger.error(
+          this,
+          error
+        )
+      }
+
+      is ApiStatusReplyException -> {
+        if (error.apiStatus == ApiStatus.THROWABLE_EXCEPTION) {
+          logger.error(error.message, error)
+        }
+      }
+
+      is HttpException -> {
+        logger.error(error.payload, error)
+        when (error.statusCode) {
+          401 -> error = ApiStatus.FAILED_AUTHORIZATION
+          404 -> error = ApiStatus.FAILED_FIND
+          400 -> error = ApiStatus.FAILED_VALIDATION
+          500 -> error = ApiStatus.FAILED
+        }
+      }
+
+      else -> logger.error(error.message, error)
+    }
 
     ApiResponse(
       it,
@@ -64,9 +94,9 @@ fun Router.setupFailureHandler(): Router {
     )
       .addError(
         when (error) {
-          is ApiStatusException -> error.apiStatus
+          is ApiStatus -> error
           is ApiStatusReplyException -> error.apiStatus
-          else -> ApiStatus.Companion.FAILED
+          else -> ApiStatus.FAILED
         }
       )
       .end()

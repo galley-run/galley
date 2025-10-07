@@ -3,7 +3,6 @@ package nl.clicqo.ext
 import java.time.LocalDate
 import java.util.UUID
 import nl.clicqo.api.ApiStatus
-import nl.clicqo.api.ApiStatusException
 
 fun String.camelCaseToSnakeCase(): String {
   return mapIndexed { index, c ->
@@ -23,7 +22,7 @@ fun String.toUUID(apiStatusToThrow: ApiStatus): UUID {
   return try {
     UUID.fromString(this)
   } catch (_: IllegalArgumentException) {
-    throw ApiStatusException(apiStatusToThrow)
+    throw apiStatusToThrow
   }
 }
 
@@ -31,7 +30,7 @@ fun String.toLocalDate(): LocalDate {
   return try {
     LocalDate.parse(this)
   } catch (e: Exception) {
-    throw ApiStatusException(ApiStatus.DATE_PARSE_EXCEPTION)
+    throw ApiStatus.DATE_PARSE_EXCEPTION
   }
 }
 

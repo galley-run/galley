@@ -50,39 +50,30 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     buffer: Buffer,
     exception: Throwable?,
   ) {
-    println("encodeCause")
     if (exception == null || exception.cause == exception) {
-      println("No cause")
-      println(exception?.message)
-      println(exception?.cause?.message)
       buffer.appendByte(0)
       return
     }
     when (val cause = exception.cause) {
       null -> {
-        println("No cause")
         buffer.appendByte(0)
       }
-      is ApiStatusException -> {
-        println("ApiStatusException")
-        println(cause.message)
-        buffer.appendByte(1)
+
+      is ApiStatus -> {
         // First encode ApiStatus object
-        encodeApiStatus(buffer, cause.apiStatus)
-        // Encode our custom message
-        encodeString(buffer, cause.customMessage)
+        encodeApiStatus(buffer, cause)
         // Encode our cause
         encodeCause(buffer, cause)
         // Encode our stacktrace
         encodeStacktrace(buffer, cause.stackTrace)
       }
+
       is ApiStatusReplyException -> {
-        println("ApiStatusReplyException")
         buffer.appendByte(2)
         encodeToWire(buffer, cause)
       }
+
       else -> {
-        println("Custom Exception")
         buffer.appendByte(-1)
         val eTypeName = cause.javaClass.simpleName
         encodeString(buffer, "$eTypeName: ${cause.message}")
@@ -100,11 +91,7 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     pos[0]++
     when (exceptionType) {
       1.toByte() -> {
-        val e =
-          ApiStatusException(
-            apiStatus = decodeApiStatus(pos, buffer),
-            customMessage = decodeString(pos, buffer),
-          )
+        val e = decodeApiStatus(pos, buffer)
         val cause = decodeCause(pos, buffer)
         if (cause != null) {
           e.initCause(cause)
@@ -112,15 +99,18 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
         e.stackTrace = decodeStacktrace(pos, buffer)
         return e
       }
+
       2.toByte() -> {
         return decodeFromWire(pos[0], buffer)
       }
+
       (-1).toByte() -> {
         val message = decodeString(pos, buffer)
         val cause = Throwable(message)
         cause.stackTrace = decodeStacktrace(pos, buffer)
         return cause
       }
+
       else -> return null
     }
   }
@@ -177,7 +167,7 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     // First encode ApiStatus object
     encodeApiStatus(buffer, body.apiStatus)
     // Encode our custom message
-    encodeString(buffer, body.customMessage)
+    encodeString(buffer, body.message)
     // Encode the cause of the exception (if available)
     encodeCause(buffer, body)
     // Encode our stacktrace

@@ -144,6 +144,13 @@
         <table>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <table_type>BASE TABLE</table_type>
+            <comment></comment>
+        </table>
+        <table>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
             <table_name>sign_up_inquiries</table_name>
             <table_type>BASE TABLE</table_type>
             <comment></comment>
@@ -845,7 +852,7 @@
             <numeric_precision>0</numeric_precision>
             <numeric_scale>0</numeric_scale>
             <ordinal_position>5</ordinal_position>
-            <is_nullable>false</is_nullable>
+            <is_nullable>true</is_nullable>
             <comment></comment>
             <hidden>false</hidden>
             <readonly>false</readonly>
@@ -3121,6 +3128,174 @@
         <column>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>id</column_name>
+            <data_type>uuid</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>1</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <column_default>uuid_generate_v4()</column_default>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>user_id</column_name>
+            <data_type>uuid</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>2</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>refresh_token_hash</column_name>
+            <data_type>bytea</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>3</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>device_name</column_name>
+            <data_type>text</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>4</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>user_agent</column_name>
+            <data_type>text</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>5</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>ip_address</column_name>
+            <data_type>inet</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>6</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>issued_at</column_name>
+            <data_type>timestamp with time zone</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>6</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>7</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <column_default>now()</column_default>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>last_used_at</column_name>
+            <data_type>timestamp with time zone</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>6</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>8</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <column_default>now()</column_default>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>expires_at</column_name>
+            <data_type>timestamp with time zone</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>6</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>9</ordinal_position>
+            <is_nullable>false</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>revoked_at</column_name>
+            <data_type>timestamp with time zone</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>6</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>10</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>replaced_by_id</column_name>
+            <data_type>uuid</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>11</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
             <table_name>sign_up_inquiries</table_name>
             <column_name>id</column_name>
             <data_type>uuid</data_type>
@@ -5295,6 +5470,28 @@
         <table_constraint>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_pkey</constraint_name>
+            <constraint_type>PRIMARY KEY</constraint_type>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <comment></comment>
+            <enforced>true</enforced>
+        </table_constraint>
+        <table_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_refresh_token_hash_key</constraint_name>
+            <constraint_type>UNIQUE</constraint_type>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <comment></comment>
+            <enforced>true</enforced>
+        </table_constraint>
+        <table_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
             <constraint_name>sign_up_inquiries_pkey</constraint_name>
             <constraint_type>PRIMARY KEY</constraint_type>
             <table_catalog></table_catalog>
@@ -5878,6 +6075,28 @@
         <table_constraint>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_replaced_by_id_fkey</constraint_name>
+            <constraint_type>FOREIGN KEY</constraint_type>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <comment></comment>
+            <enforced>true</enforced>
+        </table_constraint>
+        <table_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_fkey</constraint_name>
+            <constraint_type>FOREIGN KEY</constraint_type>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <comment></comment>
+            <enforced>true</enforced>
+        </table_constraint>
+        <table_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
             <constraint_name>fk_signups_user</constraint_name>
             <constraint_type>FOREIGN KEY</constraint_type>
             <table_catalog></table_catalog>
@@ -6354,6 +6573,36 @@
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>project_secrets</table_name>
+        </key_column_usage>
+        <key_column_usage>
+            <column_name>id</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_pkey</constraint_name>
+            <ordinal_position>1</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+        </key_column_usage>
+        <key_column_usage>
+            <column_name>user_id</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_refresh_token_hash_key</constraint_name>
+            <ordinal_position>1</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+        </key_column_usage>
+        <key_column_usage>
+            <column_name>refresh_token_hash</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_refresh_token_hash_key</constraint_name>
+            <ordinal_position>2</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
         </key_column_usage>
         <key_column_usage>
             <column_name>id</column_name>
@@ -6916,6 +7165,26 @@
             <table_name>project_secrets</table_name>
         </key_column_usage>
         <key_column_usage>
+            <column_name>replaced_by_id</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_replaced_by_id_fkey</constraint_name>
+            <ordinal_position>1</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+        </key_column_usage>
+        <key_column_usage>
+            <column_name>user_id</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_fkey</constraint_name>
+            <ordinal_position>1</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+        </key_column_usage>
+        <key_column_usage>
             <column_name>user_id</column_name>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
@@ -7455,6 +7724,26 @@
             <unique_constraint_schema>public</unique_constraint_schema>
             <unique_constraint_name>vessels_pkey</unique_constraint_name>
             <delete_rule>CASCADE</delete_rule>
+            <update_rule>NO ACTION</update_rule>
+        </referential_constraint>
+        <referential_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_replaced_by_id_fkey</constraint_name>
+            <unique_constraint_catalog></unique_constraint_catalog>
+            <unique_constraint_schema>public</unique_constraint_schema>
+            <unique_constraint_name>sessions_pkey</unique_constraint_name>
+            <delete_rule>NO ACTION</delete_rule>
+            <update_rule>NO ACTION</update_rule>
+        </referential_constraint>
+        <referential_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>sessions_user_id_fkey</constraint_name>
+            <unique_constraint_catalog></unique_constraint_catalog>
+            <unique_constraint_schema>public</unique_constraint_schema>
+            <unique_constraint_name>users_pkey</unique_constraint_name>
+            <delete_rule>NO ACTION</delete_rule>
             <update_rule>NO ACTION</update_rule>
         </referential_constraint>
         <referential_constraint>
@@ -8466,6 +8755,36 @@
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>webhook_subscriptions</table_name>
+            <is_unique>false</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_expires_at_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <is_unique>false</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_revoked_at_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <is_unique>false</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_user_id_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
             <is_unique>false</is_unique>
             <comment></comment>
         </index>
@@ -9759,6 +10078,39 @@
             <table_schema>public</table_schema>
             <table_name>webhook_subscriptions</table_name>
             <column_name>active</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_expires_at_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>expires_at</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_revoked_at_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>revoked_at</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>sessions_user_id_idx</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>sessions</table_name>
+            <column_name>user_id</column_name>
             <ordinal_position>1</ordinal_position>
             <is_descending>false</is_descending>
         </index_column_usage>

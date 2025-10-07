@@ -3,13 +3,14 @@ package nl.clicqo.eventbus
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
+import nl.clicqo.data.DataPayload
 
 class EventBusDataResponseCodec : MessageCodec<EventBusDataResponse, EventBusDataResponse> {
-  override fun encodeToWire(buffer: Buffer, s: EventBusDataResponse?) {
+
+  override fun encodeToWire(buffer: Buffer, response: EventBusDataResponse) {
     val jsonObject = JsonObject()
-      .put("payload", s?.payload)
-      .put("version", s?.version)
-      .put("format", s?.format)
+      .put("payload", response.payload)
+      .put("metadata", response.metadata)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -24,14 +25,16 @@ class EventBusDataResponseCodec : MessageCodec<EventBusDataResponse, EventBusDat
     val jsonBytes = buffer.getBuffer(position, position + length)
     val json = JsonObject(jsonBytes)
 
+    val payload = json.getJsonObject("payload", JsonObject())
+    val metadata = json.getJsonObject("metadata")
+
     return EventBusDataResponse(
-      payload = json.getJsonObject("payload"),
-      version = json.getString("version", "v1"),
-      format = json.getString("format", "json")
+      payload = DataPayload.from(payload),
+      metadata = metadata
     )
   }
 
-  override fun transform(s: EventBusDataResponse): EventBusDataResponse = s
+  override fun transform(response: EventBusDataResponse): EventBusDataResponse = response
 
   override fun name(): String = "EventBusDataResponseCodec"
 

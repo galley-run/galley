@@ -4,7 +4,7 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import run.galley.cloud.model.BaseModel
 
-data class DataPayload<T: BaseModel>(
+data class DataPayload<T : BaseModel>(
   val item: T? = null,
   val items: List<T>? = null,
 ) {
@@ -39,10 +39,11 @@ data class DataPayload<T: BaseModel>(
   }
 
   companion object {
-    fun <T: BaseModel> one(item: T): DataPayload<T> = DataPayload(item = item)
+    fun <T : BaseModel> one(item: T): DataPayload<T> = DataPayload(item = item)
 
-    fun <T: BaseModel> many(items: List<T>?): DataPayload<T> = DataPayload(items = items ?: emptyList())
-    fun <T: BaseModel> many(vararg items: T): DataPayload<T> = DataPayload(items = items.asList())
+    fun <T : BaseModel> many(items: List<T>?): DataPayload<T> = DataPayload(items = items ?: emptyList())
+
+    fun <T : BaseModel> many(vararg items: T): DataPayload<T> = DataPayload(items = items.asList())
 
     inline fun <reified T : BaseModel> from(payload: JsonObject): DataPayload<T> {
       val clazz = T::class.java

@@ -12,9 +12,11 @@ class FlywayMigrationVerticle : CoroutineVerticle() {
     val dbUsername = config.getString("username", "galley")
     val dbPassword = config.getString("password", "")
 
-    val flyway = Flyway.configure()
-      .dataSource(jdbcUrl, dbUsername, dbPassword)
-      .load()
+    val flyway =
+      Flyway
+        .configure()
+        .dataSource(jdbcUrl, dbUsername, dbPassword)
+        .load()
 
     // Start the migration
     flyway.migrate()

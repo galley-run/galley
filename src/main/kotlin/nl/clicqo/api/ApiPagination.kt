@@ -4,13 +4,16 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import java.math.RoundingMode
 
-class ApiPagination(val page: Int = DEFAULT_PAGE, var limit: Int? = null, private var total: Int? = 0) {
-  fun toJsonObject(): JsonObject {
-    return JsonObject()
+class ApiPagination(
+  val page: Int = DEFAULT_PAGE,
+  var limit: Int? = null,
+  private var total: Int? = 0,
+) {
+  fun toJsonObject(): JsonObject =
+    JsonObject()
       .put("page", page)
       .put("limit", limit ?: DEFAULT_LIMIT)
       .put("total", total)
-  }
 
   fun setLimit(limit: Int): ApiPagination {
     this.limit = limit
@@ -56,16 +59,15 @@ class ApiPagination(val page: Int = DEFAULT_PAGE, var limit: Int? = null, privat
     const val DEFAULT_PAGE = 1
     const val DEFAULT_LIMIT = 15
 
-    fun from(pagination: JsonObject): ApiPagination {
-      return ApiPagination(
+    fun from(pagination: JsonObject): ApiPagination =
+      ApiPagination(
         pagination.getInteger("page", DEFAULT_PAGE),
         pagination.getInteger("limit", null),
         pagination.getInteger("total", null),
       )
-    }
 
-    fun from(routingContext: RoutingContext): ApiPagination {
-      return ApiPagination(
+    fun from(routingContext: RoutingContext): ApiPagination =
+      ApiPagination(
         page =
           try {
             routingContext.request().getParam("page").toInt()
@@ -79,6 +81,5 @@ class ApiPagination(val page: Int = DEFAULT_PAGE, var limit: Int? = null, privat
             null
           },
       )
-    }
   }
 }

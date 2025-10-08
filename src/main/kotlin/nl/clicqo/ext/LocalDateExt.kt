@@ -11,16 +11,11 @@ fun LocalDate.toWeek(): Long {
   return "$weekBasedYear${weekOfYear.toString().padStart(2, '0')}".toLong()
 }
 
-fun LocalDate.generateWeekRange(weeksInAdvance: Long): List<LocalDate> {
-  return (0..weeksInAdvance).map { weekOffset ->
+fun LocalDate.generateWeekRange(weeksInAdvance: Long): List<LocalDate> =
+  (0..weeksInAdvance).map { weekOffset ->
     this.plusWeeks(weekOffset).toStartOfWeek()
   }
-}
 
-fun LocalDate.toStartOfWeek(): LocalDate {
-  return this.with(DayOfWeek.MONDAY)
-}
+fun LocalDate.toStartOfWeek(): LocalDate = this.with(DayOfWeek.MONDAY)
 
-fun LocalDate.toEndOfWeek(): LocalDate {
-  return this.toStartOfWeek().plusDays(6)
-}
+fun LocalDate.toEndOfWeek(): LocalDate = this.toStartOfWeek().plusDays(6)

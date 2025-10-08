@@ -12,13 +12,20 @@ import run.galley.cloud.TestVerticle
 @ExtendWith(VertxExtension::class)
 class TestCharterDataVerticle : TestVerticle() {
   @BeforeEach
-  fun deploy_verticle(vertx: Vertx, testContext: VertxTestContext) {
-    vertx.deployVerticle(CharterDataVerticle(), deploymentOptionsOf(config))
+  fun deploy_verticle(
+    vertx: Vertx,
+    testContext: VertxTestContext,
+  ) {
+    vertx
+      .deployVerticle(CharterDataVerticle(), deploymentOptionsOf(config))
       .onComplete(testContext.succeeding { _ -> testContext.completeNow() })
   }
 
   @Test
-  fun verticle_deployed(vertx: Vertx, testContext: VertxTestContext) {
+  fun verticle_deployed(
+    vertx: Vertx,
+    testContext: VertxTestContext,
+  ) {
     testContext.completeNow()
   }
 }

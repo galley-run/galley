@@ -9,8 +9,10 @@ import nl.clicqo.api.SortDirection
 import nl.clicqo.api.SortField
 
 class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataRequest> {
-
-  override fun encodeToWire(buffer: Buffer, request: EventBusDataRequest) {
+  override fun encodeToWire(
+    buffer: Buffer,
+    request: EventBusDataRequest,
+  ) {
     val identifiersJson = JsonObject(request.identifiers)
 
     val filtersJson = JsonObject()
@@ -18,33 +20,39 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
       filtersJson.put(key, JsonArray(values))
     }
 
-    val sortJson = JsonArray(
-      request.sort.map { sortField ->
+    val sortJson =
+      JsonArray(
+        request.sort.map { sortField ->
+          JsonObject()
+            .put("field", sortField.field)
+            .put("direction", sortField.direction.name)
+        },
+      )
+
+    val paginationJson =
+      request.pagination?.let {
         JsonObject()
-          .put("field", sortField.field)
-          .put("direction", sortField.direction.name)
+          .put("offset", it.offset)
+          .put("limit", it.limit)
       }
-    )
 
-    val paginationJson = request.pagination?.let {
+    val jsonObject =
       JsonObject()
-        .put("offset", it.offset)
-        .put("limit", it.limit)
-    }
-
-    val jsonObject = JsonObject()
-      .put("identifiers", identifiersJson)
-      .put("filters", filtersJson)
-      .put("sort", sortJson)
-      .put("pagination", paginationJson)
-      .put("user", request.user)
+        .put("identifiers", identifiersJson)
+        .put("filters", filtersJson)
+        .put("sort", sortJson)
+        .put("pagination", paginationJson)
+        .put("user", request.user)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
     buffer.appendBuffer(bytes)
   }
 
-  override fun decodeFromWire(pos: Int, buffer: Buffer): EventBusDataRequest {
+  override fun decodeFromWire(
+    pos: Int,
+    buffer: Buffer,
+  ): EventBusDataRequest {
     var position = pos
     val length = buffer.getInt(position)
     position += 4
@@ -52,8 +60,11 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
     val jsonBytes = buffer.getBuffer(position, position + length)
     val json = JsonObject(jsonBytes)
 
-    val identifiers = json.getJsonObject("identifiers", JsonObject()).map
-      .mapValues { it.value.toString() }
+    val identifiers =
+      json
+        .getJsonObject("identifiers", JsonObject())
+        .map
+        .mapValues { it.value.toString() }
 
     val filters = mutableMapOf<String, List<String>>()
     json.getJsonObject("filters", JsonObject()).forEach { (key, value) ->
@@ -62,21 +73,25 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
       }
     }
 
-    val sort = json.getJsonArray("sort", JsonArray()).mapNotNull {
-      if (it is JsonObject) {
-        SortField(
-          field = it.getString("field"),
-          direction = SortDirection.valueOf(it.getString("direction"))
-        )
-      } else null
-    }
+    val sort =
+      json.getJsonArray("sort", JsonArray()).mapNotNull {
+        if (it is JsonObject) {
+          SortField(
+            field = it.getString("field"),
+            direction = SortDirection.valueOf(it.getString("direction")),
+          )
+        } else {
+          null
+        }
+      }
 
-    val pagination = json.getJsonObject("pagination")?.let {
-      Pagination(
-        offset = it.getInteger("offset", 0),
-        limit = it.getInteger("limit", Pagination.DEFAULT_LIMIT)
-      )
-    }
+    val pagination =
+      json.getJsonObject("pagination")?.let {
+        Pagination(
+          offset = it.getInteger("offset", 0),
+          limit = it.getInteger("limit", Pagination.DEFAULT_LIMIT),
+        )
+      }
 
     val user = json.getJsonObject("user")
 
@@ -85,7 +100,7 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
       filters = filters,
       sort = sort,
       pagination = pagination,
-      user = user
+      user = user,
     )
   }
 

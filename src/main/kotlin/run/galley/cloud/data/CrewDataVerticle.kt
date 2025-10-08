@@ -10,7 +10,7 @@ import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.Crew
 import run.galley.cloud.sql.CrewSql
 
-class CrewDataVerticle() : PostgresDataVerticle() {
+class CrewDataVerticle : PostgresDataVerticle() {
   companion object {
     const val ADDRESS_GET_BY_USER_AND_VESSEL = "data.crew.query.get_by_user_and_vessel"
     const val ADDRESS_LIST_ACTIVE = "data.crew.query.list_active"
@@ -31,8 +31,8 @@ class CrewDataVerticle() : PostgresDataVerticle() {
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.one(crew)
-      )
+        payload = DataPayload.one(crew),
+      ),
     )
   }
 
@@ -42,8 +42,8 @@ class CrewDataVerticle() : PostgresDataVerticle() {
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.many(results?.map(Crew::from) ?: emptyList())
-      )
+        payload = DataPayload.many(results?.map(Crew::from) ?: emptyList()),
+      ),
     )
   }
 }

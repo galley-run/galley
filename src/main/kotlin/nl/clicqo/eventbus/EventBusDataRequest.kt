@@ -26,5 +26,5 @@ data class EventBusDataRequest(
   val filters: Map<String, List<String>> = emptyMap(),
   val sort: List<SortField> = emptyList(),
   val pagination: Pagination? = null,
-  val user: JsonObject? = null
+  val user: JsonObject? = null,
 )

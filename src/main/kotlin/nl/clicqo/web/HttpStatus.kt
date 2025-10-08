@@ -1,6 +1,9 @@
 package nl.clicqo.web
 
-enum class HttpStatus(val code: Int, val statusMessage: String) {
+enum class HttpStatus(
+  val code: Int,
+  val statusMessage: String,
+) {
   Ok(200, "OK"),
   Created(201, "Created"),
   Accepted(202, "Accepted"),

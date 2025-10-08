@@ -10,7 +10,7 @@ import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.model.Charter
 import run.galley.cloud.sql.CharterSql
 
-class CharterDataVerticle() : PostgresDataVerticle() {
+class CharterDataVerticle : PostgresDataVerticle() {
   companion object {
     const val ADDRESS_LIST = "data.charter.query.list"
     const val ADDRESS_GET = "data.charter.query.get"
@@ -30,18 +30,19 @@ class CharterDataVerticle() : PostgresDataVerticle() {
 
     val charters = results?.map(Charter::from) ?: emptyList()
 
-    val metadata = request.pagination?.let {
-      JsonObject()
-        .put("offset", it.offset)
-        .put("limit", it.limit)
-        .put("count", charters.size)
-    }
+    val metadata =
+      request.pagination?.let {
+        JsonObject()
+          .put("offset", it.offset)
+          .put("limit", it.limit)
+          .put("count", charters.size)
+      }
 
     message.reply(
       EventBusDataResponse(
         payload = DataPayload.many(charters),
-        metadata = metadata
-      )
+        metadata = metadata,
+      ),
     )
   }
 
@@ -49,13 +50,14 @@ class CharterDataVerticle() : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.getCharter(request))
 
-    val charter = results?.firstOrNull()?.let { Charter.from(it) }
-      ?: throw IllegalArgumentException("Charter not found")
+    val charter =
+      results?.firstOrNull()?.let { Charter.from(it) }
+        ?: throw IllegalArgumentException("Charter not found")
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.one(charter)
-      )
+        payload = DataPayload.one(charter),
+      ),
     )
   }
 }

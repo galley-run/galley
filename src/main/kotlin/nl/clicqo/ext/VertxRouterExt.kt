@@ -17,8 +17,7 @@ fun Router.setupCorsHandler(config: JsonObject): Router {
     .handler(
       CorsHandler
         .create()
-        .addOriginsWithRegex(
-          config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")).map { it.toString() })
+        .addOriginsWithRegex(config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")).map { it.toString() })
         .allowedMethod(HttpMethod.GET)
         .allowedMethod(HttpMethod.DELETE)
         .allowedMethod(HttpMethod.OPTIONS)
@@ -62,12 +61,13 @@ fun Router.setupFailureHandler(): Router {
     val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.v1+json")
 
     when (error) {
-      is ApiStatus -> error.takeIf { apiStatus -> apiStatus == ApiStatus.THROWABLE_EXCEPTION }?.message?.run {
-        logger.error(
-          this,
-          error
-        )
-      }
+      is ApiStatus ->
+        error.takeIf { apiStatus -> apiStatus == ApiStatus.THROWABLE_EXCEPTION }?.message?.run {
+          logger.error(
+            this,
+            error,
+          )
+        }
 
       is ApiStatusReplyException -> {
         if (error.apiStatus == ApiStatus.THROWABLE_EXCEPTION) {
@@ -90,16 +90,14 @@ fun Router.setupFailureHandler(): Router {
 
     ApiResponse(
       it,
-      apiResponseOptions
-    )
-      .addError(
-        when (error) {
-          is ApiStatus -> error
-          is ApiStatusReplyException -> error.apiStatus
-          else -> ApiStatus.FAILED
-        }
-      )
-      .end()
+      apiResponseOptions,
+    ).addError(
+      when (error) {
+        is ApiStatus -> error
+        is ApiStatusReplyException -> error.apiStatus
+        else -> ApiStatus.FAILED
+      },
+    ).end()
   }
 
   return this
@@ -107,7 +105,8 @@ fun Router.setupFailureHandler(): Router {
 
 fun Router.setupDefaultResponse(): Router {
   route().handler { ctx ->
-    ctx.response()
+    ctx
+      .response()
       // Do not allow proxies to cache the data
       .putHeader("Cache-Control", "no-store, no-cache")
       // Prevents Internet Explorer from MIME - sniffing a

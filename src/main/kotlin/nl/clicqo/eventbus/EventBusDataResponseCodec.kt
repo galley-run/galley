@@ -6,12 +6,15 @@ import io.vertx.core.json.JsonObject
 import nl.clicqo.data.DataPayload
 import run.galley.cloud.model.BaseModel
 
-class EventBusDataResponseCodec <T: BaseModel> : MessageCodec<EventBusDataResponse<T>, EventBusDataResponse<T>> {
-
-  override fun encodeToWire(buffer: Buffer, response: EventBusDataResponse<T>) {
-    val jsonObject = JsonObject()
-      .put("payload", response.payload.toCodec())
-      .put("metadata", response.metadata)
+class EventBusDataResponseCodec<T : BaseModel> : MessageCodec<EventBusDataResponse<T>, EventBusDataResponse<T>> {
+  override fun encodeToWire(
+    buffer: Buffer,
+    response: EventBusDataResponse<T>,
+  ) {
+    val jsonObject =
+      JsonObject()
+        .put("payload", response.payload.toCodec())
+        .put("metadata", response.metadata)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -19,7 +22,10 @@ class EventBusDataResponseCodec <T: BaseModel> : MessageCodec<EventBusDataRespon
   }
 
   @Suppress("UNCHECKED_CAST")
-  override fun decodeFromWire(pos: Int, buffer: Buffer): EventBusDataResponse<T> {
+  override fun decodeFromWire(
+    pos: Int,
+    buffer: Buffer,
+  ): EventBusDataResponse<T> {
     var position = pos
     val length = buffer.getInt(position)
     position += 4
@@ -36,18 +42,22 @@ class EventBusDataResponseCodec <T: BaseModel> : MessageCodec<EventBusDataRespon
 
     return EventBusDataResponse(
       payload = createDataPayload(payload, clazz),
-      metadata = metadata
+      metadata = metadata,
     )
   }
 
   @Suppress("UNCHECKED_CAST")
-  private fun createDataPayload(payload: JsonObject, clazz: Class<T>): DataPayload<T> {
+  private fun createDataPayload(
+    payload: JsonObject,
+    clazz: Class<T>,
+  ): DataPayload<T> {
     val modelClass = clazz.getDeclaredConstructor().newInstance()
 
     val item = payload.getJsonObject("item")?.let { modelClass.fromJsonAPIResourceObject<T>(it) }
-    val items = payload.getJsonArray("items")?.map {
-      clazz.getDeclaredConstructor().newInstance().fromJsonAPIResourceObject<T>(it as JsonObject)
-    }
+    val items =
+      payload.getJsonArray("items")?.map {
+        clazz.getDeclaredConstructor().newInstance().fromJsonAPIResourceObject<T>(it as JsonObject)
+      }
 
     return DataPayload(item = item, items = items)
   }

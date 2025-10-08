@@ -10,7 +10,7 @@ import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.User
 import run.galley.cloud.sql.UserSql
 
-class UserDataVerticle() : PostgresDataVerticle() {
+class UserDataVerticle : PostgresDataVerticle() {
   companion object {
     const val ADDRESS_GET = "data.user.query.get"
     const val ADDRESS_GET_BY_EMAIL = "data.user.query.get_by_email"
@@ -25,25 +25,27 @@ class UserDataVerticle() : PostgresDataVerticle() {
 
   private suspend fun get(message: Message<EventBusDataRequest>) {
     val request = message.body()
-    val user = pool.executePreparedQuery(UserSql.getUser(request))?.firstOrNull()?.let(User::from)
-      ?: throw ApiStatus.USER_NOT_FOUND
+    val user =
+      pool.executePreparedQuery(UserSql.getUser(request))?.firstOrNull()?.let(User::from)
+        ?: throw ApiStatus.USER_NOT_FOUND
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.one(user)
-      )
+        payload = DataPayload.one(user),
+      ),
     )
   }
 
   private suspend fun getByEmail(message: Message<EventBusDataRequest>) {
     val request = message.body()
-    val user = pool.executePreparedQuery(UserSql.getUserByEmail(request))?.firstOrNull()?.let(User::from)
-      ?: throw ApiStatus.USER_NOT_FOUND
+    val user =
+      pool.executePreparedQuery(UserSql.getUserByEmail(request))?.firstOrNull()?.let(User::from)
+        ?: throw ApiStatus.USER_NOT_FOUND
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.one(user)
-      )
+        payload = DataPayload.one(user),
+      ),
     )
   }
 }

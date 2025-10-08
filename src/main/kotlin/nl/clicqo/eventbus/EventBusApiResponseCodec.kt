@@ -5,18 +5,25 @@ import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
 
 class EventBusApiResponseCodec : MessageCodec<EventBusApiResponse, EventBusApiResponse> {
-  override fun encodeToWire(buffer: Buffer, s: EventBusApiResponse?) {
-    val jsonObject = JsonObject()
-      .put("payload", s?.payload)
-      .put("version", s?.version)
-      .put("format", s?.format)
+  override fun encodeToWire(
+    buffer: Buffer,
+    s: EventBusApiResponse?,
+  ) {
+    val jsonObject =
+      JsonObject()
+        .put("payload", s?.payload)
+        .put("version", s?.version)
+        .put("format", s?.format)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
     buffer.appendBuffer(bytes)
   }
 
-  override fun decodeFromWire(pos: Int, buffer: Buffer): EventBusApiResponse {
+  override fun decodeFromWire(
+    pos: Int,
+    buffer: Buffer,
+  ): EventBusApiResponse {
     var position = pos
     val length = buffer.getInt(position)
     position += 4
@@ -27,7 +34,7 @@ class EventBusApiResponseCodec : MessageCodec<EventBusApiResponse, EventBusApiRe
     return EventBusApiResponse(
       payload = json.getJsonObject("payload"),
       version = json.getString("version", "v1"),
-      format = json.getString("format", "json")
+      format = json.getString("format", "json"),
     )
   }
 

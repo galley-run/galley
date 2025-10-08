@@ -7,8 +7,10 @@ import io.vertx.ext.auth.User
 import io.vertx.openapi.validation.RequestParameter
 
 class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequest> {
-
-  override fun encodeToWire(buffer: Buffer, s: EventBusApiRequest) {
+  override fun encodeToWire(
+    buffer: Buffer,
+    s: EventBusApiRequest,
+  ) {
     val identifiersJson = JsonObject()
     s.identifiers?.forEach { (key, value) ->
       identifiersJson.put(key, value.toString())
@@ -19,19 +21,23 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
       queryJson.put(key, value.toString())
     }
 
-    val jsonObject = JsonObject()
-      .put("identifiers", identifiersJson)
-      .put("body", s.body)
-      .put("query", queryJson)
-      .put("user", s.user?.principal())
-      .put("version", s.version)
+    val jsonObject =
+      JsonObject()
+        .put("identifiers", identifiersJson)
+        .put("body", s.body)
+        .put("query", queryJson)
+        .put("user", s.user?.principal())
+        .put("version", s.version)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
     buffer.appendBuffer(bytes)
   }
 
-  override fun decodeFromWire(pos: Int, buffer: Buffer): EventBusApiRequest {
+  override fun decodeFromWire(
+    pos: Int,
+    buffer: Buffer,
+  ): EventBusApiRequest {
     var position = pos
     val length = buffer.getInt(position)
     position += 4
@@ -49,7 +55,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
       body = json.getJsonObject("body"),
       query = query,
       user = User.create(json.getJsonObject("user")),
-      version = json.getString("version", "v1")
+      version = json.getString("version", "v1"),
     )
   }
 

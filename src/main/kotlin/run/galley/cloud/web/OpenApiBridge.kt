@@ -15,8 +15,12 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
-class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) : OpenAPIBridgeRouter(vertx, config) {
+class OpenApiBridge(
+  override val vertx: Vertx,
+  override val config: JsonObject,
+) : OpenAPIBridgeRouter(vertx, config) {
   val logger = LoggerFactory.getLogger(this::class.java)
+
   override suspend fun buildRouter(): RouterBuilder {
     /**
      * Add security handlers for each scope.
@@ -24,19 +28,14 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
     openAPIRouterBuilder
       .security("vesselCaptain")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("VESSEL_CAPTAIN"))
-
       .security("charterCaptain")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_CAPTAIN"))
-
       .security("charterPurser")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_PURSER"))
-
       .security("charterBoatswain")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_BOATSWAIN"))
-
       .security("charterDeckhand")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_DECKHAND"))
-
       .security("charterSteward")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_STEWARD"))
 
@@ -61,11 +60,12 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
            * Currently only supports JSON as a response format.
            */
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
-          val acceptsJson = acceptHeader.split(",").find { header ->
-            header.trim().endsWith("/*", true) ||
-              header.trim().endsWith("/json", true) ||
-              header.trim().endsWith("+json", true)
-          }
+          val acceptsJson =
+            acceptHeader.split(",").find { header ->
+              header.trim().endsWith("/*", true) ||
+                header.trim().endsWith("/json", true) ||
+                header.trim().endsWith("+json", true)
+            }
 
           /**
            * Anything other than JSON is not supported at the moment.
@@ -77,25 +77,27 @@ class OpenApiBridge(override val vertx: Vertx, override val config: JsonObject) 
 
           val eb = routingContext.vertx().eventBus()
 
-          val response = eb.request<EventBusApiResponse>(
-            address,
-            EventBusApiRequest(
-              user = routingContext.user(),
-              identifiers = params,
-              body = body,
-              query = query
+          val response =
+            eb
+              .request<EventBusApiResponse>(
+                address,
+                EventBusApiRequest(
+                  user = routingContext.user(),
+                  identifiers = params,
+                  body = body,
+                  query = query,
 //            version = responseVersion,
-            )
-          ).coAwait().body()
+                ),
+              ).coAwait()
+              .body()
 
           // TODO: use requested responseFormat to return JSON or something else.
           val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.v1+json")
 
           ApiResponse(
             routingContext,
-            apiResponseOptions
-          )
-            .fromEventBusApiResponse(response)
+            apiResponseOptions,
+          ).fromEventBusApiResponse(response)
             .end()
         }
       }

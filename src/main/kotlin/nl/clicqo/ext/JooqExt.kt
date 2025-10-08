@@ -1,6 +1,5 @@
 package nl.clicqo.ext
 
-import java.util.UUID
 import nl.clicqo.api.ApiPagination
 import org.jooq.Condition
 import org.jooq.Record
@@ -9,10 +8,10 @@ import org.jooq.SelectWhereStep
 import org.jooq.TableField
 import org.jooq.UpdateConditionStep
 import org.jooq.UpdateWhereStep
+import java.util.UUID
 
-fun <R : Record?> SelectWhereStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> {
-  return this.where().applyPagination(pagination)
-}
+fun <R : Record?> SelectWhereStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> =
+  this.where().applyPagination(pagination)
 
 fun <R : Record?> SelectConditionStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> {
   if (pagination == null) {
@@ -40,13 +39,9 @@ fun <R : Record?> SelectConditionStep<R>.applyConditions(vararg conditions: Cond
 }
 
 // Overload for type-safe JOOQ Condition objects
-fun <R : Record?> SelectWhereStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> {
-  return this.where(condition)
-}
+fun <R : Record?> SelectWhereStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> = this.where(condition)
 
-fun <R : Record?> SelectConditionStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> {
-  return this.and(condition)
-}
+fun <R : Record?> SelectConditionStep<R>.applyConditions(condition: Condition): SelectConditionStep<R> = this.and(condition)
 
 // Apply sorting with type-safe JOOQ SortField objects
 fun <R : Record?> SelectConditionStep<R>.applySorting(sortFields: List<org.jooq.SortField<*>>): SelectConditionStep<R> {
@@ -57,7 +52,10 @@ fun <R : Record?> SelectConditionStep<R>.applySorting(sortFields: List<org.jooq.
 }
 
 // Apply pagination with offset and limit
-fun <R : Record?> SelectConditionStep<R>.applyPagination(offset: Int, limit: Int): SelectConditionStep<R> {
+fun <R : Record?> SelectConditionStep<R>.applyPagination(
+  offset: Int,
+  limit: Int,
+): SelectConditionStep<R> {
   this.limit(limit).offset(offset)
   return this
 }

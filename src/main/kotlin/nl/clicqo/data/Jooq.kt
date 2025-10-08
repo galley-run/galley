@@ -15,11 +15,12 @@ import org.jooq.impl.DSL
 object Jooq {
   val postgres by lazy {
     DSL.using(
-      SQLDialect.POSTGRES, Settings()
+      SQLDialect.POSTGRES,
+      Settings()
         .withBackslashEscaping(BackslashEscaping.OFF)
         .withRenderSchema(false)
         .withParamType(ParamType.NAMED)
-        .withRenderNamedParamPrefix("$")
+        .withRenderNamedParamPrefix("$"),
     )
   }
 
@@ -30,9 +31,11 @@ object Jooq {
 }
 
 suspend fun Pool.executePreparedQuery(query: Query): RowSet<Row>? {
-  val results = this.preparedQuery(query.sql)
-    .execute(Tuple.wrap(Jooq.prepareBindValues(query.bindValues)))
-    .coAwait()
+  val results =
+    this
+      .preparedQuery(query.sql)
+      .execute(Tuple.wrap(Jooq.prepareBindValues(query.bindValues)))
+      .coAwait()
 
   return results
 }

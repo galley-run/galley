@@ -43,10 +43,12 @@ class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun start() {
-    val configRetriever = ConfigRetriever.create(
-      vertx, ConfigRetrieverOptions()
-        .addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json")))
-    )
+    val configRetriever =
+      ConfigRetriever.create(
+        vertx,
+        ConfigRetrieverOptions()
+          .addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json"))),
+      )
     val config = configRetriever.config.coAwait()
 
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
@@ -55,7 +57,7 @@ class MainVerticle : CoroutineVerticle() {
     @Suppress("UNCHECKED_CAST")
     vertx.eventBus().registerDefaultCodec(
       EventBusDataResponse::class.java,
-      EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>
+      EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>,
     )
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
@@ -72,14 +74,16 @@ class MainVerticle : CoroutineVerticle() {
     }
 
     // Deploy verticles
-    val deploymentOptions = DeploymentOptions()
-      .setConfig(config)
+    val deploymentOptions =
+      DeploymentOptions()
+        .setConfig(config)
 
     // Start the DB migration
     // MainVerticle will fail to deploy if the migration fails
-    val flywayMigrationVerticleId = vertx
-      .deployVerticle(FlywayMigrationVerticle(), deploymentOptionsOf(config.getJsonObject("db")))
-      .coAwait()
+    val flywayMigrationVerticleId =
+      vertx
+        .deployVerticle(FlywayMigrationVerticle(), deploymentOptionsOf(config.getJsonObject("db")))
+        .coAwait()
     // Undeploy once the migration is done
     vertx.undeploy(flywayMigrationVerticleId).coAwait()
 
@@ -92,9 +96,10 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
 
-    val httpPort = config
-      .getJsonObject("http", JsonObject())
-      .getInteger("port", 9233)
+    val httpPort =
+      config
+        .getJsonObject("http", JsonObject())
+        .getInteger("port", 9233)
 
     try {
       // Start to run the HTTP server

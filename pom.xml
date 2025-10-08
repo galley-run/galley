@@ -435,7 +435,7 @@
                 </target>
                 <generate>
                   <pojos>true</pojos>
-                  <daos>true</daos>
+                  <daos>false</daos>
                   <interfaces>false</interfaces>
                   <javaTimeTypes>true</javaTimeTypes>
                 </generate>

@@ -21,4 +21,4 @@ jobs:
         cache: maven
 
     - name: Run ktlint format
-      run: mvn ktlint:format
+      run: mvn exec:exec@ktlint-format

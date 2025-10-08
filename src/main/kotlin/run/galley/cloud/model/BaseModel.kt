@@ -26,7 +26,8 @@ interface BaseModel {
       .put("attributes", attributes)
   }
 
-  fun fromJsonAPIResourceObject(json: JsonObject): BaseModel {
+  @Suppress("UNCHECKED_CAST")
+  fun <T : BaseModel> fromJsonAPIResourceObject(json: JsonObject): T {
     val id = json.getString("id")
     val attributes = json.getJsonObject("attributes")
 
@@ -44,6 +45,6 @@ interface BaseModel {
         }
       }
 
-    return this
+    return this as T
   }
 }

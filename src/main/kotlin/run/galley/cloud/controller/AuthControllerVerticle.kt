@@ -48,20 +48,20 @@ class AuthControllerVerticle : CoroutineVerticle() {
     val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatus.REFRESH_TOKEN_INVALID
     val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
-    val user = vertx.eventBus().request<EventBusDataResponse>(
+    val user = vertx.eventBus().request<EventBusDataResponse<Users>>(
       UserDataVerticle.ADDRESS_GET, EventBusDataRequest(
         identifiers = mapOf("id" to userId.toString()),
       )
-    ).coAwait().body().payload.toSingle<Users>() ?: throw ApiStatus.USER_NOT_FOUND
+    ).coAwait().body().payload.toSingle() ?: throw ApiStatus.USER_NOT_FOUND
 
-    val crewResponse = vertx.eventBus().request<EventBusDataResponse>(
+    val crewResponse = vertx.eventBus().request<EventBusDataResponse<Crew>>(
       CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL, EventBusDataRequest(
         identifiers = mapOf(
           "userId" to user.id.toString(),
           "vesselId" to vesselId.toString()
         ),
       )
-    ).coAwait().body().payload.toSingle<Crew>() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+    ).coAwait().body().payload.toSingle() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
@@ -100,20 +100,20 @@ class AuthControllerVerticle : CoroutineVerticle() {
     val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatus.REFRESH_TOKEN_INVALID
     val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
-    val user = vertx.eventBus().request<EventBusDataResponse>(
+    val user = vertx.eventBus().request<EventBusDataResponse<Users>>(
       UserDataVerticle.ADDRESS_GET, EventBusDataRequest(
         identifiers = mapOf("id" to userId.toString()),
       )
-    ).coAwait().body().payload.toSingle<Users>() ?: throw ApiStatus.USER_NOT_FOUND
+    ).coAwait().body().payload.toSingle() ?: throw ApiStatus.USER_NOT_FOUND
 
-    val crewResponse = vertx.eventBus().request<EventBusDataResponse>(
+    val crewResponse = vertx.eventBus().request<EventBusDataResponse<Crew>>(
       CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL, EventBusDataRequest(
         identifiers = mapOf(
           "userId" to user.id.toString(),
           "vesselId" to vesselId.toString()
         ),
       )
-    ).coAwait().body().payload.toSingle<Crew>() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+    ).coAwait().body().payload.toSingle() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     val userRole = when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
@@ -139,21 +139,21 @@ class AuthControllerVerticle : CoroutineVerticle() {
     val apiRequest = message.body()
     val email = apiRequest.body?.getString("email") ?: throw ApiStatus.ID_MISSING
 
-    val user = vertx.eventBus().request<EventBusDataResponse>(
+    val user = vertx.eventBus().request<EventBusDataResponse<Users>>(
       UserDataVerticle.ADDRESS_GET_BY_EMAIL, EventBusDataRequest(
         filters = mapOf("email" to listOf(email))
       )
-    ).coAwait().body().payload.toSingle<Users>() ?: throw ApiStatus.USER_NOT_FOUND
+    ).coAwait().body().payload.toSingle() ?: throw ApiStatus.USER_NOT_FOUND
 
-    val crewMemberships = vertx.eventBus().request<EventBusDataResponse>(
+    val crewMemberships = vertx.eventBus().request<EventBusDataResponse<Crew>>(
       CrewDataVerticle.ADDRESS_LIST_ACTIVE, EventBusDataRequest(
         filters = mapOf(
           "userId" to listOf(user.id!!.toString()),
         )
       )
-    ).coAwait().body().payload.toMany<Crew>()
+    ).coAwait().body().payload.toMany()
 
-    val crewMembership = crewMemberships.firstOrNull() ?: throw ApiStatus.VESSEL_NOT_FOUND
+    val crewMembership = crewMemberships?.firstOrNull() ?: throw ApiStatus.VESSEL_NOT_FOUND
 
     when (crewMembership.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN

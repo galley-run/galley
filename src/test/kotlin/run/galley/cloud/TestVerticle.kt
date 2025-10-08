@@ -1,6 +1,7 @@
 package run.galley.cloud
 
 import io.vertx.core.Vertx
+import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxExtension
 import nl.clicqo.api.ApiStatusReplyException
@@ -15,6 +16,7 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusDataResponseCodec
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
+import run.galley.cloud.model.BaseModel
 
 @ExtendWith(VertxExtension::class)
 open class TestVerticle {
@@ -51,7 +53,11 @@ open class TestVerticle {
       vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
       vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
       vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
-      vertx.eventBus().registerDefaultCodec(EventBusDataResponse::class.java, EventBusDataResponseCodec())
+      @Suppress("UNCHECKED_CAST")
+      vertx.eventBus().registerDefaultCodec(
+        EventBusDataResponse::class.java,
+        EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>
+      )
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }
   }

@@ -132,6 +132,40 @@ paths:
           application/vnd.galley.v1+json:
             schema:
               $ref: '#/components/schemas/CharterCreate'
+  /vessels/{vessel_id}/charters/{charter_id}:
+    parameters:
+      - $ref: '#/components/parameters/vessel_id'
+      - $ref: '#/components/parameters/charter_id'
+    get:
+      tags:
+        - charter
+      summary: View a Charter within a Vessel. Charter Captains and Pursers can only see details of their own charter. Vessel Captains can see any charter within their vessel.
+      operationId: charter.query.get
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
+      responses:
+        '200':
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: SingleCharter
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Charter'
+          description: The request was successful, and the server has returned the requested resource in the response body.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -258,6 +292,13 @@ components:
   parameters:
     vessel_id:
       name: vessel_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    charter_id:
+      name: charter_id
       in: path
       required: true
       schema:

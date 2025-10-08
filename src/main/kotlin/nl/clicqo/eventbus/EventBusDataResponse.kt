@@ -2,6 +2,7 @@ package nl.clicqo.eventbus
 
 import io.vertx.core.json.JsonObject
 import nl.clicqo.data.DataPayload
+import run.galley.cloud.model.BaseModel
 
 /**
  * Response object for EventBus communication from Data Verticles to Controller Verticles.
@@ -16,13 +17,13 @@ import nl.clicqo.data.DataPayload
  *     .put("limit", 50)
  *     .put("hasMore", true)
  */
-data class EventBusDataResponse(
-  val payload: DataPayload,
+data class EventBusDataResponse<T : BaseModel> (
+  val payload: DataPayload<T>,
   val metadata: JsonObject? = null
 ) {
   companion object {
-    fun from(payload: JsonObject, metadata: JsonObject? = null): EventBusDataResponse {
-      return EventBusDataResponse(DataPayload.from(payload), metadata)
+    inline fun <reified T: BaseModel> from(payload: JsonObject, metadata: JsonObject? = null): EventBusDataResponse<T> {
+      return EventBusDataResponse(DataPayload.from<T>(payload), metadata)
     }
   }
 }

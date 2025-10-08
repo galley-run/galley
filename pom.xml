@@ -182,7 +182,7 @@
             </goals>
             <configuration>
               <sources>
-                <source>src/main/generated/jooq</source>
+                <source>src/main/kotlin/generated/jooq</source>
               </sources>
             </configuration>
           </execution>
@@ -239,17 +239,6 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>${maven-surefire-plugin.version}</version>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>${exec-maven-plugin.version}</version>
-        <configuration>
-          <mainClass>${launcher.class}</mainClass>
-          <arguments>
-            <argument>${main.verticle}</argument>
-          </arguments>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.flywaydb</groupId>
@@ -441,8 +430,8 @@
                   </forcedTypes>
                 </database>
                 <target>
-                  <packageName>run.galley.cloud.db.generated</packageName>
-                  <directory>src/main/generated/jooq</directory>
+                  <packageName>generated.jooq</packageName>
+                  <directory>src/main/kotlin</directory>
                 </target>
                 <generate>
                   <pojos>true</pojos>
@@ -640,6 +629,53 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.7</version>
           </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <!--
+            Format and autocorrect lint errors when possible during compile. This helps in committing autocorrect changes in the
+            same commit as where the original code changes were made.
+            -->
+            <id>ktlint-format</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>exec</goal>
+            </goals>
+            <configuration>
+              <includePluginDependencies>true</includePluginDependencies>
+              <executable>java</executable>
+              <arguments>
+                <argument>-classpath</argument>
+                <classpath/>
+                <argument>com.pinterest.ktlint.Main</argument>
+                <argument>!src/**/generated/**</argument>
+                <argument>--format</argument>
+                <argument>--relative</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>${launcher.class}</mainClass>
+          <arguments>
+            <argument>${main.verticle}</argument>
+          </arguments>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>com.pinterest.ktlint</groupId>
+            <artifactId>ktlint-cli</artifactId>
+            <version>1.7.1</version>
+            <!-- Use fat jar of ktlint-cli -->
+            <classifier>all</classifier>
+            <type>jar</type>
+          </dependency>
+          <!-- additional 3rd party ruleset(s) can be specified here -->
         </dependencies>
       </plugin>
     </plugins>

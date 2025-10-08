@@ -7,12 +7,12 @@ import io.vertx.core.eventbus.MessageConsumer
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.openapi.router.OpenAPIRoute
 import io.vertx.kotlin.coroutines.dispatcher
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.ApiStatusReplyException
+import kotlin.coroutines.CoroutineContext
 
 fun <T> EventBus.coroutineConsumer(
   context: CoroutineContext,
@@ -27,9 +27,10 @@ fun <T> EventBus.coroutineLocalConsumer(
   context: CoroutineContext,
   address: String,
   fn: suspend (Message<T>) -> Unit,
-): MessageConsumer<T?>? = localConsumer<T>(address) { message ->
-  coroutineConsumerHandler(context, fn, message)
-}
+): MessageConsumer<T?>? =
+  localConsumer<T>(address) { message ->
+    coroutineConsumerHandler(context, fn, message)
+  }
 
 private fun <T> coroutineConsumerHandler(
   context: CoroutineContext,
@@ -49,7 +50,10 @@ private fun <T> coroutineConsumerHandler(
   }
 }
 
-fun OpenAPIRoute.addCoroutineHandler(vertx: Vertx, block: suspend (rc: RoutingContext) -> Unit): OpenAPIRoute {
+fun OpenAPIRoute.addCoroutineHandler(
+  vertx: Vertx,
+  block: suspend (rc: RoutingContext) -> Unit,
+): OpenAPIRoute {
   val scope = CoroutineScope(vertx.dispatcher() + SupervisorJob())
   return this.addHandler { rc -> scope.launch { block(rc) } }
 }

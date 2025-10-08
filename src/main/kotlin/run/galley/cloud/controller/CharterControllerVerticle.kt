@@ -1,5 +1,6 @@
 package run.galley.cloud.controller
 
+import generated.jooq.tables.pojos.Charters
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
@@ -15,7 +16,6 @@ import nl.kleilokaal.queue.modules.coroutineConsumer
 import org.slf4j.LoggerFactory
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CharterDataVerticle
-import run.galley.cloud.db.generated.tables.pojos.Charters
 import run.galley.cloud.model.UserRole
 import run.galley.cloud.model.getUserRole
 
@@ -46,7 +46,11 @@ class CharterControllerVerticle : CoroutineVerticle() {
       filters[key] = listOf(value.string)
     }
 
-    val vesselId = apiRequest.identifiers?.get("vessel_id")?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val vesselId =
+      apiRequest.identifiers
+        ?.get("vessel_id")
+        ?.string
+        ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
     filters["vesselId"] = listOf(vesselId.toString())
     if (userRole != UserRole.VESSEL_CAPTAIN) {
@@ -55,23 +59,26 @@ class CharterControllerVerticle : CoroutineVerticle() {
     }
 
     // Build data request with filters, sort, and pagination
-    val dataRequest = EventBusDataRequest(
-      filters = filters,
-      sort = listOf(SortField("id", SortDirection.ASC)),
-      pagination = Pagination(offset = 0, limit = 10),
-      user = apiRequest.user.principal()
-    )
+    val dataRequest =
+      EventBusDataRequest(
+        filters = filters,
+        sort = listOf(SortField("id", SortDirection.ASC)),
+        pagination = Pagination(offset = 0, limit = 10),
+        user = apiRequest.user.principal(),
+      )
 
-    val dataResponse = vertx.eventBus()
-      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
-      .coAwait()
-      .body()
+    val dataResponse =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
+        .coAwait()
+        .body()
 
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        payload = dataResponse.payload.toJsonObject()
-      )
+        payload = dataResponse.payload.toJsonObject(),
+      ),
     )
   }
 
@@ -79,30 +86,32 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val apiRequest = message.body()
 
     // Extract charterId from path identifiers
-    val charterId = apiRequest.identifiers?.get("charter_id")?.string
-      ?: throw IllegalArgumentException("charterId is required")
+    val charterId =
+      apiRequest.identifiers?.get("charter_id")?.string
+        ?: throw IllegalArgumentException("charterId is required")
 
     // Build data request with identifier
-    val dataRequest = EventBusDataRequest(
-      identifiers = mapOf("id" to charterId),
-      filters = mapOf("vessel_id" to listOf(apiRequest.identifiers["vessel_id"]?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT)),
-      user = apiRequest.user?.principal()
-    )
+    val dataRequest =
+      EventBusDataRequest(
+        identifiers = mapOf("id" to charterId),
+        filters = mapOf("vessel_id" to listOf(apiRequest.identifiers["vessel_id"]?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT)),
+        user = apiRequest.user?.principal(),
+      )
 
-    val dataResponse = vertx.eventBus()
-      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_GET, dataRequest)
-      .coAwait()
-      .body()
+    val dataResponse =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_GET, dataRequest)
+        .coAwait()
+        .body()
 
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        payload = dataResponse.payload.toJsonObject()
-      )
+        payload = dataResponse.payload.toJsonObject(),
+      ),
     )
   }
 
-  private suspend fun create(message: Message<EventBusApiRequest>) {
-    throw ApiStatus.VESSEL_INSERT_FAILED
-  }
+  private suspend fun create(message: Message<EventBusApiRequest>): Unit = throw ApiStatus.VESSEL_INSERT_FAILED
 }

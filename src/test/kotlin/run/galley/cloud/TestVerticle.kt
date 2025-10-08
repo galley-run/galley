@@ -20,8 +20,9 @@ import run.galley.cloud.model.BaseModel
 
 @ExtendWith(VertxExtension::class)
 open class TestVerticle {
-  val config = JsonObject(
-    """{
+  val config =
+    JsonObject(
+      """{
   "http": {
     "port": 9233
   },
@@ -43,8 +44,8 @@ open class TestVerticle {
     "username": "username",
     "password": "password"
   }
-}"""
-  )
+}""",
+    )
 
   companion object {
     @JvmStatic
@@ -56,10 +57,9 @@ open class TestVerticle {
       @Suppress("UNCHECKED_CAST")
       vertx.eventBus().registerDefaultCodec(
         EventBusDataResponse::class.java,
-        EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>
+        EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>,
       )
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }
   }
-
 }

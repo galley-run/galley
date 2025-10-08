@@ -6,7 +6,7 @@ import io.vertx.pgclient.PgConnectOptions
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.PoolOptions
 
-open class PostgresDataVerticle() : CoroutineVerticle() {
+open class PostgresDataVerticle : CoroutineVerticle() {
   protected lateinit var pool: Pool
 
   override suspend fun start() {
@@ -15,26 +15,29 @@ open class PostgresDataVerticle() : CoroutineVerticle() {
     val dbConfig = config.getJsonObject("db")
 
     // Connection options
-    val connectOptions = PgConnectOptions()
-      .setPort(dbConfig.getInteger("port", 5432))
-      .setHost(dbConfig.getString("host", "localhost"))
-      .setDatabase(dbConfig.getString("database", "galley"))
-      .setUser(dbConfig.getString("username", "galley"))
-      .setPassword(dbConfig.getString("password", ""))
+    val connectOptions =
+      PgConnectOptions()
+        .setPort(dbConfig.getInteger("port", 5432))
+        .setHost(dbConfig.getString("host", "localhost"))
+        .setDatabase(dbConfig.getString("database", "galley"))
+        .setUser(dbConfig.getString("username", "galley"))
+        .setPassword(dbConfig.getString("password", ""))
 
     // Pool options
-    val poolOptions = PoolOptions()
-      .setMaxSize(dbConfig.getInteger("pool_size", 5))
-      .setShared(true)
-      .setName("data-pool")
-      .setEventLoopSize(dbConfig.getInteger("event_loop_size", 4))
+    val poolOptions =
+      PoolOptions()
+        .setMaxSize(dbConfig.getInteger("pool_size", 5))
+        .setShared(true)
+        .setName("data-pool")
+        .setEventLoopSize(dbConfig.getInteger("event_loop_size", 4))
 
     // Create the pool
-    pool = PgBuilder.pool()
-      .with(poolOptions)
-      .connectingTo(connectOptions)
-      .using(vertx)
-      .build()
+    pool =
+      PgBuilder
+        .pool()
+        .with(poolOptions)
+        .connectingTo(connectOptions)
+        .using(vertx)
+        .build()
   }
-
 }

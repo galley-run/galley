@@ -8,7 +8,7 @@ import nl.clicqo.web.HttpStatus
 
 class ApiResponse(
   val routingContext: RoutingContext,
-  apiResponseOptions: ApiResponseOptions = ApiResponseOptions()
+  apiResponseOptions: ApiResponseOptions = ApiResponseOptions(),
 ) {
   var body: JsonObject? = null
   var httpStatus: HttpStatus = HttpStatus.NoContent
@@ -49,7 +49,8 @@ class ApiResponse(
       httpStatus = HttpStatus.Ok
     }
 
-    routingContext.response()
+    routingContext
+      .response()
       .setStatusCode(httpStatus.code)
       .setStatusMessage(httpStatus.statusMessage)
       .putHeader("content-type", contentType)
@@ -57,4 +58,3 @@ class ApiResponse(
       .end(build())
   }
 }
-

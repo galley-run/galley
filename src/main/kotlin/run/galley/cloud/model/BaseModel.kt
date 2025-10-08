@@ -4,20 +4,27 @@ import io.vertx.core.json.JsonObject
 
 interface BaseModel {
   fun toJsonAPIResourceObject(): JsonObject {
-    val attributes = JsonObject()
-      .put(
-        "id", this::class.java.getDeclaredFields()
-          .firstOrNull { it.name == "id" }
-          ?.let { it.isAccessible = true; it.get(this) })
-      .apply {
-        this@BaseModel::class.java.getDeclaredFields()
-          .filter { it.name != "id" }
-          .forEach { field ->
-            field.isAccessible = true
-            val value = field.get(this@BaseModel) ?: return@forEach
-            put(field.name, value)
-          }
-      }
+    val attributes =
+      JsonObject()
+        .put(
+          "id",
+          this::class.java
+            .getDeclaredFields()
+            .firstOrNull { it.name == "id" }
+            ?.let {
+              it.isAccessible = true
+              it.get(this)
+            },
+        ).apply {
+          this@BaseModel::class.java
+            .getDeclaredFields()
+            .filter { it.name != "id" }
+            .forEach { field ->
+              field.isAccessible = true
+              val value = field.get(this@BaseModel) ?: return@forEach
+              put(field.name, value)
+            }
+        }
     val id = attributes.getString("id")
     attributes.remove("id")
     return JsonObject()
@@ -31,7 +38,8 @@ interface BaseModel {
     val id = json.getString("id")
     val attributes = json.getJsonObject("attributes")
 
-    this::class.java.getDeclaredFields()
+    this::class.java
+      .getDeclaredFields()
       .forEach { field ->
         field.isAccessible = true
         when (field.name) {

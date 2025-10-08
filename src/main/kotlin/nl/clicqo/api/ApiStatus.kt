@@ -2,7 +2,7 @@ package nl.clicqo.api
 
 import nl.clicqo.web.HttpStatus
 
-open class ApiStatus: Throwable {
+open class ApiStatus : Throwable {
   val code: Int
   override var message: String = ""
   val httpStatus: HttpStatus
@@ -50,7 +50,7 @@ open class ApiStatus: Throwable {
     val THROWABLE_EXCEPTION =
       ApiStatus(
         102,
-        FAILED
+        FAILED,
       )
     val UUID_PARSE_EXCEPTION = ApiStatus(103, "A UUID couldn't be processed")
     val DATE_PARSE_EXCEPTION = ApiStatus(104, "A local date string couldn't be processed")

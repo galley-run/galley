@@ -9,7 +9,10 @@ import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.openapi.contract.OpenAPIContract
 import run.galley.cloud.web.JWT
 
-abstract class OpenAPIBridgeRouter(open val vertx: Vertx, open val config: JsonObject) {
+abstract class OpenAPIBridgeRouter(
+  open val vertx: Vertx,
+  open val config: JsonObject,
+) {
   protected lateinit var openAPIRouterBuilder: RouterBuilder
   lateinit var authProvider: JWTAuth
 
@@ -24,7 +27,10 @@ abstract class OpenAPIBridgeRouter(open val vertx: Vertx, open val config: JsonO
 
   abstract suspend fun buildRouter(): RouterBuilder
 
-  suspend fun catchAll(routingContext: RoutingContext, fn: suspend () -> Unit) {
+  suspend fun catchAll(
+    routingContext: RoutingContext,
+    fn: suspend () -> Unit,
+  ) {
     try {
       fn()
     } catch (e: Throwable) {

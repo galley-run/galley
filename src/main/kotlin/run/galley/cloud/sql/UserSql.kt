@@ -1,6 +1,7 @@
 package run.galley.cloud.sql
 
-import java.util.UUID
+import generated.jooq.tables.references.USERS
+import generated.jooq.tables.references.VESSELS
 import nl.clicqo.api.SortDirection
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusDataRequest
@@ -10,8 +11,7 @@ import org.jooq.Condition
 import org.jooq.Query
 import org.jooq.SortField
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.db.generated.tables.references.USERS
-import run.galley.cloud.db.generated.tables.references.VESSELS
+import java.util.UUID
 
 object UserSql {
   fun getUser(request: EventBusDataRequest): Query {
@@ -30,8 +30,8 @@ object UserSql {
       .where(USERS.EMAIL.eq(email))
   }
 
-  private fun buildConditions(filters: Map<String, List<String>>): List<Condition> {
-    return filters.mapNotNull { (field, values) ->
+  private fun buildConditions(filters: Map<String, List<String>>): List<Condition> =
+    filters.mapNotNull { (field, values) ->
       when (field) {
         "id" -> VESSELS.ID.`in`(values.map { UUID.fromString(it) })
         "name" -> if (values.size == 1) VESSELS.NAME.containsIgnoreCase(values[0]) else null
@@ -39,16 +39,16 @@ object UserSql {
         else -> null
       }
     }
-  }
 
   private fun buildSortField(sortField: nl.clicqo.api.SortField): SortField<*> {
-    val field = when (sortField.field) {
-      "id" -> VESSELS.ID
-      "name" -> VESSELS.NAME
-      "userId" -> VESSELS.USER_ID
-      "createdAt" -> VESSELS.CREATED_AT
-      else -> throw IllegalArgumentException("Unknown sort field: ${sortField.field}")
-    }
+    val field =
+      when (sortField.field) {
+        "id" -> VESSELS.ID
+        "name" -> VESSELS.NAME
+        "userId" -> VESSELS.USER_ID
+        "createdAt" -> VESSELS.CREATED_AT
+        else -> throw IllegalArgumentException("Unknown sort field: ${sortField.field}")
+      }
 
     return when (sortField.direction) {
       SortDirection.ASC -> field.asc()

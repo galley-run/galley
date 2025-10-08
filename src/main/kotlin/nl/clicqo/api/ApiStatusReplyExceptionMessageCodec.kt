@@ -197,15 +197,9 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     return e
   }
 
-  override fun transform(exception: ApiStatusReplyException?): ApiStatusReplyException {
-    return exception!!
-  }
+  override fun transform(exception: ApiStatusReplyException?): ApiStatusReplyException = exception!!
 
-  override fun name(): String {
-    return ApiStatusReplyExceptionMessageCodec::class.java.simpleName!!
-  }
+  override fun name(): String = ApiStatusReplyExceptionMessageCodec::class.java.simpleName!!
 
-  override fun systemCodecID(): Byte {
-    return -1
-  }
+  override fun systemCodecID(): Byte = -1
 }

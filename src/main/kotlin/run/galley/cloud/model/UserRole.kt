@@ -8,7 +8,7 @@ enum class UserRole {
   CHARTER_BOATSWAIN,
   CHARTER_PURSER,
   CHARTER_STEWARD,
-  CHARTER_DECKHAND;
+  CHARTER_DECKHAND,
 }
 
 fun User.getUserRole(): UserRole? = principal().getString("scope")?.let(UserRole::valueOf)

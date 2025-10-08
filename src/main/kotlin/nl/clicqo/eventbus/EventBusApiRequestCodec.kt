@@ -28,6 +28,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
         .put("query", queryJson)
         .put("user", s.user?.principal())
         .put("version", s.version)
+        .put("format", s.format)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -56,6 +57,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
       query = query,
       user = User.create(json.getJsonObject("user")),
       version = json.getString("version", "v1"),
+      format = json.getString("format", "json"),
     )
   }
 

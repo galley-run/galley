@@ -1,5 +1,6 @@
 package run.galley.cloud.model
 
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 
 interface BaseModel {
@@ -46,13 +47,30 @@ interface BaseModel {
           "id" -> field.set(this, id)
           else -> {
             val value = attributes.getValue(field.name)
-            if (value != null) {
-              field.set(this, value)
-            }
+//            if (value != null) {
+            field.set(this, value)
+//            }
           }
         }
       }
 
     return this as T
   }
+
+  @Suppress("UNCHECKED_CAST")
+  fun <T : BaseModel> fromRequestBody(json: JsonObject): T {
+    this::class.java
+      .getDeclaredFields()
+      .forEach { field ->
+        field.isAccessible = true
+        val value = json.getValue(field.name)
+        if (value != null) {
+          field.set(this, value)
+        }
+      }
+
+    return this as T
+  }
 }
+
+fun List<BaseModel>.toJsonAPIResourceObject(): JsonArray = JsonArray(map { it.toJsonAPIResourceObject() })

@@ -8,10 +8,10 @@ import nl.clicqo.api.Pagination
 import nl.clicqo.api.SortDirection
 import nl.clicqo.api.SortField
 
-class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataRequest> {
+class EventBusQueryDataRequestCodec : MessageCodec<EventBusQueryDataRequest, EventBusQueryDataRequest> {
   override fun encodeToWire(
     buffer: Buffer,
-    request: EventBusDataRequest,
+    request: EventBusQueryDataRequest,
   ) {
     val identifiersJson = JsonObject(request.identifiers)
 
@@ -52,7 +52,7 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
   override fun decodeFromWire(
     pos: Int,
     buffer: Buffer,
-  ): EventBusDataRequest {
+  ): EventBusQueryDataRequest {
     var position = pos
     val length = buffer.getInt(position)
     position += 4
@@ -95,7 +95,7 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
 
     val user = json.getJsonObject("user")
 
-    return EventBusDataRequest(
+    return EventBusQueryDataRequest(
       identifiers = identifiers,
       filters = filters,
       sort = sort,
@@ -104,9 +104,9 @@ class EventBusDataRequestCodec : MessageCodec<EventBusDataRequest, EventBusDataR
     )
   }
 
-  override fun transform(request: EventBusDataRequest): EventBusDataRequest = request
+  override fun transform(request: EventBusQueryDataRequest): EventBusQueryDataRequest = request
 
-  override fun name(): String = "EventBusDataRequestCodec"
+  override fun name(): String = "EventBusQueryDataRequestCodec"
 
   override fun systemCodecID(): Byte = -1
 }

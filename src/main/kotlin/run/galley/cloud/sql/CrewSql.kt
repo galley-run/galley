@@ -3,7 +3,7 @@ package run.galley.cloud.sql
 import generated.jooq.enums.MemberStatus
 import generated.jooq.tables.references.CREW
 import nl.clicqo.data.Jooq
-import nl.clicqo.eventbus.EventBusDataRequest
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
@@ -13,7 +13,7 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 object CrewSql {
-  fun getCrewMemberByUserAndVessel(request: EventBusDataRequest): Query {
+  fun getCrewMemberByUserAndVessel(request: EventBusQueryDataRequest): Query {
     val userId = request.identifiers["userId"] ?: throw ApiStatus.ID_MISSING
     val vesselId = request.identifiers["vesselId"] ?: throw ApiStatus.ID_MISSING
     return Jooq.postgres
@@ -24,7 +24,7 @@ object CrewSql {
       ).and(CREW.DELETED_AT.isNull.or(CREW.DELETED_AT.gt(OffsetDateTime.now())))
   }
 
-  fun listActive(request: EventBusDataRequest): Query {
+  fun listActive(request: EventBusQueryDataRequest): Query {
     val conditions = buildConditions(request.filters)
     return Jooq.postgres
       .selectFrom(CREW)

@@ -10,8 +10,8 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
-import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.toUUID
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.ApiStatus
@@ -54,20 +54,20 @@ class AuthControllerVerticle : CoroutineVerticle() {
         .eventBus()
         .request<EventBusDataResponse<Users>>(
           UserDataVerticle.ADDRESS_GET,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             identifiers = mapOf("id" to userId.toString()),
           ),
         ).coAwait()
         .body()
         .payload
-        .toSingle() ?: throw ApiStatus.USER_NOT_FOUND
+        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewResponse =
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
           CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             identifiers =
               mapOf(
                 "userId" to user.id.toString(),
@@ -77,7 +77,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
         ).coAwait()
         .body()
         .payload
-        .toSingle() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        .toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
@@ -95,13 +95,10 @@ class AuthControllerVerticle : CoroutineVerticle() {
 
     message.reply(
       EventBusApiResponse(
-        payload =
+        data =
           JsonObject().put(
-            "data",
-            JsonObject().put(
-              "refreshToken",
-              newToken,
-            ),
+            "refreshToken",
+            newToken,
           ),
       ),
     )
@@ -128,20 +125,20 @@ class AuthControllerVerticle : CoroutineVerticle() {
         .eventBus()
         .request<EventBusDataResponse<Users>>(
           UserDataVerticle.ADDRESS_GET,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             identifiers = mapOf("id" to userId.toString()),
           ),
         ).coAwait()
         .body()
         .payload
-        .toSingle() ?: throw ApiStatus.USER_NOT_FOUND
+        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewResponse =
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
           CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             identifiers =
               mapOf(
                 "userId" to user.id.toString(),
@@ -151,7 +148,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
         ).coAwait()
         .body()
         .payload
-        .toSingle() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        .toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     val userRole =
       when (crewResponse.vesselRole) {
@@ -168,13 +165,10 @@ class AuthControllerVerticle : CoroutineVerticle() {
 
     message.reply(
       EventBusApiResponse(
-        payload =
+        data =
           JsonObject().put(
-            "data",
-            JsonObject().put(
-              "accessToken",
-              newToken,
-            ),
+            "accessToken",
+            newToken,
           ),
       ),
     )
@@ -189,20 +183,20 @@ class AuthControllerVerticle : CoroutineVerticle() {
         .eventBus()
         .request<EventBusDataResponse<Users>>(
           UserDataVerticle.ADDRESS_GET_BY_EMAIL,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             filters = mapOf("email" to listOf(email)),
           ),
         ).coAwait()
         .body()
         .payload
-        .toSingle() ?: throw ApiStatus.USER_NOT_FOUND
+        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewMemberships =
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
           CrewDataVerticle.ADDRESS_LIST_ACTIVE,
-          EventBusDataRequest(
+          EventBusQueryDataRequest(
             filters =
               mapOf(
                 "userId" to listOf(user.id!!.toString()),
@@ -222,15 +216,12 @@ class AuthControllerVerticle : CoroutineVerticle() {
 
     message.reply(
       EventBusApiResponse(
-        payload =
+        data =
           JsonObject().put(
-            "data",
-            JsonObject().put(
-              "refreshToken",
-              JWT.authProvider(vertx, config).issueRefreshToken(
-                user.id!!,
-                JWT.claims(crewMembership.vesselId!!),
-              ),
+            "refreshToken",
+            JWT.authProvider(vertx, config).issueRefreshToken(
+              user.id!!,
+              JWT.claims(crewMembership.vesselId!!),
             ),
           ),
       ),

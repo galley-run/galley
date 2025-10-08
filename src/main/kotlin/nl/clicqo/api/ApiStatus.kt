@@ -60,5 +60,6 @@ open class ApiStatus : Throwable {
     val FAILED_UPDATE = ApiStatus(113, "Updating the resource failed")
     val FAILED_DELETE = ApiStatus(114, "Deleting the resource failed")
     val FAILED_AUTHORIZATION = ApiStatus(115, "Authorization failed", HttpStatus.Unauthorized)
+    val PG_DUPLICATE_ENTRY = ApiStatus(120, "A duplicate entry was found", HttpStatus.Conflict)
   }
 }

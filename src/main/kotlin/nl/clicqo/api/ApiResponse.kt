@@ -11,7 +11,7 @@ class ApiResponse(
   apiResponseOptions: ApiResponseOptions = ApiResponseOptions(),
 ) {
   var body: JsonObject? = null
-  var httpStatus: HttpStatus = HttpStatus.NoContent
+  var httpStatus: HttpStatus = apiResponseOptions.httpStatus
   var contentType: String = apiResponseOptions.contentType
   var errors: JsonArray? = null
 
@@ -38,8 +38,24 @@ class ApiResponse(
   }
 
   fun fromEventBusApiResponse(eventBusApiResponse: EventBusApiResponse): ApiResponse {
-    this.httpStatus = HttpStatus.Ok
-    this.body = eventBusApiResponse.payload
+    this.httpStatus = eventBusApiResponse.httpStatus ?: HttpStatus.Ok
+    this.body =
+      JsonObject()
+        .put("data", eventBusApiResponse.data)
+        .run {
+          eventBusApiResponse.meta?.let { this.put("meta", it) }
+          eventBusApiResponse.links?.let { this.put("links", it) }
+          eventBusApiResponse.included?.let { this.put("included", it) }
+          eventBusApiResponse.errors?.let {
+            this.remove("data")
+            this.remove("included")
+            this.put("errors", it)
+          }
+
+          this
+        }
+    this.contentType =
+      "application/vnd.galley.{${eventBusApiResponse.version}}+${eventBusApiResponse.format}"
 
     return this
   }

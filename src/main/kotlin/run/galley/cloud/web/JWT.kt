@@ -41,13 +41,11 @@ object JWT {
   fun accessToken(userId: String): JWTOptions =
     jwtOptions
       .setSubject(userId)
-      .setHeader(JsonObject().put("typ", "at+jwt"))
       .setExpiresInSeconds(TTL_ACCESS_TOKEN)
 
   fun refreshToken(userId: String): JWTOptions =
     jwtOptions
       .setSubject(userId)
-      .setHeader(JsonObject().put("typ", "rt+jwt"))
       .setExpiresInSeconds(TTL_REFRESH_TOKEN)
 
   fun claims(vesselId: UUID): JsonObject = JsonObject().put("vesselId", vesselId.toString())

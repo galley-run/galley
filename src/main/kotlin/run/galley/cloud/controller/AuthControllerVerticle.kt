@@ -97,8 +97,11 @@ class AuthControllerVerticle : CoroutineVerticle() {
       EventBusApiResponse(
         payload =
           JsonObject().put(
-            "refreshToken",
-            newToken,
+            "data",
+            JsonObject().put(
+              "refreshToken",
+              newToken,
+            ),
           ),
       ),
     )
@@ -167,8 +170,11 @@ class AuthControllerVerticle : CoroutineVerticle() {
       EventBusApiResponse(
         payload =
           JsonObject().put(
-            "accessToken",
-            newToken,
+            "data",
+            JsonObject().put(
+              "accessToken",
+              newToken,
+            ),
           ),
       ),
     )
@@ -218,10 +224,13 @@ class AuthControllerVerticle : CoroutineVerticle() {
       EventBusApiResponse(
         payload =
           JsonObject().put(
-            "refreshToken",
-            JWT.authProvider(vertx, config).issueRefreshToken(
-              user.id!!,
-              JWT.claims(crewMembership.vesselId!!),
+            "data",
+            JsonObject().put(
+              "refreshToken",
+              JWT.authProvider(vertx, config).issueRefreshToken(
+                user.id!!,
+                JWT.claims(crewMembership.vesselId!!),
+              ),
             ),
           ),
       ),

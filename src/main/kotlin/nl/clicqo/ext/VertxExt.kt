@@ -47,8 +47,8 @@ private fun <T> coroutineConsumerHandler(
       message.reply(e)
     } catch (e: PgException) {
       message.reply(
-        when {
-          e.constraint?.contains("uq_") == true -> ApiStatusReplyException(ApiStatus.PG_DUPLICATE_ENTRY)
+        when (e.sqlState) {
+          "23505" -> ApiStatusReplyException(ApiStatus.PG_DUPLICATE_ENTRY) // Pg Error for unique_violation
           else -> ApiStatusReplyException(e)
         },
       )

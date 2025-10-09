@@ -9,6 +9,7 @@ import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.kleilokaal.queue.modules.coroutineConsumer
+import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.Charter
 import run.galley.cloud.sql.CharterSql
 
@@ -53,9 +54,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.getCharter(request))
 
-    val charter =
-      results?.firstOrNull()?.let { Charter.from(it) }
-        ?: throw IllegalArgumentException("Charter not found")
+    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
 
     message.reply(
       EventBusDataResponse(
@@ -68,7 +67,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.createCharter(request))
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw IllegalArgumentException("Charter not found")
+    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
 
     message.reply(
       EventBusDataResponse(

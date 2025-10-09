@@ -22,6 +22,7 @@ object ApiStatus {
   val REFRESH_TOKEN_MISSING = ApiStatus(1302, REFRESH_TOKEN_INVALID)
 
   val CHARTER_NO_ACCESS = ApiStatus(1400, "You don't have access to this charter")
+  val CHARTER_NOT_FOUND = ApiStatus(1401, "The charter could not be found")
 
   val USER_NOT_FOUND = ApiStatus(1500, "The user could not be found")
 

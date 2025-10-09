@@ -12,15 +12,15 @@ import run.galley.cloud.sql.UserSql
 
 class UserDataVerticle : PostgresDataVerticle() {
   companion object {
-    const val ADDRESS_GET = "data.user.query.get"
-    const val ADDRESS_GET_BY_EMAIL = "data.user.query.get_by_email"
+    const val GET = "data.user.query.get"
+    const val GET_BY_EMAIL = "data.user.query.get_by_email"
   }
 
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET_BY_EMAIL, ::getByEmail)
+    vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
+    vertx.eventBus().coroutineConsumer(coroutineContext, GET_BY_EMAIL, ::getByEmail)
   }
 
   private suspend fun get(message: Message<EventBusQueryDataRequest>) {

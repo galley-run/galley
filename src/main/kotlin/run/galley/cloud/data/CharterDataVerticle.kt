@@ -14,17 +14,17 @@ import run.galley.cloud.sql.CharterSql
 
 class CharterDataVerticle : PostgresDataVerticle() {
   companion object {
-    const val ADDRESS_LIST = "data.charter.query.list"
-    const val ADDRESS_GET = "data.charter.query.get"
-    const val ADDRESS_CREATE = "data.charter.cmd.create"
+    const val LIST = "data.charter.query.list"
+    const val GET = "data.charter.query.get"
+    const val CREATE = "data.charter.cmd.create"
   }
 
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST, ::list)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
+    vertx.eventBus().coroutineConsumer(coroutineContext, LIST, ::list)
+    vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
+    vertx.eventBus().coroutineConsumer(coroutineContext, CREATE, ::create)
   }
 
   private suspend fun list(message: Message<EventBusQueryDataRequest>) {

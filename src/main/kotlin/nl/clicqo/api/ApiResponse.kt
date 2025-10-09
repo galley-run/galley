@@ -4,6 +4,7 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
 import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.openapi.contract.OpenAPIContract
 import io.vertx.openapi.validation.ResponseValidator
 import io.vertx.openapi.validation.ValidatableResponse
 import io.vertx.openapi.validation.ValidatorException
@@ -87,6 +88,7 @@ class ApiResponse(
   suspend fun end(
     responseValidator: ResponseValidator,
     operationId: String,
+    contract: OpenAPIContract,
   ) {
     if (httpStatus == HttpStatus.NoContent && body != null) {
       httpStatus = HttpStatus.Ok
@@ -98,7 +100,20 @@ class ApiResponse(
       .setStatusMessage(httpStatus.statusMessage)
       .putHeader("content-type", contentType)
 
-    val response = ValidatableResponse.create(httpStatus.code, body?.toBuffer(), contentType)
+    // Filter body data based on OpenAPI schema
+    val filteredBody =
+      body?.let { bodyObj ->
+        val data = bodyObj.getValue("data")
+        val filteredData = OpenAPISchemaFilter.filterBySchema(data, contract, operationId, httpStatus.code, contentType)
+
+        JsonObject(bodyObj.map).apply {
+          if (filteredData != null) {
+            put("data", filteredData)
+          }
+        }
+      }
+
+    val response = ValidatableResponse.create(httpStatus.code, filteredBody?.toBuffer(), contentType)
     val validatedResponse =
       try {
         responseValidator.validate(response, operationId).coAwait()

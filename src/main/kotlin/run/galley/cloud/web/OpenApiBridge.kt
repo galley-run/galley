@@ -144,13 +144,11 @@ class OpenApiBridge(
           val apiResponseOptions =
             ApiResponseOptions(contentType = "application/vnd.galley.$requestedVersion+$requestedFormat")
 
-          // TODO: Filter response properties to only include keys defined in the OpenAPI contract
-
           ApiResponse(
             routingContext,
             apiResponseOptions,
           ).fromEventBusApiResponse(response)
-            .end(ResponseValidator.create(vertx, openAPIContract), operation.operationId)
+            .end(ResponseValidator.create(vertx, openAPIContract), operation.operationId, openAPIContract)
         }
       }
     }

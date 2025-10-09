@@ -131,7 +131,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
         ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
     val charter = apiRequest.body ?: throw ApiStatus.REQUEST_BODY_MISSING
-    charter.put("vesselId", vesselId)
+    charter.put(CHARTERS.VESSEL_ID.name, vesselId)
 
     val dataRequest =
       EventBusCmdDataRequest(

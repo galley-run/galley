@@ -48,7 +48,7 @@ private fun <T> coroutineConsumerHandler(
     } catch (e: PgException) {
       message.reply(
         when {
-          e.constraint.contains("uq_") -> ApiStatusReplyException(ApiStatus.PG_DUPLICATE_ENTRY)
+          e.constraint?.contains("uq_") == true -> ApiStatusReplyException(ApiStatus.PG_DUPLICATE_ENTRY)
           else -> ApiStatusReplyException(e)
         },
       )

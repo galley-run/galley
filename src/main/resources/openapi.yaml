@@ -107,14 +107,12 @@ paths:
           content:
             application/vnd.galley.v1+json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/Charter'
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Charter'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

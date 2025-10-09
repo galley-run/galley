@@ -24,8 +24,6 @@ object OpenAPISchemaFilter {
       return data
     }
 
-    logger.debug("Filtering data for operationId=$operationId with allowedFields=$allowedFields")
-
     return when (data) {
       is JsonObject -> filterJsonObject(data, allowedFields)
       is JsonArray -> filterJsonArray(data, allowedFields)
@@ -48,9 +46,6 @@ object OpenAPISchemaFilter {
     if (attributes != null) {
       val filteredAttributes = JsonObject(attributes.map.filterKeys { it in allowedFields })
       val removedFields = attributes.fieldNames() - allowedFields
-      if (removedFields.isNotEmpty()) {
-        logger.info("Filtered out attribute fields: $removedFields")
-      }
       filtered.put("attributes", filteredAttributes)
     }
 
@@ -79,7 +74,6 @@ object OpenAPISchemaFilter {
     // Handle allOf composition
     val allOf = schema.getJsonArray("allOf")
     if (allOf != null) {
-      logger.debug("Schema uses allOf composition")
       for (i in 0 until allOf.size()) {
         val subSchema = allOf.getJsonObject(i)
         // Recursively extract attributes fields from each sub-schema
@@ -157,11 +151,9 @@ object OpenAPISchemaFilter {
       val objectSchema =
         when {
           dataSchema.getString("type") == "array" -> {
-            logger.debug("Data is array type")
             dataSchema.getJsonObject("items")
           }
           else -> {
-            logger.debug("Data is object type")
             dataSchema
           }
         }
@@ -173,7 +165,6 @@ object OpenAPISchemaFilter {
         return null
       }
 
-      logger.info("Allowed attribute fields for operationId=$operationId: $attributesFields")
       return attributesFields
     } catch (e: Exception) {
       logger.error("Error getting allowed fields for operationId=$operationId", e)

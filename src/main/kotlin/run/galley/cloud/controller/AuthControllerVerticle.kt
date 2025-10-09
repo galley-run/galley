@@ -25,17 +25,17 @@ import run.galley.cloud.web.issueRefreshToken
 
 class AuthControllerVerticle : CoroutineVerticle() {
   companion object {
-    const val ADDRESS_ISSUE_REFRESH_TOKEN = "auth.refreshToken.cmd.issue"
-    const val ADDRESS_ISSUE_ACCESS_TOKEN = "auth.accessToken.cmd.issue"
-    const val ADDRESS_SIGN_IN = "auth.cmd.issue"
+    const val ISSUE_REFRESH_TOKEN = "auth.refreshToken.cmd.issue"
+    const val ISSUE_ACCESS_TOKEN = "auth.accessToken.cmd.issue"
+    const val SIGN_IN = "auth.cmd.issue"
   }
 
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_ISSUE_REFRESH_TOKEN, ::issueRefreshToken)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_ISSUE_ACCESS_TOKEN, ::issueAccessToken)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_SIGN_IN, ::signIn)
+    vertx.eventBus().coroutineConsumer(coroutineContext, ISSUE_REFRESH_TOKEN, ::issueRefreshToken)
+    vertx.eventBus().coroutineConsumer(coroutineContext, ISSUE_ACCESS_TOKEN, ::issueAccessToken)
+    vertx.eventBus().coroutineConsumer(coroutineContext, SIGN_IN, ::signIn)
   }
 
   private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {
@@ -53,7 +53,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Users>>(
-          UserDataVerticle.ADDRESS_GET,
+          UserDataVerticle.GET,
           EventBusQueryDataRequest(
             identifiers = mapOf("id" to userId.toString()),
           ),
@@ -66,7 +66,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL,
+          CrewDataVerticle.GET_BY_USER_AND_VESSEL,
           EventBusQueryDataRequest(
             identifiers =
               mapOf(
@@ -124,7 +124,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Users>>(
-          UserDataVerticle.ADDRESS_GET,
+          UserDataVerticle.GET,
           EventBusQueryDataRequest(
             identifiers = mapOf("id" to userId.toString()),
           ),
@@ -137,7 +137,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.ADDRESS_GET_BY_USER_AND_VESSEL,
+          CrewDataVerticle.GET_BY_USER_AND_VESSEL,
           EventBusQueryDataRequest(
             identifiers =
               mapOf(
@@ -182,7 +182,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Users>>(
-          UserDataVerticle.ADDRESS_GET_BY_EMAIL,
+          UserDataVerticle.GET_BY_EMAIL,
           EventBusQueryDataRequest(
             filters = mapOf("email" to listOf(email)),
           ),
@@ -195,7 +195,7 @@ class AuthControllerVerticle : CoroutineVerticle() {
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.ADDRESS_LIST_ACTIVE,
+          CrewDataVerticle.LIST_ACTIVE,
           EventBusQueryDataRequest(
             filters =
               mapOf(

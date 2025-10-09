@@ -12,15 +12,15 @@ import run.galley.cloud.sql.CrewSql
 
 class CrewDataVerticle : PostgresDataVerticle() {
   companion object {
-    const val ADDRESS_GET_BY_USER_AND_VESSEL = "data.crew.query.get_by_user_and_vessel"
-    const val ADDRESS_LIST_ACTIVE = "data.crew.query.list_active"
+    const val GET_BY_USER_AND_VESSEL = "data.crew.query.get_by_user_and_vessel"
+    const val LIST_ACTIVE = "data.crew.query.list_active"
   }
 
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET_BY_USER_AND_VESSEL, ::getByUserAndVessel)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST_ACTIVE, ::listActive)
+    vertx.eventBus().coroutineConsumer(coroutineContext, GET_BY_USER_AND_VESSEL, ::getByUserAndVessel)
+    vertx.eventBus().coroutineConsumer(coroutineContext, LIST_ACTIVE, ::listActive)
   }
 
   private suspend fun getByUserAndVessel(message: Message<EventBusQueryDataRequest>) {

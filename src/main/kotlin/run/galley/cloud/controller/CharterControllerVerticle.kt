@@ -24,8 +24,6 @@ import run.galley.cloud.model.getUserRole
 import run.galley.cloud.model.toJsonAPIResourceObject
 
 class CharterControllerVerticle : CoroutineVerticle() {
-  private val logger = LoggerFactory.getLogger(this::class.java)
-
   companion object {
     const val ADDRESS_LIST = "charter.query.list"
     const val ADDRESS_GET = "charter.query.get"

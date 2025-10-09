@@ -30,6 +30,7 @@ object Jooq {
     }
 }
 
+@Suppress("SqlSourceToSinkFlow")
 suspend fun Pool.executePreparedQuery(query: Query): RowSet<Row>? {
   val results =
     this

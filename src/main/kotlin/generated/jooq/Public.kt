@@ -3,7 +3,6 @@
  */
 package generated.jooq
 
-
 import generated.jooq.tables.ApiKeys
 import generated.jooq.tables.CharterBillingProfile
 import generated.jooq.tables.CharterProjects
@@ -38,9 +37,6 @@ import generated.jooq.tables.WebauthnCredentials
 import generated.jooq.tables.WebhookDeliveries
 import generated.jooq.tables.WebhookSubscriptions
 import generated.jooq.tables.records.PgpArmorHeadersRecord
-
-import kotlin.collections.List
-
 import org.jooq.Catalog
 import org.jooq.Configuration
 import org.jooq.Field
@@ -48,249 +44,252 @@ import org.jooq.Result
 import org.jooq.Table
 import org.jooq.impl.DSL
 import org.jooq.impl.SchemaImpl
-
+import kotlin.collections.List
 
 /**
  * standard public schema
  */
 @Suppress("warnings")
 open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALOG, DSL.comment("standard public schema")) {
-    companion object {
-
-        /**
-         * The reference instance of <code>public</code>
-         */
-        val PUBLIC: Public = Public()
-    }
-
+  companion object {
     /**
-     * The table <code>public.api_keys</code>.
+     * The reference instance of <code>public</code>
      */
-    val API_KEYS: ApiKeys get() = ApiKeys.API_KEYS
+    val PUBLIC: Public = Public()
+  }
 
-    /**
-     * The table <code>public.charter_billing_profile</code>.
-     */
-    val CHARTER_BILLING_PROFILE: CharterBillingProfile get() = CharterBillingProfile.CHARTER_BILLING_PROFILE
+  /**
+   * The table <code>public.api_keys</code>.
+   */
+  val API_KEYS: ApiKeys get() = ApiKeys.API_KEYS
 
-    /**
-     * The table <code>public.charter_projects</code>.
-     */
-    val CHARTER_PROJECTS: CharterProjects get() = CharterProjects.CHARTER_PROJECTS
+  /**
+   * The table <code>public.charter_billing_profile</code>.
+   */
+  val CHARTER_BILLING_PROFILE: CharterBillingProfile get() = CharterBillingProfile.CHARTER_BILLING_PROFILE
 
-    /**
-     * The table <code>public.charters</code>.
-     */
-    val CHARTERS: Charters get() = Charters.CHARTERS
+  /**
+   * The table <code>public.charter_projects</code>.
+   */
+  val CHARTER_PROJECTS: CharterProjects get() = CharterProjects.CHARTER_PROJECTS
 
-    /**
-     * The table <code>public.crew</code>.
-     */
-    val CREW: Crew get() = Crew.CREW
+  /**
+   * The table <code>public.charters</code>.
+   */
+  val CHARTERS: Charters get() = Charters.CHARTERS
 
-    /**
-     * The table <code>public.crew_charter_member</code>.
-     */
-    val CREW_CHARTER_MEMBER: CrewCharterMember get() = CrewCharterMember.CREW_CHARTER_MEMBER
+  /**
+   * The table <code>public.crew</code>.
+   */
+  val CREW: Crew get() = Crew.CREW
 
-    /**
-     * The table <code>public.email_login_tokens</code>.
-     */
-    val EMAIL_LOGIN_TOKENS: EmailLoginTokens get() = EmailLoginTokens.EMAIL_LOGIN_TOKENS
+  /**
+   * The table <code>public.crew_charter_member</code>.
+   */
+  val CREW_CHARTER_MEMBER: CrewCharterMember get() = CrewCharterMember.CREW_CHARTER_MEMBER
 
-    /**
-     * The table <code>public.flyway_schema_history</code>.
-     */
-    val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory get() = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
+  /**
+   * The table <code>public.email_login_tokens</code>.
+   */
+  val EMAIL_LOGIN_TOKENS: EmailLoginTokens get() = EmailLoginTokens.EMAIL_LOGIN_TOKENS
 
-    /**
-     * The table <code>public.locker</code>.
-     */
-    val LOCKER: Locker get() = Locker.LOCKER
+  /**
+   * The table <code>public.flyway_schema_history</code>.
+   */
+  val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory get() = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
-    /**
-     * The table <code>public.logbook</code>.
-     */
-    val LOGBOOK: Logbook get() = Logbook.LOGBOOK
+  /**
+   * The table <code>public.locker</code>.
+   */
+  val LOCKER: Locker get() = Locker.LOCKER
 
-    /**
-     * The table <code>public.mv_logbook_recent</code>.
-     */
-    val MV_LOGBOOK_RECENT: MvLogbookRecent get() = MvLogbookRecent.MV_LOGBOOK_RECENT
+  /**
+   * The table <code>public.logbook</code>.
+   */
+  val LOGBOOK: Logbook get() = Logbook.LOGBOOK
 
-    /**
-     * The table <code>public.mv_outbox_ready</code>.
-     */
-    val MV_OUTBOX_READY: MvOutboxReady get() = MvOutboxReady.MV_OUTBOX_READY
+  /**
+   * The table <code>public.mv_logbook_recent</code>.
+   */
+  val MV_LOGBOOK_RECENT: MvLogbookRecent get() = MvLogbookRecent.MV_LOGBOOK_RECENT
 
-    /**
-     * The table <code>public.outbox_events</code>.
-     */
-    val OUTBOX_EVENTS: OutboxEvents get() = OutboxEvents.OUTBOX_EVENTS
+  /**
+   * The table <code>public.mv_outbox_ready</code>.
+   */
+  val MV_OUTBOX_READY: MvOutboxReady get() = MvOutboxReady.MV_OUTBOX_READY
 
-    /**
-     * The table <code>public.pgp_armor_headers</code>.
-     */
-    val PGP_ARMOR_HEADERS: PgpArmorHeaders get() = PgpArmorHeaders.PGP_ARMOR_HEADERS
+  /**
+   * The table <code>public.outbox_events</code>.
+   */
+  val OUTBOX_EVENTS: OutboxEvents get() = OutboxEvents.OUTBOX_EVENTS
 
-    /**
-     * Call <code>public.pgp_armor_headers</code>.
-     */
-    fun PGP_ARMOR_HEADERS(
-          configuration: Configuration
-        , __1: String?
-    ): Result<PgpArmorHeadersRecord> = configuration.dsl().selectFrom(generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-          __1
-    )).fetch()
+  /**
+   * The table <code>public.pgp_armor_headers</code>.
+   */
+  val PGP_ARMOR_HEADERS: PgpArmorHeaders get() = PgpArmorHeaders.PGP_ARMOR_HEADERS
 
-    /**
-     * Get <code>public.pgp_armor_headers</code> as a table.
-     */
-    fun PGP_ARMOR_HEADERS(
-          __1: String?
-    ): PgpArmorHeaders = generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-        __1
+  /**
+   * Call <code>public.pgp_armor_headers</code>.
+   */
+  fun PGP_ARMOR_HEADERS(
+    configuration: Configuration,
+    __1: String?,
+  ): Result<PgpArmorHeadersRecord> =
+    configuration
+      .dsl()
+      .selectFrom(
+        generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+          __1,
+        ),
+      ).fetch()
+
+  /**
+   * Get <code>public.pgp_armor_headers</code> as a table.
+   */
+  fun PGP_ARMOR_HEADERS(__1: String?): PgpArmorHeaders =
+    generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+      __1,
     )
 
-    /**
-     * Get <code>public.pgp_armor_headers</code> as a table.
-     */
-    fun PGP_ARMOR_HEADERS(
-          __1: Field<String?>
-    ): PgpArmorHeaders = generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-        __1
+  /**
+   * Get <code>public.pgp_armor_headers</code> as a table.
+   */
+  fun PGP_ARMOR_HEADERS(__1: Field<String?>): PgpArmorHeaders =
+    generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+      __1,
     )
 
-    /**
-     * The table <code>public.project_api_gateway</code>.
-     */
-    val PROJECT_API_GATEWAY: ProjectApiGateway get() = ProjectApiGateway.PROJECT_API_GATEWAY
+  /**
+   * The table <code>public.project_api_gateway</code>.
+   */
+  val PROJECT_API_GATEWAY: ProjectApiGateway get() = ProjectApiGateway.PROJECT_API_GATEWAY
 
-    /**
-     * The table <code>public.project_applications</code>.
-     */
-    val PROJECT_APPLICATIONS: ProjectApplications get() = ProjectApplications.PROJECT_APPLICATIONS
+  /**
+   * The table <code>public.project_applications</code>.
+   */
+  val PROJECT_APPLICATIONS: ProjectApplications get() = ProjectApplications.PROJECT_APPLICATIONS
 
-    /**
-     * The table <code>public.project_configs</code>.
-     */
-    val PROJECT_CONFIGS: ProjectConfigs get() = ProjectConfigs.PROJECT_CONFIGS
+  /**
+   * The table <code>public.project_configs</code>.
+   */
+  val PROJECT_CONFIGS: ProjectConfigs get() = ProjectConfigs.PROJECT_CONFIGS
 
-    /**
-     * The table <code>public.project_databases</code>.
-     */
-    val PROJECT_DATABASES: ProjectDatabases get() = ProjectDatabases.PROJECT_DATABASES
+  /**
+   * The table <code>public.project_databases</code>.
+   */
+  val PROJECT_DATABASES: ProjectDatabases get() = ProjectDatabases.PROJECT_DATABASES
 
-    /**
-     * The table <code>public.project_secrets</code>.
-     */
-    val PROJECT_SECRETS: ProjectSecrets get() = ProjectSecrets.PROJECT_SECRETS
+  /**
+   * The table <code>public.project_secrets</code>.
+   */
+  val PROJECT_SECRETS: ProjectSecrets get() = ProjectSecrets.PROJECT_SECRETS
 
-    /**
-     * The table <code>public.sessions</code>.
-     */
-    val SESSIONS: Sessions get() = Sessions.SESSIONS
+  /**
+   * The table <code>public.sessions</code>.
+   */
+  val SESSIONS: Sessions get() = Sessions.SESSIONS
 
-    /**
-     * The table <code>public.sign_up_inquiries</code>.
-     */
-    val SIGN_UP_INQUIRIES: SignUpInquiries get() = SignUpInquiries.SIGN_UP_INQUIRIES
+  /**
+   * The table <code>public.sign_up_inquiries</code>.
+   */
+  val SIGN_UP_INQUIRIES: SignUpInquiries get() = SignUpInquiries.SIGN_UP_INQUIRIES
 
-    /**
-     * The table <code>public.user_identities</code>.
-     */
-    val USER_IDENTITIES: UserIdentities get() = UserIdentities.USER_IDENTITIES
+  /**
+   * The table <code>public.user_identities</code>.
+   */
+  val USER_IDENTITIES: UserIdentities get() = UserIdentities.USER_IDENTITIES
 
-    /**
-     * The table <code>public.users</code>.
-     */
-    val USERS: Users get() = Users.USERS
+  /**
+   * The table <code>public.users</code>.
+   */
+  val USERS: Users get() = Users.USERS
 
-    /**
-     * The table <code>public.v_logbook_recent</code>.
-     */
-    val V_LOGBOOK_RECENT: VLogbookRecent get() = VLogbookRecent.V_LOGBOOK_RECENT
+  /**
+   * The table <code>public.v_logbook_recent</code>.
+   */
+  val V_LOGBOOK_RECENT: VLogbookRecent get() = VLogbookRecent.V_LOGBOOK_RECENT
 
-    /**
-     * The table <code>public.v_outbox_audit</code>.
-     */
-    val V_OUTBOX_AUDIT: VOutboxAudit get() = VOutboxAudit.V_OUTBOX_AUDIT
+  /**
+   * The table <code>public.v_outbox_audit</code>.
+   */
+  val V_OUTBOX_AUDIT: VOutboxAudit get() = VOutboxAudit.V_OUTBOX_AUDIT
 
-    /**
-     * The table <code>public.vessel_billing_profile</code>.
-     */
-    val VESSEL_BILLING_PROFILE: VesselBillingProfile get() = VesselBillingProfile.VESSEL_BILLING_PROFILE
+  /**
+   * The table <code>public.vessel_billing_profile</code>.
+   */
+  val VESSEL_BILLING_PROFILE: VesselBillingProfile get() = VesselBillingProfile.VESSEL_BILLING_PROFILE
 
-    /**
-     * The table <code>public.vessel_engine_nodes</code>.
-     */
-    val VESSEL_ENGINE_NODES: VesselEngineNodes get() = VesselEngineNodes.VESSEL_ENGINE_NODES
+  /**
+   * The table <code>public.vessel_engine_nodes</code>.
+   */
+  val VESSEL_ENGINE_NODES: VesselEngineNodes get() = VesselEngineNodes.VESSEL_ENGINE_NODES
 
-    /**
-     * The table <code>public.vessel_engine_regions</code>.
-     */
-    val VESSEL_ENGINE_REGIONS: VesselEngineRegions get() = VesselEngineRegions.VESSEL_ENGINE_REGIONS
+  /**
+   * The table <code>public.vessel_engine_regions</code>.
+   */
+  val VESSEL_ENGINE_REGIONS: VesselEngineRegions get() = VesselEngineRegions.VESSEL_ENGINE_REGIONS
 
-    /**
-     * The table <code>public.vessel_engines</code>.
-     */
-    val VESSEL_ENGINES: VesselEngines get() = VesselEngines.VESSEL_ENGINES
+  /**
+   * The table <code>public.vessel_engines</code>.
+   */
+  val VESSEL_ENGINES: VesselEngines get() = VesselEngines.VESSEL_ENGINES
 
-    /**
-     * The table <code>public.vessels</code>.
-     */
-    val VESSELS: Vessels get() = Vessels.VESSELS
+  /**
+   * The table <code>public.vessels</code>.
+   */
+  val VESSELS: Vessels get() = Vessels.VESSELS
 
-    /**
-     * The table <code>public.webauthn_credentials</code>.
-     */
-    val WEBAUTHN_CREDENTIALS: WebauthnCredentials get() = WebauthnCredentials.WEBAUTHN_CREDENTIALS
+  /**
+   * The table <code>public.webauthn_credentials</code>.
+   */
+  val WEBAUTHN_CREDENTIALS: WebauthnCredentials get() = WebauthnCredentials.WEBAUTHN_CREDENTIALS
 
-    /**
-     * The table <code>public.webhook_deliveries</code>.
-     */
-    val WEBHOOK_DELIVERIES: WebhookDeliveries get() = WebhookDeliveries.WEBHOOK_DELIVERIES
+  /**
+   * The table <code>public.webhook_deliveries</code>.
+   */
+  val WEBHOOK_DELIVERIES: WebhookDeliveries get() = WebhookDeliveries.WEBHOOK_DELIVERIES
 
-    /**
-     * The table <code>public.webhook_subscriptions</code>.
-     */
-    val WEBHOOK_SUBSCRIPTIONS: WebhookSubscriptions get() = WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS
+  /**
+   * The table <code>public.webhook_subscriptions</code>.
+   */
+  val WEBHOOK_SUBSCRIPTIONS: WebhookSubscriptions get() = WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS
 
-    override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
+  override fun getCatalog(): Catalog = DefaultCatalog.DEFAULT_CATALOG
 
-    override fun getTables(): List<Table<*>> = listOf(
-        ApiKeys.API_KEYS,
-        CharterBillingProfile.CHARTER_BILLING_PROFILE,
-        CharterProjects.CHARTER_PROJECTS,
-        Charters.CHARTERS,
-        Crew.CREW,
-        CrewCharterMember.CREW_CHARTER_MEMBER,
-        EmailLoginTokens.EMAIL_LOGIN_TOKENS,
-        FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
-        Locker.LOCKER,
-        Logbook.LOGBOOK,
-        MvLogbookRecent.MV_LOGBOOK_RECENT,
-        MvOutboxReady.MV_OUTBOX_READY,
-        OutboxEvents.OUTBOX_EVENTS,
-        PgpArmorHeaders.PGP_ARMOR_HEADERS,
-        ProjectApiGateway.PROJECT_API_GATEWAY,
-        ProjectApplications.PROJECT_APPLICATIONS,
-        ProjectConfigs.PROJECT_CONFIGS,
-        ProjectDatabases.PROJECT_DATABASES,
-        ProjectSecrets.PROJECT_SECRETS,
-        Sessions.SESSIONS,
-        SignUpInquiries.SIGN_UP_INQUIRIES,
-        UserIdentities.USER_IDENTITIES,
-        Users.USERS,
-        VLogbookRecent.V_LOGBOOK_RECENT,
-        VOutboxAudit.V_OUTBOX_AUDIT,
-        VesselBillingProfile.VESSEL_BILLING_PROFILE,
-        VesselEngineNodes.VESSEL_ENGINE_NODES,
-        VesselEngineRegions.VESSEL_ENGINE_REGIONS,
-        VesselEngines.VESSEL_ENGINES,
-        Vessels.VESSELS,
-        WebauthnCredentials.WEBAUTHN_CREDENTIALS,
-        WebhookDeliveries.WEBHOOK_DELIVERIES,
-        WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS
+  override fun getTables(): List<Table<*>> =
+    listOf(
+      ApiKeys.API_KEYS,
+      CharterBillingProfile.CHARTER_BILLING_PROFILE,
+      CharterProjects.CHARTER_PROJECTS,
+      Charters.CHARTERS,
+      Crew.CREW,
+      CrewCharterMember.CREW_CHARTER_MEMBER,
+      EmailLoginTokens.EMAIL_LOGIN_TOKENS,
+      FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
+      Locker.LOCKER,
+      Logbook.LOGBOOK,
+      MvLogbookRecent.MV_LOGBOOK_RECENT,
+      MvOutboxReady.MV_OUTBOX_READY,
+      OutboxEvents.OUTBOX_EVENTS,
+      PgpArmorHeaders.PGP_ARMOR_HEADERS,
+      ProjectApiGateway.PROJECT_API_GATEWAY,
+      ProjectApplications.PROJECT_APPLICATIONS,
+      ProjectConfigs.PROJECT_CONFIGS,
+      ProjectDatabases.PROJECT_DATABASES,
+      ProjectSecrets.PROJECT_SECRETS,
+      Sessions.SESSIONS,
+      SignUpInquiries.SIGN_UP_INQUIRIES,
+      UserIdentities.USER_IDENTITIES,
+      Users.USERS,
+      VLogbookRecent.V_LOGBOOK_RECENT,
+      VOutboxAudit.V_OUTBOX_AUDIT,
+      VesselBillingProfile.VESSEL_BILLING_PROFILE,
+      VesselEngineNodes.VESSEL_ENGINE_NODES,
+      VesselEngineRegions.VESSEL_ENGINE_REGIONS,
+      VesselEngines.VESSEL_ENGINES,
+      Vessels.VESSELS,
+      WebauthnCredentials.WEBAUTHN_CREDENTIALS,
+      WebhookDeliveries.WEBHOOK_DELIVERIES,
+      WebhookSubscriptions.WEBHOOK_SUBSCRIPTIONS,
     )
 }

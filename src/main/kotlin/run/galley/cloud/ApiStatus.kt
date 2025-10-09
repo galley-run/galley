@@ -5,7 +5,9 @@ import nl.clicqo.web.HttpStatus
 
 object ApiStatus {
   val ID_MISSING = ApiStatus(1000, "The identifier is missing")
-  val FILTER_MISSING = ApiStatus(1000, "The filter is missing")
+  val FILTER_MISSING = ApiStatus(1001, "The filter is missing")
+  val REQUEST_BODY_MISSING = ApiStatus(1002, "The request body is missing")
+  val MISSING_USER_ID = ApiStatus(1003, "The user id is missing")
 
   val USER_ROLE_FORBIDDEN =
     ApiStatus(1100, "You don't have the required role to perform this action", HttpStatus.Forbidden)

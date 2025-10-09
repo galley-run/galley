@@ -21,7 +21,7 @@ import nl.clicqo.api.SortField
  *     pagination = Pagination(offset = 0, limit = 50)
  *   )
  */
-data class EventBusDataRequest(
+data class EventBusQueryDataRequest(
   val identifiers: Map<String, String> = emptyMap(),
   val filters: Map<String, List<String>> = emptyMap(),
   val sort: List<SortField> = emptyList(),

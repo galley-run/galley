@@ -3,8 +3,8 @@ package run.galley.cloud.data
 import io.vertx.core.eventbus.Message
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
-import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.Crew
@@ -23,7 +23,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST_ACTIVE, ::listActive)
   }
 
-  private suspend fun getByUserAndVessel(message: Message<EventBusDataRequest>) {
+  private suspend fun getByUserAndVessel(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
     val results = pool.executePreparedQuery(CrewSql.getCrewMemberByUserAndVessel(request))
 
@@ -36,7 +36,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
     )
   }
 
-  private suspend fun listActive(message: Message<EventBusDataRequest>) {
+  private suspend fun listActive(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
     val results = pool.executePreparedQuery(CrewSql.listActive(request))
 

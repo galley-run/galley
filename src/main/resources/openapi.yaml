@@ -53,9 +53,9 @@ tags:
   - description: The Chef AI Agent which can guide you through Galley and can give you recommendations specific to your needs on Vessel scope
     name: chef
 paths:
-  /vessels/{vessel_id}/charters:
+  /vessels/{vesselId}/charters:
     parameters:
-      - $ref: '#/components/parameters/vessel_id'
+      - $ref: '#/components/parameters/vesselId'
     get:
       tags:
         - charter
@@ -132,10 +132,10 @@ paths:
           application/vnd.galley.v1+json:
             schema:
               $ref: '#/components/schemas/CharterCreate'
-  /vessels/{vessel_id}/charters/{charter_id}:
+  /vessels/{vesselId}/charters/{charterId}:
     parameters:
-      - $ref: '#/components/parameters/vessel_id'
-      - $ref: '#/components/parameters/charter_id'
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
     get:
       tags:
         - charter
@@ -173,6 +173,7 @@ paths:
       summary: Refresh RefreshToken
       description: Rotate RefreshToken and return new RefreshToken. Will extend the RefreshToken's lifetime.
       operationId: auth.refreshToken.cmd.issue
+      security: []
       requestBody:
         required: true
         content:
@@ -200,6 +201,7 @@ paths:
       summary: Refresh AccessToken
       description: Rotate AccessToken and return new AccessToken.
       operationId: auth.accessToken.cmd.issue
+      security: []
       requestBody:
         required: true
         content:
@@ -226,6 +228,7 @@ paths:
         - auth
       summary: Sign in
       operationId: auth.cmd.issue
+      security: []
       requestBody:
         required: true
         content:
@@ -290,15 +293,15 @@ components:
       x-vessel-role: member
       x-charter-role: steward
   parameters:
-    vessel_id:
-      name: vessel_id
+    vesselId:
+      name: vesselId
       in: path
       required: true
       schema:
         type: string
         format: uuid
-    charter_id:
-      name: charter_id
+    charterId:
+      name: charterId
       in: path
       required: true
       schema:

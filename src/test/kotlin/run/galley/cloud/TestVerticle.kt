@@ -10,10 +10,12 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiRequestCodec
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusApiResponseCodec
-import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.EventBusDataRequestCodec
+import nl.clicqo.eventbus.EventBusCmdDataRequest
+import nl.clicqo.eventbus.EventBusCmdDataRequestCodec
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusDataResponseCodec
+import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.eventbus.EventBusQueryDataRequestCodec
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 import run.galley.cloud.model.BaseModel
@@ -53,11 +55,17 @@ open class TestVerticle {
     fun setup(vertx: Vertx) {
       vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
       vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
-      vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
+      vertx.eventBus().registerDefaultCodec(EventBusQueryDataRequest::class.java, EventBusQueryDataRequestCodec())
       @Suppress("UNCHECKED_CAST")
       vertx.eventBus().registerDefaultCodec(
         EventBusDataResponse::class.java,
         EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>,
+      )
+      @Suppress("UNCHECKED_CAST")
+      vertx.eventBus().registerDefaultCodec(
+        EventBusCmdDataRequest::class.java,
+        EventBusCmdDataRequestCodec<BaseModel>()
+          as MessageCodec<EventBusCmdDataRequest<out BaseModel>, EventBusCmdDataRequest<out BaseModel>>,
       )
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }

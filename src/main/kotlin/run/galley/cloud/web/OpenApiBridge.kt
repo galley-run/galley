@@ -13,6 +13,7 @@ import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.web.HttpStatus
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
 class OpenApiBridge(
@@ -67,6 +68,17 @@ class OpenApiBridge(
                 header.trim().endsWith("+json", true)
             }
 
+          val requestedVersion =
+            acceptHeader
+              .takeIf { it.startsWith("application/vnd.") }
+              ?.substringAfterLast(".")
+              ?.split("+")
+              ?.firstOrNull() ?: "v1"
+          val requestedFormat =
+            acceptHeader
+              .takeIf { it.startsWith("application/vnd.") }
+              ?.substringAfterLast("+") ?: "json"
+
           /**
            * Anything other than JSON is not supported at the moment.
            */
@@ -86,13 +98,13 @@ class OpenApiBridge(
                   identifiers = params,
                   body = body,
                   query = query,
-//            version = responseVersion,
+                  format = requestedFormat,
+                  version = requestedVersion,
                 ),
               ).coAwait()
               .body()
 
-          // TODO: use requested responseFormat to return JSON or something else.
-          val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.v1+json")
+          val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.$requestedVersion+$requestedFormat")
 
           ApiResponse(
             routingContext,

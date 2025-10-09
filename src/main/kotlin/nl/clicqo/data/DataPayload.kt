@@ -8,10 +8,14 @@ data class DataPayload<T : BaseModel>(
   val item: T? = null,
   val items: List<T>? = null,
 ) {
-  fun toSingle(): T? = item
+  fun toOne(): T? = item
 
   fun toMany(): List<T>? = items
 
+  /**
+   * Avoid the use of this method. It is only used internally.
+   * Use toOne() or toMany() instead.
+   */
   fun toCodec(): JsonObject {
     val payload = JsonObject()
     if (item != null) {
@@ -20,19 +24,6 @@ data class DataPayload<T : BaseModel>(
     } else {
       payload
         .put("items", JsonArray(items?.map { it.toJsonAPIResourceObject() }))
-    }
-
-    return payload
-  }
-
-  fun toJsonObject(): JsonObject {
-    val payload = JsonObject()
-    if (item != null) {
-      payload
-        .put("data", item.toJsonAPIResourceObject())
-    } else {
-      payload
-        .put("data", JsonArray(items?.map { it.toJsonAPIResourceObject() }))
     }
 
     return payload

@@ -3,7 +3,7 @@ package run.galley.cloud.sql
 import generated.jooq.tables.references.VESSELS
 import nl.clicqo.api.SortDirection
 import nl.clicqo.data.Jooq
-import nl.clicqo.eventbus.EventBusDataRequest
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.applyPagination
 import nl.clicqo.ext.applySorting
@@ -14,7 +14,7 @@ import org.jooq.SortField
 import java.util.UUID
 
 object VesselSql {
-  fun listVessels(request: EventBusDataRequest): Query {
+  fun listVessels(request: EventBusQueryDataRequest): Query {
     val conditions = buildConditions(request.filters)
     val sortFields = request.sort.map { buildSortField(it) }
 
@@ -34,7 +34,7 @@ object VesselSql {
     return query
   }
 
-  fun getVessel(request: EventBusDataRequest): Query {
+  fun getVessel(request: EventBusQueryDataRequest): Query {
     val id =
       request.identifiers["vesselId"]
         ?: throw IllegalArgumentException("vesselId is required")

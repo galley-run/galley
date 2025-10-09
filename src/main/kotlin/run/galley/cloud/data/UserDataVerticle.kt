@@ -3,8 +3,8 @@ package run.galley.cloud.data
 import io.vertx.core.eventbus.Message
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
-import nl.clicqo.eventbus.EventBusDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.User
@@ -23,7 +23,7 @@ class UserDataVerticle : PostgresDataVerticle() {
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET_BY_EMAIL, ::getByEmail)
   }
 
-  private suspend fun get(message: Message<EventBusDataRequest>) {
+  private suspend fun get(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
     val user =
       pool.executePreparedQuery(UserSql.getUser(request))?.firstOrNull()?.let(User::from)
@@ -36,7 +36,7 @@ class UserDataVerticle : PostgresDataVerticle() {
     )
   }
 
-  private suspend fun getByEmail(message: Message<EventBusDataRequest>) {
+  private suspend fun getByEmail(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
     val user =
       pool.executePreparedQuery(UserSql.getUserByEmail(request))?.firstOrNull()?.let(User::from)

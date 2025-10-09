@@ -76,7 +76,7 @@ fun Router.setupFailureHandler(): Router {
       }
 
       is HttpException -> {
-        logger.trace(error.payload, error)
+        logger.error(error.payload, error)
         when (error.statusCode) {
           401 -> error = ApiStatus.FAILED_AUTHORIZATION
           404 -> error = ApiStatus.FAILED_FIND

@@ -7,17 +7,21 @@ import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.Pagination
 import nl.clicqo.api.SortDirection
 import nl.clicqo.api.SortField
+import nl.clicqo.data.DataPayload
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
-import nl.clicqo.eventbus.EventBusDataRequest
+import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.toUUID
+import nl.clicqo.web.HttpStatus
 import nl.kleilokaal.queue.modules.coroutineConsumer
 import org.slf4j.LoggerFactory
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.UserRole
 import run.galley.cloud.model.getUserRole
+import run.galley.cloud.model.toJsonAPIResourceObject
 
 class CharterControllerVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -33,7 +37,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST, ::list)
     vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
-//    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
+    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
@@ -48,7 +52,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     val vesselId =
       apiRequest.identifiers
-        ?.get("vessel_id")
+        ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
 
@@ -60,7 +64,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     // Build data request with filters, sort, and pagination
     val dataRequest =
-      EventBusDataRequest(
+      EventBusQueryDataRequest(
         filters = filters,
         sort = listOf(SortField("id", SortDirection.ASC)),
         pagination = Pagination(offset = 0, limit = 10),
@@ -77,7 +81,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        payload = dataResponse.payload.toJsonObject(),
+        data = dataResponse.payload.toMany()!!.toJsonAPIResourceObject(),
       ),
     )
   }
@@ -87,14 +91,20 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     // Extract charterId from path identifiers
     val charterId =
-      apiRequest.identifiers?.get("charter_id")?.string
+      apiRequest.identifiers?.get("charterId")?.string
         ?: throw IllegalArgumentException("charterId is required")
 
     // Build data request with identifier
     val dataRequest =
-      EventBusDataRequest(
+      EventBusQueryDataRequest(
         identifiers = mapOf("id" to charterId),
-        filters = mapOf("vessel_id" to listOf(apiRequest.identifiers["vessel_id"]?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT)),
+        filters =
+          mapOf(
+            "vesselId" to
+              listOf(
+                apiRequest.identifiers["vesselId"]?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT,
+              ),
+          ),
         user = apiRequest.user?.principal(),
       )
 
@@ -108,10 +118,43 @@ class CharterControllerVerticle : CoroutineVerticle() {
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        payload = dataResponse.payload.toJsonObject(),
+        data = dataResponse.payload.toOne()!!.toJsonAPIResourceObject(),
       ),
     )
   }
 
-  private suspend fun create(message: Message<EventBusApiRequest>): Unit = throw ApiStatus.VESSEL_INSERT_FAILED
+  private suspend fun create(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val userId = apiRequest.user?.subject()?.toUUID() ?: throw ApiStatus.USER_NOT_FOUND
+
+    val vesselId =
+      apiRequest.identifiers
+        ?.get("vesselId")
+        ?.string
+        ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+
+    val charter =
+      apiRequest.body?.let { Charters().fromRequestBody<Charters>(it) } ?: throw ApiStatus.REQUEST_BODY_MISSING
+    charter.vesselId = vesselId
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        payload = DataPayload.one(charter),
+        userId = userId,
+      )
+
+    val dataResponse =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_CREATE, dataRequest)
+        .coAwait()
+        .body()
+
+    message.reply(
+      EventBusApiResponse(
+        data = dataResponse.payload.toOne()!!.toJsonAPIResourceObject(),
+        httpStatus = HttpStatus.Created,
+      ),
+    )
+  }
 }

@@ -21,10 +21,12 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiRequestCodec
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusApiResponseCodec
-import nl.clicqo.eventbus.EventBusDataRequest
-import nl.clicqo.eventbus.EventBusDataRequestCodec
+import nl.clicqo.eventbus.EventBusCmdDataRequest
+import nl.clicqo.eventbus.EventBusCmdDataRequestCodec
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusDataResponseCodec
+import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.eventbus.EventBusQueryDataRequestCodec
 import nl.clicqo.ext.setupCorsHandler
 import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
@@ -53,7 +55,13 @@ class MainVerticle : CoroutineVerticle() {
 
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
-    vertx.eventBus().registerDefaultCodec(EventBusDataRequest::class.java, EventBusDataRequestCodec())
+    @Suppress("UNCHECKED_CAST")
+    vertx.eventBus().registerDefaultCodec(
+      EventBusCmdDataRequest::class.java,
+      EventBusCmdDataRequestCodec<BaseModel>()
+        as MessageCodec<EventBusCmdDataRequest<out BaseModel>, EventBusCmdDataRequest<out BaseModel>>,
+    )
+    vertx.eventBus().registerDefaultCodec(EventBusQueryDataRequest::class.java, EventBusQueryDataRequestCodec())
     @Suppress("UNCHECKED_CAST")
     vertx.eventBus().registerDefaultCodec(
       EventBusDataResponse::class.java,

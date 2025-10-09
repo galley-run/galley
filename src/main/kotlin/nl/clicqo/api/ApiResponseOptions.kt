@@ -1,5 +1,8 @@
 package nl.clicqo.api
 
+import nl.clicqo.web.HttpStatus
+
 data class ApiResponseOptions(
-  val contentType: String = "application/json",
+  var contentType: String = "application/json",
+  var httpStatus: HttpStatus = HttpStatus.NoContent,
 )

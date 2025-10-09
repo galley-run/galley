@@ -7,6 +7,7 @@ import io.vertx.core.eventbus.MessageConsumer
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.openapi.router.OpenAPIRoute
 import io.vertx.kotlin.coroutines.dispatcher
+import io.vertx.pgclient.PgException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -44,6 +45,13 @@ private fun <T> coroutineConsumerHandler(
       message.reply(ApiStatusReplyException(e))
     } catch (e: ApiStatusReplyException) {
       message.reply(e)
+    } catch (e: PgException) {
+      message.reply(
+        when {
+          e.constraint?.contains("uq_") == true -> ApiStatusReplyException(ApiStatus.PG_DUPLICATE_ENTRY)
+          else -> ApiStatusReplyException(e)
+        },
+      )
     } catch (e: Exception) {
       message.reply(ApiStatusReplyException(e))
     }

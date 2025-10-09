@@ -27,17 +27,17 @@ class CharterControllerVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   companion object {
-    const val ADDRESS_LIST = "charter.query.list"
-    const val ADDRESS_GET = "charter.query.get"
-    const val ADDRESS_CREATE = "charter.cmd.create"
+    const val LIST = "charter.query.list"
+    const val GET = "charter.query.get"
+    const val CREATE = "charter.cmd.create"
   }
 
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_LIST, ::list)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_GET, ::get)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ADDRESS_CREATE, ::create)
+    vertx.eventBus().coroutineConsumer(coroutineContext, LIST, ::list)
+    vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
+    vertx.eventBus().coroutineConsumer(coroutineContext, CREATE, ::create)
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
@@ -74,7 +74,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val dataResponse =
       vertx
         .eventBus()
-        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_LIST, dataRequest)
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.LIST, dataRequest)
         .coAwait()
         .body()
 
@@ -111,7 +111,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val dataResponse =
       vertx
         .eventBus()
-        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_GET, dataRequest)
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.GET, dataRequest)
         .coAwait()
         .body()
 
@@ -146,7 +146,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val dataResponse =
       vertx
         .eventBus()
-        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ADDRESS_CREATE, dataRequest)
+        .request<EventBusDataResponse<Charters>>(CharterDataVerticle.CREATE, dataRequest)
         .coAwait()
         .body()
 

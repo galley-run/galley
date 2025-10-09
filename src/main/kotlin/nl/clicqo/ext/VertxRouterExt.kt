@@ -77,23 +77,26 @@ fun Router.setupFailureHandler(): Router {
         }
       }
 
-      is ValidatorException -> {
-        logger.error(error.message, error)
-        error =
-          when (error.type()) {
-            ValidatorErrorType.UNSUPPORTED_VALUE_FORMAT -> ApiStatus.CONTENT_TYPE_NOT_DEFINED
-            else -> ApiStatus.FAILED_VALIDATION
-          }
-      }
-
       is HttpException -> {
         logger.error(error.payload, error)
+
         error =
-          when (error.statusCode) {
-            401 -> ApiStatus.FAILED_AUTHORIZATION
-            404 -> ApiStatus.FAILED_FIND
-            400 -> ApiStatus.FAILED_VALIDATION
-            else -> ApiStatus.FAILED
+          when (error.cause) {
+            is ValidatorException -> {
+              when ((error.cause as ValidatorException).type()) {
+                ValidatorErrorType.UNSUPPORTED_VALUE_FORMAT -> ApiStatus.CONTENT_TYPE_NOT_DEFINED
+                else -> ApiStatus.FAILED_VALIDATION
+              }
+            }
+
+            else -> {
+              when (error.statusCode) {
+                401 -> ApiStatus.FAILED_AUTHORIZATION
+                404 -> ApiStatus.FAILED_FIND
+                400 -> ApiStatus.FAILED_VALIDATION
+                else -> ApiStatus.FAILED
+              }
+            }
           }
       }
 

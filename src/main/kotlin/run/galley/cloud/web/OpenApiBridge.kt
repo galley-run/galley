@@ -63,6 +63,7 @@ class OpenApiBridge(
           /**
            * Currently only supports JSON as a response format.
            */
+          val contentType = routingContext.request().getHeader("Content-Type") ?: "*/*"
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
           val acceptsJson =
             acceptHeader.split(",").find { header ->
@@ -96,7 +97,7 @@ class OpenApiBridge(
           val requestBodySchema =
             contractOperation.requestBody
               ?.content
-              ?.get(acceptHeader)
+              ?.get(contentType)
               ?.schema
 
           val requiredProperties =

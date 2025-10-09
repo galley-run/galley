@@ -74,6 +74,19 @@ To run the application:
 ./mvnw clean compile exec:java
 ----
 
+=== (Only for development)
+
+You can start the app with JVM System Property `-Dapp.env=dev` to enable a smoother development experience.
+
+The following customizations only work in if `app.env` is set to `dev`.
+
+==== Extend Access Token TTL
+
+Add JVM System Property `-Djwt.ttl.access=3600` to extend the TTL seconds of the AccessToken (default: 30s).
+
+Recommendation: Don't customize the TTL access unless really needed.
+
+
 == Help
 
 Galley is built with Kotlin and upon *Eclipse Vert.x™*, a reactive framework which runs on the JVM.

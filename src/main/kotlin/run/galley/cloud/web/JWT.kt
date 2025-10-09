@@ -8,6 +8,7 @@ import io.vertx.ext.auth.User
 import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
 import nl.clicqo.ext.getUUID
+import nl.clicqo.system.Debug
 import run.galley.cloud.model.UserRole
 import java.util.UUID
 
@@ -33,7 +34,9 @@ object JWT {
       .setIssuer("run.galley.auth")
 
   // Keep a short expiration time for access tokens
-  const val TTL_ACCESS_TOKEN = 30 // 30 seconds
+  val TTL_ACCESS_TOKEN: Int =
+    Debug.getProperty("jwt.ttl.access")?.toIntOrNull()
+      ?: 30
 
   // Keep a long expiration time for access tokens
   const val TTL_REFRESH_TOKEN = 7776000 // 90 days
@@ -52,21 +55,10 @@ object JWT {
 }
 
 fun JWTAuth.issueAccessToken(
-  userId: String,
-  userRole: UserRole,
-  extraClaims: JsonObject = JsonObject(),
-): String = generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId))
-
-fun JWTAuth.issueAccessToken(
   userId: UUID,
   userRole: UserRole,
   extraClaims: JsonObject = JsonObject(),
 ): String = generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId.toString()))
-
-fun JWTAuth.issueRefreshToken(
-  userId: String,
-  extraClaims: JsonObject = JsonObject(),
-): String = generateToken(extraClaims, JWT.refreshToken(userId))
 
 fun JWTAuth.issueRefreshToken(
   userId: UUID,

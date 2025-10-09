@@ -1,6 +1,5 @@
 package run.galley.cloud.data
 
-import generated.jooq.tables.pojos.Charters
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import nl.clicqo.data.DataPayload
@@ -18,6 +17,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     const val LIST = "data.charter.query.list"
     const val GET = "data.charter.query.get"
     const val CREATE = "data.charter.cmd.create"
+    const val PATCH = "data.charter.cmd.patch"
   }
 
   override suspend fun start() {
@@ -26,6 +26,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     vertx.eventBus().coroutineConsumer(coroutineContext, LIST, ::list)
     vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
     vertx.eventBus().coroutineConsumer(coroutineContext, CREATE, ::create)
+    vertx.eventBus().coroutineConsumer(coroutineContext, PATCH, ::patch)
   }
 
   private suspend fun list(message: Message<EventBusQueryDataRequest>) {
@@ -63,9 +64,22 @@ class CharterDataVerticle : PostgresDataVerticle() {
     )
   }
 
-  private suspend fun create(message: Message<EventBusCmdDataRequest<Charters>>) {
+  private suspend fun create(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.createCharter(request))
+
+    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
+
+    message.reply(
+      EventBusDataResponse(
+        payload = DataPayload.one(charter),
+      ),
+    )
+  }
+
+  private suspend fun patch(message: Message<EventBusCmdDataRequest>) {
+    val request = message.body()
+    val results = pool.executePreparedQuery(CharterSql.patchCharter(request))
 
     val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
 

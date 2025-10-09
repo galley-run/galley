@@ -15,11 +15,12 @@ abstract class OpenAPIBridgeRouter(
 ) {
   protected lateinit var openAPIRouterBuilder: RouterBuilder
   lateinit var authProvider: JWTAuth
+  protected lateinit var openAPIContract: OpenAPIContract
 
   suspend fun initialize(): OpenAPIBridgeRouter {
     val openAPIFile = config.getJsonObject("api").getString("openapiFile", "openapi.yaml")
-    val contract = OpenAPIContract.from(vertx, openAPIFile).coAwait()
-    this.openAPIRouterBuilder = RouterBuilder.create(vertx, contract)
+    openAPIContract = OpenAPIContract.from(vertx, openAPIFile).coAwait()
+    this.openAPIRouterBuilder = RouterBuilder.create(vertx, openAPIContract)
     this.authProvider = JWT.authProvider(vertx, config)
 
     return this

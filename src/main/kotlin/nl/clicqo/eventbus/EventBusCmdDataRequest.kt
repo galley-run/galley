@@ -1,7 +1,6 @@
 package nl.clicqo.eventbus
 
 import io.vertx.core.json.JsonObject
-import nl.clicqo.data.DataPayload
 import run.galley.cloud.model.BaseModel
 import java.util.UUID
 
@@ -15,9 +14,9 @@ import java.util.UUID
  * @property userId The ID of the user initiating the request, providing context for auditing or attribution.
  * @property payload Encapsulates the data payload, which can include a single or multiple items of type [T].
  */
-data class EventBusCmdDataRequest<T : BaseModel>(
+data class EventBusCmdDataRequest(
   val identifier: UUID? = null, // Used for to update an existing resource.
   val filters: Map<String, List<String>> = emptyMap(), // Used for updating specific resources
   val userId: UUID? = null, // Used for creator context
-  val payload: DataPayload<T>? = null,
+  val payload: JsonObject? = null,
 )

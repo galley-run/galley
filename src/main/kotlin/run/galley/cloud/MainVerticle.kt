@@ -55,12 +55,7 @@ class MainVerticle : CoroutineVerticle() {
 
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
-    @Suppress("UNCHECKED_CAST")
-    vertx.eventBus().registerDefaultCodec(
-      EventBusCmdDataRequest::class.java,
-      EventBusCmdDataRequestCodec<BaseModel>()
-        as MessageCodec<EventBusCmdDataRequest<out BaseModel>, EventBusCmdDataRequest<out BaseModel>>,
-    )
+    vertx.eventBus().registerDefaultCodec(EventBusCmdDataRequest::class.java, EventBusCmdDataRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusQueryDataRequest::class.java, EventBusQueryDataRequestCodec())
     @Suppress("UNCHECKED_CAST")
     vertx.eventBus().registerDefaultCodec(

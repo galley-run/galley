@@ -2,6 +2,7 @@ package run.galley.cloud.model
 
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
+import nl.clicqo.ext.toSingular
 
 interface BaseModel {
   fun toJsonAPIResourceObject(): JsonObject {
@@ -22,14 +23,14 @@ interface BaseModel {
             .filter { it.name != "id" }
             .forEach { field ->
               field.isAccessible = true
-              val value = field.get(this@BaseModel) ?: return@forEach
+              val value = field.get(this@BaseModel)
               put(field.name, value)
             }
         }
     val id = attributes.getString("id")
     attributes.remove("id")
     return JsonObject()
-      .put("type", this::class.simpleName?.lowercase())
+      .put("type", this::class.simpleName?.toSingular())
       .put("id", id)
       .put("attributes", attributes)
   }
@@ -47,25 +48,8 @@ interface BaseModel {
           "id" -> field.set(this, id)
           else -> {
             val value = attributes.getValue(field.name)
-//            if (value != null) {
             field.set(this, value)
-//            }
           }
-        }
-      }
-
-    return this as T
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  fun <T : BaseModel> fromRequestBody(json: JsonObject): T {
-    this::class.java
-      .getDeclaredFields()
-      .forEach { field ->
-        field.isAccessible = true
-        val value = json.getValue(field.name)
-        if (value != null) {
-          field.set(this, value)
         }
       }
 

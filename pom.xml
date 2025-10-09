@@ -101,6 +101,11 @@
       <version>${kotlin.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-reflect</artifactId>
+      <version>${kotlin.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.ongres.scram</groupId>
       <artifactId>scram-client</artifactId>
       <version>3.1</version>

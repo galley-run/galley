@@ -3,13 +3,20 @@ package nl.clicqo.api
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
+import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.openapi.validation.ResponseValidator
+import io.vertx.openapi.validation.ValidatableResponse
+import io.vertx.openapi.validation.ValidatorException
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.web.HttpStatus
+import org.slf4j.LoggerFactory
 
 class ApiResponse(
   val routingContext: RoutingContext,
   apiResponseOptions: ApiResponseOptions = ApiResponseOptions(),
 ) {
+  private val logger = LoggerFactory.getLogger(this::class.java)
+
   var body: JsonObject? = null
   var httpStatus: HttpStatus = apiResponseOptions.httpStatus
   var contentType: String = apiResponseOptions.contentType
@@ -39,10 +46,14 @@ class ApiResponse(
 
   fun fromEventBusApiResponse(eventBusApiResponse: EventBusApiResponse): ApiResponse {
     this.httpStatus = eventBusApiResponse.httpStatus ?: HttpStatus.Ok
+    this.contentType =
+      "application/vnd.galley.${eventBusApiResponse.version}+${eventBusApiResponse.format}"
     this.body =
       JsonObject()
-        .put("data", eventBusApiResponse.data)
-        .run {
+        .put(
+          "data",
+          eventBusApiResponse.data,
+        ).run {
           eventBusApiResponse.meta?.let { this.put("meta", it) }
           eventBusApiResponse.links?.let { this.put("links", it) }
           eventBusApiResponse.included?.let { this.put("included", it) }
@@ -54,8 +65,6 @@ class ApiResponse(
 
           this
         }
-    this.contentType =
-      "application/vnd.galley.{${eventBusApiResponse.version}}+${eventBusApiResponse.format}"
 
     return this
   }
@@ -70,7 +79,33 @@ class ApiResponse(
       .setStatusCode(httpStatus.code)
       .setStatusMessage(httpStatus.statusMessage)
       .putHeader("content-type", contentType)
+
     routingContext
       .end(build())
+  }
+
+  suspend fun end(
+    responseValidator: ResponseValidator,
+    operationId: String,
+  ) {
+    if (httpStatus == HttpStatus.NoContent && body != null) {
+      httpStatus = HttpStatus.Ok
+    }
+
+    routingContext
+      .response()
+      .setStatusCode(httpStatus.code)
+      .setStatusMessage(httpStatus.statusMessage)
+      .putHeader("content-type", contentType)
+
+    val response = ValidatableResponse.create(httpStatus.code, body?.toBuffer(), contentType)
+    val validatedResponse =
+      try {
+        responseValidator.validate(response, operationId).coAwait()
+      } catch (e: ValidatorException) {
+        logger.error(e.message)
+        throw ApiStatus.RESPONSE_VALIDATION_FAILED
+      }
+    validatedResponse.send(routingContext.response())
   }
 }

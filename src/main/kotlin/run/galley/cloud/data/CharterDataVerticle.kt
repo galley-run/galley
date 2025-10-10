@@ -2,18 +2,23 @@ package run.galley.cloud.data
 
 import generated.jooq.tables.pojos.Charters
 import io.vertx.core.eventbus.Message
+import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
+import io.vertx.pgclient.PgException
+import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
-import nl.kleilokaal.queue.modules.coroutineConsumer
+import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.Charter
 import run.galley.cloud.sql.CharterSql
 
 class CharterDataVerticle : PostgresDataVerticle() {
+  private val logger = LoggerFactory.getLogger(this::class.java)
+
   companion object {
     const val LIST = "data.charter.query.list"
     const val GET = "data.charter.query.get"
@@ -25,11 +30,13 @@ class CharterDataVerticle : PostgresDataVerticle() {
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, LIST, ::list)
-    vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
-    vertx.eventBus().coroutineConsumer(coroutineContext, CREATE, ::create)
-    vertx.eventBus().coroutineConsumer(coroutineContext, PATCH, ::patch)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ARCHIVE, ::archive)
+    coroutineEventBus {
+      vertx.eventBus().coConsumer(LIST, handler = ::list)
+      vertx.eventBus().coConsumer(GET, handler = ::get)
+      vertx.eventBus().coConsumer(CREATE, handler = ::create)
+      vertx.eventBus().coConsumer(PATCH, handler = ::patch)
+      vertx.eventBus().coConsumer(ARCHIVE, handler = ::archive)
+    }
   }
 
   private suspend fun list(message: Message<EventBusQueryDataRequest>) {
@@ -56,9 +63,19 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun get(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CharterSql.getCharter(request))
+    val results =
+      try {
+        pool.executePreparedQuery(CharterSql.getCharter(request))
+      } catch (e: Exception) {
+        logger.error("Error while getting charter", e)
+        null
+      }
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
+    val charter =
+      results
+        ?.firstOrNull()
+        ?.let(Charter::from)
+        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(
@@ -69,9 +86,11 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
+
+    // Run extra layer of validation
     val results = pool.executePreparedQuery(CharterSql.createCharter(request))
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
+    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(
@@ -84,7 +103,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.patchCharter(request))
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatus.CHARTER_NOT_FOUND
+    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(
@@ -98,7 +117,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val updated = pool.executePreparedQuery(CharterSql.archiveCharter(request))
 
     if (updated?.rowCount() == 0) {
-      throw ApiStatus.CHARTER_NOT_FOUND
+      throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
     }
 
     message.reply(

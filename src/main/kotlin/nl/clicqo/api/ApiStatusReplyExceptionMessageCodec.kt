@@ -4,13 +4,18 @@ import io.netty.util.CharsetUtil
 import io.vertx.core.buffer.Buffer
 import io.vertx.core.eventbus.MessageCodec
 import nl.clicqo.web.HttpStatus
+import java.nio.charset.Charset
 
 class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException, ApiStatusReplyException> {
+  private companion object {
+    val CHARSET: Charset = CharsetUtil.UTF_8
+  }
+
   private fun encodeString(
     buffer: Buffer,
     message: String,
   ) {
-    val messageArr = message.toByteArray(CharsetUtil.UTF_8)
+    val messageArr = message.toByteArray(CHARSET)
     buffer.appendInt(messageArr.size)
     buffer.appendBytes(messageArr)
   }
@@ -21,7 +26,7 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
   ): String {
     val asMessageLen = buffer.getInt(pos[0])
     pos[0] += 4
-    val asMessage = String(buffer.getBytes(pos[0], pos[0] + asMessageLen), CharsetUtil.UTF_8)
+    val asMessage = String(buffer.getBytes(pos[0], pos[0] + asMessageLen), CHARSET)
     pos[0] += asMessageLen
     return asMessage
   }
@@ -50,16 +55,14 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     buffer: Buffer,
     exception: Throwable?,
   ) {
-    if (exception == null || exception.cause == exception) {
+    val cause = exception?.cause
+    if (cause == null || cause == exception) {
       buffer.appendByte(0)
       return
     }
-    when (val cause = exception.cause) {
-      null -> {
-        buffer.appendByte(0)
-      }
-
+    when (cause) {
       is ApiStatus -> {
+        buffer.appendByte(1)
         // First encode ApiStatus object
         encodeApiStatus(buffer, cause)
         // Encode our cause
@@ -122,9 +125,10 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     buffer.appendInt(stackTrace.size)
     for (el in stackTrace) {
       encodeString(buffer, el.className)
-      if (el.fileName != null) {
+      val fileName = el.fileName
+      if (fileName != null) {
         buffer.appendByte(1)
-        encodeString(buffer, el.fileName!!)
+        encodeString(buffer, fileName)
       } else {
         buffer.appendByte(0)
       }
@@ -168,6 +172,14 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     encodeApiStatus(buffer, body.apiStatus)
     // Encode our custom message
     encodeString(buffer, body.message)
+    // Encode source pointer (if available)
+    val sourcePointer = body.sourcePointer
+    if (sourcePointer != null) {
+      buffer.appendByte(1)
+      encodeString(buffer, sourcePointer)
+    } else {
+      buffer.appendByte(0)
+    }
     // Encode the cause of the exception (if available)
     encodeCause(buffer, body)
     // Encode our stacktrace
@@ -188,8 +200,14 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
 
     // Decode our custom message
     val customMessage = decodeString(currentPos, buffer)
+
+    // Decode source pointer (if available)
+    val hasSourcePointer = buffer.getByte(currentPos[0]) == 1.toByte()
+    currentPos[0]++
+    val sourcePointer = if (hasSourcePointer) decodeString(currentPos, buffer) else null
+
     val cause = decodeCause(currentPos, buffer)
-    val e = ApiStatusReplyException(apiStatus, customMessage)
+    val e = ApiStatusReplyException(apiStatus, customMessage, sourcePointer)
     if (cause != null) {
       e.initCause(cause)
     }
@@ -197,9 +215,10 @@ class ApiStatusReplyExceptionMessageCodec : MessageCodec<ApiStatusReplyException
     return e
   }
 
-  override fun transform(exception: ApiStatusReplyException?): ApiStatusReplyException = exception!!
+  override fun transform(exception: ApiStatusReplyException?): ApiStatusReplyException =
+    exception ?: throw IllegalArgumentException("Cannot transform null exception")
 
-  override fun name(): String = ApiStatusReplyExceptionMessageCodec::class.java.simpleName!!
+  override fun name(): String = ApiStatusReplyExceptionMessageCodec::class.java.simpleName
 
   override fun systemCodecID(): Byte = -1
 }

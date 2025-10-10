@@ -51,7 +51,7 @@ class MainVerticle : CoroutineVerticle() {
         ConfigRetrieverOptions()
           .addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json"))),
       )
-    val config = configRetriever.config.coAwait()
+    val config = configRetriever.config.coAwait().mergeIn(config)
 
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())

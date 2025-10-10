@@ -31,6 +31,12 @@ open class ApiStatus : Throwable {
     this.httpStatus = extendFrom.httpStatus
   }
 
+  constructor(extendFrom: ApiStatus, message: String?) {
+    this.code = extendFrom.code
+    this.message = message ?: extendFrom.message
+    this.httpStatus = extendFrom.httpStatus
+  }
+
   constructor(code: Int) {
     this.code = code
     this.message = ""
@@ -60,10 +66,10 @@ open class ApiStatus : Throwable {
     val FAILED_UPDATE = ApiStatus(113, "Updating the resource failed")
     val FAILED_DELETE = ApiStatus(114, "Deleting the resource failed")
     val FAILED_AUTHORIZATION = ApiStatus(115, "Authorization failed", HttpStatus.Unauthorized)
-    val PG_DUPLICATE_ENTRY = ApiStatus(120, "A duplicate entry was found", HttpStatus.Conflict)
+    val PG_FAILED_CONSTRAINT_DUPLICATE = ApiStatus(120, "The request couldn't be processed", HttpStatus.Conflict)
     val REQUEST_BODY_NOT_ALLOWED = ApiStatus(130, "The request body should be a Json object", HttpStatus.BadRequest)
     val REQUEST_BODY_MISSING_REQUIRED_FIELDS = ApiStatus(131, "The request body is missing required fields", HttpStatus.BadRequest)
-    val CONTENT_TYPE_NOT_DEFINED = ApiStatus(132, "The requested content type is not available", HttpStatus.NotAcceptable)
+    val CONTENT_TYPE_NOT_DEFINED = ApiStatus(132, "The requested content type is not available", HttpStatus.UnsupportedMediaType)
     val RESPONSE_VALIDATION_FAILED = ApiStatus(140, "The response validation failed", HttpStatus.InternalServerError)
 
     @Suppress("ktlint:standard:function-naming")

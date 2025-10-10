@@ -4,8 +4,8 @@
   },
   "jwt": {
     "secret": "secret",
-    "keystore": "keystore.jceks",
-    "type": "jceks",
+    "keystore": "keystore.p12",
+    "type": "pkcs12",
     "pepper": "long-and-random-string"
   },
   "api": {

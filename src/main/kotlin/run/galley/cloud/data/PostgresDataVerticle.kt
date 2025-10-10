@@ -5,8 +5,11 @@ import io.vertx.pgclient.PgBuilder
 import io.vertx.pgclient.PgConnectOptions
 import io.vertx.sqlclient.Pool
 import io.vertx.sqlclient.PoolOptions
+import nl.clicqo.ext.CoroutineEventBusSupport
 
-open class PostgresDataVerticle : CoroutineVerticle() {
+open class PostgresDataVerticle :
+  CoroutineVerticle(),
+  CoroutineEventBusSupport {
   protected lateinit var pool: Pool
 
   override suspend fun start() {

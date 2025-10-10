@@ -105,7 +105,7 @@ class ApiResponse(
       .putHeader("content-type", contentType)
 
     // Filter body data based on OpenAPI schema
-    val filteredBody =
+    var filteredBody =
       body?.let { bodyObj ->
         val data = bodyObj.getValue("data")
         val filteredData = OpenAPISchemaFilter.filterBySchema(data, contract, operationId, httpStatus.code, contentType)
@@ -116,6 +116,10 @@ class ApiResponse(
           }
         }
       }
+
+    if (httpStatus === HttpStatus.NoContent) {
+      filteredBody = null
+    }
 
     val response = ValidatableResponse.create(httpStatus.code, filteredBody?.toBuffer(), contentType)
     val validatedResponse =

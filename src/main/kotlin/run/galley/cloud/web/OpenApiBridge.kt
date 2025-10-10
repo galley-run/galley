@@ -93,7 +93,10 @@ class OpenApiBridge(
             val charterIds = routingContext.user().principal().getJsonArray("charterIds")
 
             // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-            if (requestedCharterId != null && charterIds != null && charterIds.contains(requestedCharterId)) {
+            val hasCharterAccess = requestedCharterId != null && charterIds != null &&
+              charterIds.toList().map { it?.toString() }.contains(requestedCharterId)
+
+            if (hasCharterAccess) {
               // User has access to this charter
               routingContext.next()
               return@catchAll

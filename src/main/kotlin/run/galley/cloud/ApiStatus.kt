@@ -24,8 +24,10 @@ object ApiStatus {
   val CHARTER_NO_ACCESS = ApiStatus(1400, "You don't have access to this charter")
   val CHARTER_NOT_FOUND = ApiStatus(1401, "The charter could not be found")
   val CHARTER_CREATE_FAILURE = ApiStatus(1402, "The charter could not be created")
+  val CHARTER_ID_INCORRECT = ApiStatus(1403, "The charter id is incorrect")
 
   val USER_NOT_FOUND = ApiStatus(1500, "The user could not be found")
 
-  val CREW_NO_VESSEL_MEMBER = ApiStatus(1600, "The user is not a member of this Vessel crew")
+  val CREW_NO_VESSEL_MEMBER = ApiStatus(1600, "The user is not a member of this Vessel crew", HttpStatus.Forbidden)
+  val CREW_NO_CHARTER_MEMBER = ApiStatus(1601, "The user is not a member of this Charter crew", HttpStatus.Forbidden)
 }

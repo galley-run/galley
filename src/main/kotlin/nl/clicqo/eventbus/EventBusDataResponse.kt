@@ -18,13 +18,15 @@ import run.galley.cloud.model.BaseModel
  *     .put("hasMore", true)
  */
 data class EventBusDataResponse<T : BaseModel>(
-  val payload: DataPayload<T>,
+  val payload: DataPayload<T>? = null,
   val metadata: JsonObject? = null,
 ) {
   companion object {
     inline fun <reified T : BaseModel> from(
-      payload: JsonObject,
+      payload: JsonObject? = null,
       metadata: JsonObject? = null,
-    ): EventBusDataResponse<T> = EventBusDataResponse(DataPayload.from<T>(payload), metadata)
+    ): EventBusDataResponse<T> = EventBusDataResponse(payload?.let { DataPayload.from<T>(it) }, metadata)
+
+    inline fun <reified T : BaseModel> noContent() = EventBusDataResponse<T>(payload = null)
   }
 }

@@ -12,6 +12,8 @@ import nl.clicqo.ext.toUUID
 import nl.clicqo.ext.whereNotDeleted
 import org.jooq.Condition
 import org.jooq.Query
+import org.jooq.impl.DSL
+import org.jooq.impl.DSL.currentOffsetDateTime
 import run.galley.cloud.ApiStatus
 import java.util.UUID
 
@@ -64,6 +66,14 @@ object CharterSql {
       .whereNotDeleted(CHARTERS.DELETED_AT)
       .returning()
   }
+
+  fun archiveCharter(request: EventBusCmdDataRequest): Query =
+    Jooq.postgres
+      .update(CHARTERS)
+      .set(CHARTERS.DELETED_AT, currentOffsetDateTime())
+      .where(CHARTERS.ID.eq(request.identifier))
+      .applyConditions(requiredConditions = listOf(CHARTERS.VESSEL_ID), *buildConditions(request.filters))
+      .whereNotDeleted(CHARTERS.DELETED_AT)
 
   private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> =
     filters

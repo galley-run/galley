@@ -13,7 +13,7 @@ class EventBusDataResponseCodec<T : BaseModel> : MessageCodec<EventBusDataRespon
   ) {
     val jsonObject =
       JsonObject()
-        .put("payload", response.payload.toCodec())
+        .put("payload", response.payload?.toCodec())
         .put("metadata", response.metadata)
 
     val bytes = jsonObject.toBuffer()

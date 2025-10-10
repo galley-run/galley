@@ -11,7 +11,7 @@ data class EventBusApiResponse(
   val format: String = "json",
   val httpStatus: HttpStatus? = null,
   // For the JSON:API Body spec
-  val data: ClusterSerializable,
+  val data: ClusterSerializable? = null,
   val errors: JsonArray? = null,
   val meta: JsonObject? = null,
   val links: JsonObject? = null,

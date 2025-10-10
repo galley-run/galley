@@ -29,6 +29,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     const val GET = "charter.query.get"
     const val CREATE = "charter.cmd.create"
     const val PATCH = "charter.cmd.patch"
+    const val DELETE = "charter.cmd.delete"
   }
 
   override suspend fun start() {
@@ -38,6 +39,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
     vertx.eventBus().coroutineConsumer(coroutineContext, CREATE, ::create)
     vertx.eventBus().coroutineConsumer(coroutineContext, PATCH, ::patch)
+    vertx.eventBus().coroutineConsumer(coroutineContext, DELETE, ::delete)
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
@@ -81,7 +83,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload.toMany()!!.toJsonAPIResourceObject(),
+        data = dataResponse.payload?.toMany()?.toJsonAPIResourceObject(),
       ),
     )
   }
@@ -90,14 +92,12 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val apiRequest = message.body()
 
     val vesselId = apiRequest.identifiers?.get("vesselId")?.string ?: throw ApiStatus.VESSEL_ID_INCORRECT
-    val charterId =
-      apiRequest.identifiers["charterId"]?.string
-        ?: throw IllegalArgumentException("charterId is required")
+    val charterId = apiRequest.identifiers["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
     // Build data request with identifier
     val dataRequest =
       EventBusQueryDataRequest(
-        identifiers = mapOf("id" to charterId),
+        identifiers = mapOf("id" to charterId.toString()),
         filters =
           mapOf(
             CHARTERS.VESSEL_ID.name to listOf(vesselId),
@@ -115,7 +115,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload.toOne()!!.toJsonAPIResourceObject(),
+        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject(),
       ),
     )
   }
@@ -148,7 +148,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_CREATE_FAILURE,
+        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_CREATE_FAILURE,
         httpStatus = HttpStatus.Created,
       ),
     )
@@ -164,7 +164,7 @@ class CharterControllerVerticle : CoroutineVerticle() {
     val charterId =
       apiRequest.identifiers["charterId"]
         ?.string
-        ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+        ?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
     val dataRequest =
       EventBusCmdDataRequest(
@@ -185,8 +185,35 @@ class CharterControllerVerticle : CoroutineVerticle() {
 
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_NOT_FOUND,
+        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_NOT_FOUND,
       ),
     )
+  }
+
+  private suspend fun delete(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val vesselId =
+      apiRequest.identifiers
+        ?.get("vesselId")
+        ?.string
+        ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val charterId = apiRequest.identifiers["charterId"] ?.string ?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
+
+    // Prerequisite:
+    // Check if there are any active projects for this charter
+    // TODO: Check if there are any active projects for this charter when the projects data verticle is implemented
+
+    val deleteRequest =
+      EventBusCmdDataRequest(identifier = charterId, filters = mapOf(CHARTERS.VESSEL_ID.name to listOf(vesselId.toString())))
+
+    // Idea: Optional, second call on delete can delete an archived charter
+
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ARCHIVE, deleteRequest)
+      .coAwait()
+      .body()
+
+    message.reply(EventBusApiResponse())
   }
 }

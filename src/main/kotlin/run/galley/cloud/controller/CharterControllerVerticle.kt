@@ -79,11 +79,14 @@ class CharterControllerVerticle : CoroutineVerticle() {
         .request<EventBusDataResponse<Charters>>(CharterDataVerticle.LIST, dataRequest)
         .coAwait()
         .body()
+        .payload
+        ?.toMany()
+        ?.toJsonAPIResourceObject()
 
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload?.toMany()?.toJsonAPIResourceObject(),
+        data = dataResponse,
       ),
     )
   }
@@ -111,11 +114,14 @@ class CharterControllerVerticle : CoroutineVerticle() {
         .request<EventBusDataResponse<Charters>>(CharterDataVerticle.GET, dataRequest)
         .coAwait()
         .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_NOT_FOUND
 
     // Convert back to API response
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject(),
+        data = dataResponse,
       ),
     )
   }
@@ -145,10 +151,13 @@ class CharterControllerVerticle : CoroutineVerticle() {
         .request<EventBusDataResponse<Charters>>(CharterDataVerticle.CREATE, dataRequest)
         .coAwait()
         .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_CREATE_FAILURE
 
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_CREATE_FAILURE,
+        data = dataResponse,
         httpStatus = HttpStatus.Created,
       ),
     )
@@ -182,10 +191,13 @@ class CharterControllerVerticle : CoroutineVerticle() {
         .request<EventBusDataResponse<Charters>>(CharterDataVerticle.PATCH, dataRequest)
         .coAwait()
         .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_NOT_FOUND
 
     message.reply(
       EventBusApiResponse(
-        data = dataResponse.payload?.toOne()?.toJsonAPIResourceObject() ?: throw ApiStatus.CHARTER_NOT_FOUND,
+        data = dataResponse,
       ),
     )
   }
@@ -197,14 +209,17 @@ class CharterControllerVerticle : CoroutineVerticle() {
         ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
-    val charterId = apiRequest.identifiers["charterId"] ?.string ?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
+    val charterId = apiRequest.identifiers["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
     // Prerequisite:
     // Check if there are any active projects for this charter
     // TODO: Check if there are any active projects for this charter when the projects data verticle is implemented
 
     val deleteRequest =
-      EventBusCmdDataRequest(identifier = charterId, filters = mapOf(CHARTERS.VESSEL_ID.name to listOf(vesselId.toString())))
+      EventBusCmdDataRequest(
+        identifier = charterId,
+        filters = mapOf(CHARTERS.VESSEL_ID.name to listOf(vesselId.toString())),
+      )
 
     // Idea: Optional, second call on delete can delete an archived charter
 

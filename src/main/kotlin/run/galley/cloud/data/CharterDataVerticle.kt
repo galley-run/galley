@@ -95,7 +95,11 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun archive(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-    pool.executePreparedQuery(CharterSql.archiveCharter(request))
+    val updated = pool.executePreparedQuery(CharterSql.archiveCharter(request))
+
+    if (updated?.rowCount() == 0) {
+      throw ApiStatus.CHARTER_NOT_FOUND
+    }
 
     message.reply(
       EventBusDataResponse.noContent<Charters>(),

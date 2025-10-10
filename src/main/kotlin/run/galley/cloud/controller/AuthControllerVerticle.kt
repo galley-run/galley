@@ -58,9 +58,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
             identifiers = mapOf("id" to userId.toString()),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.body()
+        ?.payload
+        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewResponse =
       vertx
@@ -75,9 +75,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
               ),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        ?.body()
+        ?.payload
+        ?.toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
@@ -129,9 +129,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
             identifiers = mapOf("id" to userId.toString()),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.body()
+        ?.payload
+        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewResponse =
       vertx
@@ -146,9 +146,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
               ),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        ?.body()
+        ?.payload
+        ?.toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
     val userRole =
       when (crewResponse.vesselRole) {
@@ -187,9 +187,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
             filters = mapOf("email" to listOf(email)),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.body()
+        ?.payload
+        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
 
     val crewMemberships =
       vertx
@@ -203,9 +203,9 @@ class AuthControllerVerticle : CoroutineVerticle() {
               ),
           ),
         ).coAwait()
-        .body()
-        .payload
-        .toMany()
+        ?.body()
+        ?.payload
+        ?.toMany()
 
     val crewMembership = crewMemberships?.firstOrNull() ?: throw ApiStatus.VESSEL_NOT_FOUND
 

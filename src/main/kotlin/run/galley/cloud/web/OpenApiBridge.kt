@@ -17,6 +17,7 @@ import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.kleilokaal.queue.modules.addCoroutineHandler
+import run.galley.cloud.model.getUserRole
 
 class OpenApiBridge(
   override val vertx: Vertx,
@@ -50,6 +51,66 @@ class OpenApiBridge(
       // Here we'll remove the prefix (if any) of the eventbus address to avoid direct access into Data Verticles
       val address = operation.operationId.removePrefix("data.")
       logger.info("Registered eventbus address: $address")
+
+      route.addCoroutineHandler(vertx) { routingContext ->
+        catchAll(routingContext) {
+          // Check if user is authenticated
+          val validatedRequest = routingContext.get<ValidatedRequest>(RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST)
+
+          val params = validatedRequest.pathParameters
+
+          // If user is not authenticated -> continue
+          if (routingContext.user() == null) {
+            routingContext.next()
+            return@catchAll
+          }
+
+          routingContext.put("vesselId", routingContext.user().principal().getString("vesselId"))
+
+          if (params.contains("vesselId")) {
+            val requestedVesselId = params["vesselId"]?.string
+            val jwtVesselId = routingContext.user().principal().getString("vesselId")
+            val userRole = routingContext.user().getUserRole()
+
+            // Check if vesselId in JWT matches the requested Vessel ID
+            if (jwtVesselId == requestedVesselId) {
+              // Check if user is vessel captain of this vessel
+              if (userRole == run.galley.cloud.model.UserRole.VESSEL_CAPTAIN) {
+                // All good - user is captain of their own vessel
+                routingContext.next()
+                return@catchAll
+              }
+              // Is user vessel member? -> go on to next check
+              // Continue to allow vessel members access (will be checked by other security handlers)
+            } else {
+              // vesselId doesn't match JWT - throw 403 Forbidden
+              throw run.galley.cloud.ApiStatus.CREW_NO_VESSEL_MEMBER
+            }
+          }
+
+          if (params.contains("charterId")) {
+            val requestedCharterId = params["charterId"]?.string
+            val charterIds = routingContext.user().principal().getJsonArray("charterIds")
+
+            // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
+            val hasCharterAccess =
+              requestedCharterId != null && charterIds != null &&
+                charterIds.toList().map { it?.toString() }.contains(requestedCharterId)
+
+            if (hasCharterAccess) {
+              // User has access to this charter
+              routingContext.next()
+              return@catchAll
+            } else {
+              // No access - throw 403 Forbidden
+              throw run.galley.cloud.ApiStatus.CREW_NO_CHARTER_MEMBER
+            }
+          }
+
+          // Possibly add crew_project_member later? Don't see big benefits for it now..
+          routingContext.next()
+        }
+      }
 
       route.addCoroutineHandler(vertx) { routingContext ->
         catchAll(routingContext) {

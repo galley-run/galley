@@ -9,6 +9,8 @@ enum class HttpStatus(
   Accepted(202, "Accepted"),
   NoContent(204, "No Content"),
   NeedsRefresh(210, "Needs Refresh"),
+  MultipleChoices(300, "Multiple Choices"),
+  MovedPermanently(301, "Moved Permanently"),
   Found(302, "Found"),
   NotModified(304, "Not Modified"),
   MovedTemporary(307, "Moved temporary"),

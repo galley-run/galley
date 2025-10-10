@@ -5283,30 +5283,8 @@
         <table_constraint>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_user_vessel</constraint_name>
-            <constraint_type>UNIQUE</constraint_type>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew</table_name>
-            <comment></comment>
-            <enforced>true</enforced>
-        </table_constraint>
-        <table_constraint>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
             <constraint_name>crew_charter_member_pkey</constraint_name>
             <constraint_type>PRIMARY KEY</constraint_type>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew_charter_member</table_name>
-            <comment></comment>
-            <enforced>true</enforced>
-        </table_constraint>
-        <table_constraint>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_charter_member</constraint_name>
-            <constraint_type>UNIQUE</constraint_type>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>crew_charter_member</table_name>
@@ -5417,17 +5395,6 @@
             <constraint_schema>public</constraint_schema>
             <constraint_name>project_applications_pkey</constraint_name>
             <constraint_type>PRIMARY KEY</constraint_type>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>project_applications</table_name>
-            <comment></comment>
-            <enforced>true</enforced>
-        </table_constraint>
-        <table_constraint>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_project_slug</constraint_name>
-            <constraint_type>UNIQUE</constraint_type>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>project_applications</table_name>
@@ -6375,51 +6342,11 @@
             <table_name>crew</table_name>
         </key_column_usage>
         <key_column_usage>
-            <column_name>user_id</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_user_vessel</constraint_name>
-            <ordinal_position>1</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew</table_name>
-        </key_column_usage>
-        <key_column_usage>
-            <column_name>vessel_id</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_user_vessel</constraint_name>
-            <ordinal_position>2</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew</table_name>
-        </key_column_usage>
-        <key_column_usage>
             <column_name>id</column_name>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
             <constraint_name>crew_charter_member_pkey</constraint_name>
             <ordinal_position>1</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew_charter_member</table_name>
-        </key_column_usage>
-        <key_column_usage>
-            <column_name>crew_id</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_charter_member</constraint_name>
-            <ordinal_position>1</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>crew_charter_member</table_name>
-        </key_column_usage>
-        <key_column_usage>
-            <column_name>charter_id</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_crew_charter_member</constraint_name>
-            <ordinal_position>2</ordinal_position>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>crew_charter_member</table_name>
@@ -6520,26 +6447,6 @@
             <constraint_schema>public</constraint_schema>
             <constraint_name>project_applications_pkey</constraint_name>
             <ordinal_position>1</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>project_applications</table_name>
-        </key_column_usage>
-        <key_column_usage>
-            <column_name>project_id</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_project_slug</constraint_name>
-            <ordinal_position>1</ordinal_position>
-            <table_catalog></table_catalog>
-            <table_schema>public</table_schema>
-            <table_name>project_applications</table_name>
-        </key_column_usage>
-        <key_column_usage>
-            <column_name>slug</column_name>
-            <constraint_catalog></constraint_catalog>
-            <constraint_schema>public</constraint_schema>
-            <constraint_name>uq_project_slug</constraint_name>
-            <ordinal_position>2</ordinal_position>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>project_applications</table_name>
@@ -8811,6 +8718,26 @@
         <index>
             <index_catalog></index_catalog>
             <index_schema>public</index_schema>
+            <index_name>uq_crew_charter_member</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew_charter_member</table_name>
+            <is_unique>true</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_crew_user_vessel</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew</table_name>
+            <is_unique>true</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
             <index_name>uq_locker_vessel_name</index_name>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
@@ -8825,6 +8752,16 @@
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>vessel_engine_nodes</table_name>
+            <is_unique>true</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_project_slug</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>project_applications</table_name>
             <is_unique>true</is_unique>
             <comment></comment>
         </index>
@@ -10161,6 +10098,50 @@
         <index_column_usage>
             <index_catalog></index_catalog>
             <index_schema>public</index_schema>
+            <index_name>uq_crew_charter_member</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew_charter_member</table_name>
+            <column_name>crew_id</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_crew_charter_member</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew_charter_member</table_name>
+            <column_name>charter_id</column_name>
+            <ordinal_position>2</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_crew_user_vessel</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew</table_name>
+            <column_name>user_id</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_crew_user_vessel</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>crew</table_name>
+            <column_name>vessel_id</column_name>
+            <ordinal_position>2</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
             <index_name>uq_locker_vessel_name</index_name>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
@@ -10189,6 +10170,28 @@
             <table_name>vessel_engine_nodes</table_name>
             <column_name>ip_address</column_name>
             <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_project_slug</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>project_applications</table_name>
+            <column_name>project_id</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>uq_project_slug</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>project_applications</table_name>
+            <column_name>slug</column_name>
+            <ordinal_position>2</ordinal_position>
             <is_descending>false</is_descending>
         </index_column_usage>
         <index_column_usage>

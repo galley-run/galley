@@ -30,3 +30,14 @@ fun String.toLocalDate(): LocalDate =
   }
 
 fun String.isValidEmail(): Boolean = this.matches(Regex("^[\\w\\-.+]+@([\\w-]+\\.)+[\\w-]{2,}\$"))
+
+fun String.toSingular(): String =
+  when (this) {
+    "crew" -> "crew"
+    else ->
+      when {
+        endsWith("ies") -> dropLast(3) + "y"
+        endsWith("s") && !endsWith("ss") -> dropLast(1)
+        else -> this
+      }
+  }

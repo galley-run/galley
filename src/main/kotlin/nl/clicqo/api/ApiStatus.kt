@@ -61,5 +61,12 @@ open class ApiStatus : Throwable {
     val FAILED_DELETE = ApiStatus(114, "Deleting the resource failed")
     val FAILED_AUTHORIZATION = ApiStatus(115, "Authorization failed", HttpStatus.Unauthorized)
     val PG_DUPLICATE_ENTRY = ApiStatus(120, "A duplicate entry was found", HttpStatus.Conflict)
+    val REQUEST_BODY_NOT_ALLOWED = ApiStatus(130, "The request body should be a Json object", HttpStatus.BadRequest)
+    val REQUEST_BODY_MISSING_REQUIRED_FIELDS = ApiStatus(131, "The request body is missing required fields", HttpStatus.BadRequest)
+    val CONTENT_TYPE_NOT_DEFINED = ApiStatus(132, "The requested content type is not available", HttpStatus.NotAcceptable)
+    val RESPONSE_VALIDATION_FAILED = ApiStatus(140, "The response validation failed", HttpStatus.InternalServerError)
+
+    @Suppress("ktlint:standard:function-naming")
+    fun JOOQ_MISSING_REQUIRED_FIELDS(message: String) = ApiStatus(130, "The following fields are missing in the condition: ($message)")
   }
 }

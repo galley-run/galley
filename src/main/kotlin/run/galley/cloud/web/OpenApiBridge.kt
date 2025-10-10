@@ -1,19 +1,21 @@
 package run.galley.cloud.web
 
+import com.github.jknack.handlebars.internal.lang3.StringUtils.isNotBlank
 import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.openapi.validation.ResponseValidator
 import io.vertx.openapi.validation.ValidatedRequest
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
+import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
-import nl.clicqo.web.HttpStatus
 import nl.kleilokaal.queue.modules.addCoroutineHandler
 
 class OpenApiBridge(
@@ -54,12 +56,21 @@ class OpenApiBridge(
           val validatedRequest = routingContext.get<ValidatedRequest>(RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST)
 
           val params = validatedRequest.pathParameters
-          val body = validatedRequest.body.get() as? JsonObject
+          val rawBody = validatedRequest.body.jsonObject
           val query = validatedRequest.query
+
+          val contractOperation = openAPIContract.operation(operation.operationId)
 
           /**
            * Currently only supports JSON as a response format.
            */
+          val contentType =
+            routingContext
+              .request()
+              .getHeader("Content-Type")
+              ?.substringBefore(";")
+              ?.trim()
+              ?.takeIf(::isNotBlank) ?: "*/*"
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
           val acceptsJson =
             acceptHeader.split(",").find { header ->
@@ -87,10 +98,44 @@ class OpenApiBridge(
             return@catchAll
           }
 
-          val eb = routingContext.vertx().eventBus()
+          /**
+           * Filter body to only include keys defined in the OpenAPI contract
+           */
+          val requestBodySchema =
+            contractOperation.requestBody
+              ?.content
+              ?.get(contentType)
+              ?.schema
+
+          val requiredProperties =
+            requestBodySchema
+              ?.get<JsonArray>("required")
+              ?.toList() ?: emptyList()
+          val properties =
+            requestBodySchema
+              ?.get<JsonObject>("properties")
+              ?.fieldNames()
+              ?.toList() ?: emptyList()
+
+          val body =
+            if (rawBody != null) {
+              val filteredBody = rawBody.map.filterKeys { properties.contains(it) }
+
+              // Check if all required properties are present
+              val missingRequired = requiredProperties.filterNot { filteredBody.containsKey(it) }
+              if (missingRequired.isNotEmpty()) {
+                throw ApiStatus.REQUEST_BODY_MISSING_REQUIRED_FIELDS
+              }
+
+              JsonObject(filteredBody)
+            } else {
+              null
+            }
 
           val response =
-            eb
+            routingContext
+              .vertx()
+              .eventBus()
               .request<EventBusApiResponse>(
                 address,
                 EventBusApiRequest(
@@ -104,13 +149,14 @@ class OpenApiBridge(
               ).coAwait()
               .body()
 
-          val apiResponseOptions = ApiResponseOptions(contentType = "application/vnd.galley.$requestedVersion+$requestedFormat")
+          val apiResponseOptions =
+            ApiResponseOptions(contentType = "application/vnd.galley.$requestedVersion+$requestedFormat")
 
           ApiResponse(
             routingContext,
             apiResponseOptions,
           ).fromEventBusApiResponse(response)
-            .end()
+            .end(ResponseValidator.create(vertx, openAPIContract), operation.operationId, openAPIContract)
         }
       }
     }

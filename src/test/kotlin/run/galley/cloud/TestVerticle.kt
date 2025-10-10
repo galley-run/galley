@@ -61,12 +61,8 @@ open class TestVerticle {
         EventBusDataResponse::class.java,
         EventBusDataResponseCodec<BaseModel>() as MessageCodec<EventBusDataResponse<out BaseModel>, EventBusDataResponse<out BaseModel>>,
       )
-      @Suppress("UNCHECKED_CAST")
-      vertx.eventBus().registerDefaultCodec(
-        EventBusCmdDataRequest::class.java,
-        EventBusCmdDataRequestCodec<BaseModel>()
-          as MessageCodec<EventBusCmdDataRequest<out BaseModel>, EventBusCmdDataRequest<out BaseModel>>,
-      )
+
+      vertx.eventBus().registerDefaultCodec(EventBusCmdDataRequest::class.java, EventBusCmdDataRequestCodec())
       vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
     }
   }

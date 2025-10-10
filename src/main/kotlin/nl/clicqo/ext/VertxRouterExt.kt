@@ -6,6 +6,8 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.HttpException
+import io.vertx.openapi.validation.ValidatorErrorType
+import io.vertx.openapi.validation.ValidatorException
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.ApiStatus
@@ -77,12 +79,25 @@ fun Router.setupFailureHandler(): Router {
 
       is HttpException -> {
         logger.error(error.payload, error)
-        when (error.statusCode) {
-          401 -> error = ApiStatus.FAILED_AUTHORIZATION
-          404 -> error = ApiStatus.FAILED_FIND
-          400 -> error = ApiStatus.FAILED_VALIDATION
-          500 -> error = ApiStatus.FAILED
-        }
+
+        error =
+          when (error.cause) {
+            is ValidatorException -> {
+              when ((error.cause as ValidatorException).type()) {
+                ValidatorErrorType.UNSUPPORTED_VALUE_FORMAT -> ApiStatus.CONTENT_TYPE_NOT_DEFINED
+                else -> ApiStatus.FAILED_VALIDATION
+              }
+            }
+
+            else -> {
+              when (error.statusCode) {
+                401 -> ApiStatus.FAILED_AUTHORIZATION
+                404 -> ApiStatus.FAILED_FIND
+                400 -> ApiStatus.FAILED_VALIDATION
+                else -> ApiStatus.FAILED
+              }
+            }
+          }
       }
 
       else -> logger.error(error.message, error)

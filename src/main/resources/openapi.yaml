@@ -107,14 +107,12 @@ paths:
           content:
             application/vnd.galley.v1+json:
               schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - data
-                  properties:
-                    data:
-                      $ref: '#/components/schemas/Charter'
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Charter'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -166,6 +164,45 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    patch:
+      summary: Update a Charter
+      operationId: charter.cmd.patch
+      description: Partially updates a record of type Charter
+      tags:
+        - charter
+      security:
+        - vesselCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Charter'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      requestBody:
+        required: true
+        description: Charter update data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/CharterUpdate'
   /auth/refresh-token:
     post:
       tags:
@@ -342,19 +379,25 @@ components:
             type:
               type: string
               enum:
-                - charter
+                - Charter
               description: Resource type
             attributes:
               type: object
               required:
                 - name
-                - vessel_id
+                - vesselId
               properties:
                 name:
                   type: string
                   examples:
                     - Clicqo
-                vessel_id:
+                description:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - Our company charter for production workloads
+                vesselId:
                   type: string
                   format: uuid
                   examples:
@@ -370,7 +413,9 @@ components:
           examples:
             - Clicqo
         description:
-          type: string
+          type:
+            - string
+            - 'null'
           examples:
             - Our company
     Charter:
@@ -392,16 +437,16 @@ components:
             type:
               type: string
               enum:
-                - charter
+                - Charter
               description: Resource type
             attributes:
               type: object
               required:
                 - name
                 - description
-                - vessel_id
+                - vesselId
               properties:
-                vessel_id:
+                vesselId:
                   type: string
                   format: uuid
                   description: Vessel this charter belongs to
@@ -413,10 +458,28 @@ components:
                   examples:
                     - Clicqo
                 description:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Charter description
                   examples:
                     - Our company charter for production workloads
+    CharterUpdate:
+      type: object
+      required:
+        - name
+      description: Data transfer object for updating a Charter.
+      properties:
+        name:
+          type: string
+          examples:
+            - Clicqo
+        description:
+          type:
+            - string
+            - 'null'
+          examples:
+            - Clicqo
     RefreshToken:
       type: object
       required:

@@ -45,7 +45,7 @@ class EventBusApiResponseCodec : MessageCodec<EventBusApiResponse, EventBusApiRe
       errors = json.getJsonArray("errors"),
       version = json.getString("version", "v1"),
       format = json.getString("format", "json"),
-      httpStatus = json.getString("httpStatus")?.let { HttpStatus.valueOf(it) },
+      httpStatus = json.getString("httpStatus")?.let { HttpStatus.valueOf(it) } ?: HttpStatus.NoContent,
     )
   }
 

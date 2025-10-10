@@ -1,5 +1,6 @@
 package run.galley.cloud.web
 
+import com.github.jknack.handlebars.internal.lang3.StringUtils.isNotBlank
 import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
@@ -63,7 +64,13 @@ class OpenApiBridge(
           /**
            * Currently only supports JSON as a response format.
            */
-          val contentType = routingContext.request().getHeader("Content-Type") ?: "*/*"
+          val contentType =
+            routingContext
+              .request()
+              .getHeader("Content-Type")
+              ?.substringBefore(";")
+              ?.trim()
+              ?.takeIf(::isNotBlank) ?: "*/*"
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
           val acceptsJson =
             acceptHeader.split(",").find { header ->

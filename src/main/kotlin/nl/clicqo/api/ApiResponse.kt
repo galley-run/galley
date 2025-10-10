@@ -48,16 +48,6 @@ class ApiResponse(
   fun fromEventBusApiResponse(eventBusApiResponse: EventBusApiResponse): ApiResponse {
     this.httpStatus = eventBusApiResponse.httpStatus
 
-    if (httpStatus == HttpStatus.NoContent && eventBusApiResponse.data != null) {
-      httpStatus = HttpStatus.Ok
-    }
-    if (httpStatus == HttpStatus.Ok && eventBusApiResponse.data == null) {
-      httpStatus = HttpStatus.NoContent
-    }
-    if (httpStatus.code in 200..<300 && eventBusApiResponse.errors != null) {
-      httpStatus = HttpStatus.InternalServerError
-    }
-
     this.contentType =
       "application/vnd.galley.${eventBusApiResponse.version}+${eventBusApiResponse.format}"
     this.body =
@@ -77,6 +67,17 @@ class ApiResponse(
 
           this
         }
+
+    if (httpStatus == HttpStatus.NoContent && eventBusApiResponse.data != null) {
+      httpStatus = HttpStatus.Ok
+    }
+    if (httpStatus == HttpStatus.Ok && eventBusApiResponse.data == null) {
+      httpStatus = HttpStatus.NoContent
+      body = null
+    }
+    if (httpStatus.code in 200..<300 && eventBusApiResponse.errors != null) {
+      httpStatus = HttpStatus.InternalServerError
+    }
 
     return this
   }

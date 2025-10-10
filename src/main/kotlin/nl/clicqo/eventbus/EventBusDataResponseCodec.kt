@@ -33,15 +33,15 @@ class EventBusDataResponseCodec<T : BaseModel> : MessageCodec<EventBusDataRespon
     val jsonBytes = buffer.getBuffer(position, position + length)
     val json = JsonObject(jsonBytes)
 
-    val payload = json.getJsonObject("payload", JsonObject())
+    val payload = json.getJsonObject("payload")
     val metadata = json.getJsonObject("metadata")
 
     // We need to use the type from the JSON payload since T is not reified here
-    val type = payload.getString("type")
-    val clazz = Class.forName("run.galley.cloud.model.${type.replaceFirstChar { it.uppercase() }}") as Class<T>
+    val type = payload?.getString("type")
+    val clazz = Class.forName("run.galley.cloud.model.${type?.replaceFirstChar { it.uppercase() }}") as Class<T>
 
     return EventBusDataResponse(
-      payload = createDataPayload(payload, clazz),
+      payload = payload?.let { createDataPayload(it, clazz) },
       metadata = metadata,
     )
   }

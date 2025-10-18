@@ -63,13 +63,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun get(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results =
-      try {
-        pool.executePreparedQuery(CharterSql.getCharter(request))
-      } catch (e: Exception) {
-        logger.error("Error while getting charter", e)
-        null
-      }
+    val results = pool.executePreparedQuery(CharterSql.getCharter(request))
 
     val charter =
       results
@@ -86,8 +80,6 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-
-    // Run extra layer of validation
     val results = pool.executePreparedQuery(CharterSql.createCharter(request))
 
     val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)

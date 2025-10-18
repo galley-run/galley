@@ -27,6 +27,7 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusDataResponseCodec
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.eventbus.EventBusQueryDataRequestCodec
+import nl.clicqo.ext.applyIf
 import nl.clicqo.ext.setupCorsHandler
 import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
@@ -49,9 +50,11 @@ class MainVerticle : CoroutineVerticle() {
       ConfigRetriever.create(
         vertx,
         ConfigRetrieverOptions()
-          .addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json"))),
+          .applyIf(vertx.fileSystem().exists("config.json").coAwait()) {
+            this.addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json")))
+          },
       )
-    val config = configRetriever.config.coAwait()
+    val config = configRetriever.config.coAwait().mergeIn(config)
 
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())

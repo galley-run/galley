@@ -185,4 +185,4 @@ nbdist/
 !.vscode/extensions.json
 
 config.json
-keystore.jceks
+keystore.p12

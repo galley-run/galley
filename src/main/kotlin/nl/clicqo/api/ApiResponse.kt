@@ -3,12 +3,14 @@ package nl.clicqo.api
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.RoutingContext
+import io.vertx.json.schema.JsonSchemaValidationException
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.openapi.contract.OpenAPIContract
 import io.vertx.openapi.validation.ResponseValidator
 import io.vertx.openapi.validation.ValidatableResponse
 import io.vertx.openapi.validation.ValidatorException
 import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.ext.applyIf
 import nl.clicqo.web.HttpStatus
 import org.slf4j.LoggerFactory
 
@@ -28,11 +30,22 @@ class ApiResponse(
     return this
   }
 
-  fun addError(error: ApiStatus): ApiResponse {
+  fun addError(
+    error: ApiStatus,
+    source: ApiErrorSource? = null,
+  ): ApiResponse {
     if (errors == null) {
       errors = JsonArray()
     }
-    errors?.add(JsonObject().put("code", error.code).put("message", error.message))
+    errors?.add(
+      JsonObject()
+        .put("status", error.code)
+        .put("title", error.message)
+        .applyIf(source != null) {
+          this.put("source", source?.toJsonObject())
+          this
+        },
+    )
     setHttpStatus(error.httpStatus)
 
     return this
@@ -125,6 +138,9 @@ class ApiResponse(
     val validatedResponse =
       try {
         responseValidator.validate(response, operationId).coAwait()
+      } catch (e: JsonSchemaValidationException) {
+        logger.error(e.message)
+        throw ApiStatus.RESPONSE_VALIDATION_FAILED
       } catch (e: ValidatorException) {
         logger.error(e.message)
         throw ApiStatus.RESPONSE_VALIDATION_FAILED

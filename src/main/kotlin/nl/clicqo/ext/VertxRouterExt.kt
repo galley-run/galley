@@ -1,13 +1,17 @@
 package nl.clicqo.ext
 
+import io.vertx.core.eventbus.ReplyException
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.HttpException
+import io.vertx.json.schema.JsonSchemaValidationException
+import io.vertx.openapi.validation.SchemaValidationException
 import io.vertx.openapi.validation.ValidatorErrorType
 import io.vertx.openapi.validation.ValidatorException
+import nl.clicqo.api.ApiErrorSource
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.ApiStatus
@@ -54,6 +58,7 @@ fun Router.setupFailureHandler(): Router {
   val logger = LoggerFactory.getLogger(this::class.java)
 
   route().failureHandler {
+    var source: ApiErrorSource? = null
     var error =
       when (it.failure()) {
         is ClassCastException -> ApiStatus.HTTP_CLASS_CAST_EXCEPTION
@@ -71,33 +76,56 @@ fun Router.setupFailureHandler(): Router {
           )
         }
 
+      is JsonSchemaValidationException -> {
+        error = ApiStatus.FAILED_VALIDATION
+        source = ApiErrorSource().setPointer(error.message)
+      }
+
       is ApiStatusReplyException -> {
         if (error.apiStatus == ApiStatus.THROWABLE_EXCEPTION) {
           logger.error(error.message, error)
         }
       }
 
-      is HttpException -> {
-        logger.error(error.payload, error)
+      is ReplyException -> {
+        logger.error(error.message, error)
+        error = ApiStatus.FAILED // It can be anything
+      }
 
-        error =
-          when (error.cause) {
-            is ValidatorException -> {
+      is HttpException -> {
+        logger.error(error.payload)
+
+        when (error.cause) {
+          is SchemaValidationException -> {
+            (error.cause as SchemaValidationException).outputUnit.errors.first().instanceLocation?.let { location ->
+              source = ApiErrorSource().setPointer(location)
+            }
+            error = ApiStatus(ApiStatus.FAILED_VALIDATION, error.cause?.message)
+          }
+
+          is JsonSchemaValidationException -> {
+            error = ApiStatus.FAILED_VALIDATION
+            source = ApiErrorSource().setPointer((error.cause as JsonSchemaValidationException).location())
+          }
+
+          is ValidatorException -> {
+            error =
               when ((error.cause as ValidatorException).type()) {
                 ValidatorErrorType.UNSUPPORTED_VALUE_FORMAT -> ApiStatus.CONTENT_TYPE_NOT_DEFINED
                 else -> ApiStatus.FAILED_VALIDATION
               }
-            }
+          }
 
-            else -> {
+          else -> {
+            error =
               when (error.statusCode) {
                 401 -> ApiStatus.FAILED_AUTHORIZATION
                 404 -> ApiStatus.FAILED_FIND
                 400 -> ApiStatus.FAILED_VALIDATION
                 else -> ApiStatus.FAILED
               }
-            }
           }
+        }
       }
 
       else -> logger.error(error.message, error)
@@ -112,6 +140,7 @@ fun Router.setupFailureHandler(): Router {
         is ApiStatusReplyException -> error.apiStatus
         else -> ApiStatus.FAILED
       },
+      source = source,
     ).end()
   }
 

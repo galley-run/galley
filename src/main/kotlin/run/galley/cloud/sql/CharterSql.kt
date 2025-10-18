@@ -12,7 +12,6 @@ import nl.clicqo.ext.toUUID
 import nl.clicqo.ext.whereNotDeleted
 import org.jooq.Condition
 import org.jooq.Query
-import org.jooq.impl.DSL
 import org.jooq.impl.DSL.currentOffsetDateTime
 import run.galley.cloud.ApiStatus
 import java.util.UUID

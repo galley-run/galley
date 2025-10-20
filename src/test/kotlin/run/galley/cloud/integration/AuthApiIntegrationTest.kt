@@ -366,7 +366,7 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
     }
 
   @Test
-  fun `test POST token with deleted user returns 404`(testContext: VertxTestContext) =
+  fun `test POST token with deleted user returns 403`(testContext: VertxTestContext) =
     runTest {
       // First, sign in to get a valid refresh token
       val signInBody = JsonObject().put("email", "test@example.com")
@@ -403,7 +403,7 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
       testContext.verify {
         assertEquals(200, signInResp.statusCode())
         assertNotNull(refreshToken)
-        assertEquals(404, resp.statusCode())
+        assertEquals(403, resp.statusCode())
         testContext.completeNow()
       }
     }

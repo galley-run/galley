@@ -4,7 +4,6 @@ import generated.jooq.tables.pojos.Charters
 import io.vertx.core.eventbus.Message
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
-import io.vertx.pgclient.PgException
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
@@ -17,8 +16,6 @@ import run.galley.cloud.model.Charter
 import run.galley.cloud.sql.CharterSql
 
 class CharterDataVerticle : PostgresDataVerticle() {
-  private val logger = LoggerFactory.getLogger(this::class.java)
-
   companion object {
     const val LIST = "data.charter.query.list"
     const val GET = "data.charter.query.get"

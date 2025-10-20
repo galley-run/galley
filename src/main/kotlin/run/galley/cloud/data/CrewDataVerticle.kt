@@ -30,7 +30,11 @@ class CrewDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CrewSql.getCrewMemberByUserAndVessel(request))
 
-    val crew = results?.firstOrNull()?.let(Crew::from) ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
+    val crew =
+      results
+        ?.firstOrNull()
+        ?.let(Crew::from)
+        ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
     message.reply(
       EventBusDataResponse(

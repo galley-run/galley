@@ -1,6 +1,7 @@
 package run.galley.cloud.data
 
 import io.vertx.core.eventbus.Message
+import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusDataResponse
@@ -29,7 +30,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CrewSql.getCrewMemberByUserAndVessel(request))
 
-    val crew = results?.firstOrNull()?.let(Crew::from) ?: throw ApiStatus.USER_NOT_FOUND
+    val crew = results?.firstOrNull()?.let(Crew::from) ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(

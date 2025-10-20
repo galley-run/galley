@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.authentication.TokenCredentials
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataResponse
@@ -45,14 +46,19 @@ class AuthControllerVerticle :
 
   private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val refreshToken = apiRequest.body?.getString("refreshToken") ?: throw ApiStatus.REFRESH_TOKEN_MISSING
+    val refreshToken =
+      apiRequest.body?.getString("refreshToken") ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_MISSING)
 
     val refreshTokenUser =
-      JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
-        ?: throw ApiStatus.REFRESH_TOKEN_INVALID
+      try {
+        JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
+          ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+      } catch (_: Exception) {
+        throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+      }
 
-    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatus.REFRESH_TOKEN_INVALID
-    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     val user =
       vertx
@@ -65,7 +71,7 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     val crewResponse =
       vertx
@@ -82,7 +88,7 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
     when (crewResponse.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN
@@ -116,14 +122,19 @@ class AuthControllerVerticle :
    */
   private suspend fun issueAccessToken(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val refreshToken = apiRequest.body?.getString("refreshToken") ?: throw ApiStatus.REFRESH_TOKEN_MISSING
+    val refreshToken =
+      apiRequest.body?.getString("refreshToken") ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_MISSING)
 
     val refreshTokenUser =
-      JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
-        ?: throw ApiStatus.REFRESH_TOKEN_INVALID
+      try {
+        JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
+          ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+      } catch (_: Exception) {
+        throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+      }
 
-    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatus.REFRESH_TOKEN_INVALID
-    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
+    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     val user =
       vertx
@@ -136,7 +147,7 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     val crewResponse =
       vertx
@@ -153,7 +164,7 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
     val userRole =
       when (crewResponse.vesselRole) {
@@ -181,7 +192,7 @@ class AuthControllerVerticle :
 
   private suspend fun signIn(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val email = apiRequest.body?.getString("email") ?: throw ApiStatus.ID_MISSING
+    val email = apiRequest.body?.getString("email") ?: throw ApiStatusReplyException(ApiStatus.ID_MISSING)
 
     val user =
       vertx
@@ -194,7 +205,7 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatus.USER_NOT_FOUND
+        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     val crewMemberships =
       vertx
@@ -212,7 +223,7 @@ class AuthControllerVerticle :
         ?.payload
         ?.toMany()
 
-    val crewMembership = crewMemberships?.firstOrNull() ?: throw ApiStatus.VESSEL_NOT_FOUND
+    val crewMembership = crewMemberships?.firstOrNull() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND)
 
     when (crewMembership.vesselRole) {
       VesselRole.captain -> UserRole.VESSEL_CAPTAIN

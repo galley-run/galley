@@ -5,7 +5,7 @@ import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
-import nl.kleilokaal.queue.modules.coroutineConsumer
+import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.User
 import run.galley.cloud.sql.UserSql
@@ -19,8 +19,10 @@ class UserDataVerticle : PostgresDataVerticle() {
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, GET, ::get)
-    vertx.eventBus().coroutineConsumer(coroutineContext, GET_BY_EMAIL, ::getByEmail)
+    coroutineEventBus {
+      vertx.eventBus().coConsumer(GET, handler = ::get)
+      vertx.eventBus().coConsumer(GET_BY_EMAIL, handler = ::getByEmail)
+    }
   }
 
   private suspend fun get(message: Message<EventBusQueryDataRequest>) {

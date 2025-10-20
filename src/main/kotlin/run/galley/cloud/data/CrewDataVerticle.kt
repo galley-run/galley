@@ -5,7 +5,7 @@ import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
-import nl.kleilokaal.queue.modules.coroutineConsumer
+import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.Crew
 import run.galley.cloud.sql.CrewSql
@@ -19,8 +19,10 @@ class CrewDataVerticle : PostgresDataVerticle() {
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, GET_BY_USER_AND_VESSEL, ::getByUserAndVessel)
-    vertx.eventBus().coroutineConsumer(coroutineContext, LIST_ACTIVE, ::listActive)
+    coroutineEventBus {
+      vertx.eventBus().coConsumer(GET_BY_USER_AND_VESSEL, handler = ::getByUserAndVessel)
+      vertx.eventBus().coConsumer(LIST_ACTIVE, handler = ::listActive)
+    }
   }
 
   private suspend fun getByUserAndVessel(message: Message<EventBusQueryDataRequest>) {

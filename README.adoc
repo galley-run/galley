@@ -27,7 +27,14 @@ You can generate a keystore by running the following command:
 
 [shell]
 ----
-keytool -genseckey -keystore keystore.jceks -storetype JCEKS -storepass "secret" -keyalg HmacSHA256 -keysize 2048 -alias HS256 -keypass "secret"
+keytool -genseckey \
+  -keystore keystore.p12 \
+  -storetype PKCS12 \
+  -storepass "secret" \
+  -keyalg HmacSHA512 \
+  -keysize 512 \
+  -alias HS512 \
+  -keypass "secret"
 ----
 
 In the root folder you also need to copy `_config.json` into `config.json` and change the variables as you need. Make sure the `jwt.secret` aligns with the secret you've put in when creating the keystore.

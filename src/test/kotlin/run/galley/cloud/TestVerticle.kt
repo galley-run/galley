@@ -26,12 +26,12 @@ open class TestVerticle {
     JsonObject(
       """{
   "http": {
-    "port": 9233
+    "port": 19233
   },
   "jwt": {
     "secret": "secret",
     "keystore": "keystore.jceks",
-    "type": "jceks",
+    "type": "pkcs12",
     "pepper": "long-and-random-string"
   },
   "api": {

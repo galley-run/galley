@@ -16,7 +16,7 @@ import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
-import nl.kleilokaal.queue.modules.addCoroutineHandler
+import nl.clicqo.ext.addCoroutineHandler
 import run.galley.cloud.model.getUserRole
 
 class OpenApiBridge(

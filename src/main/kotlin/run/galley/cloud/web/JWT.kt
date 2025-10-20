@@ -15,10 +15,11 @@ import java.util.UUID
 object JWT {
   fun authConfig(config: JsonObject): JWTAuthOptions =
     JWTAuthOptions()
+      .setJWTOptions(jwtOptions)
       .setKeyStore(
         KeyStoreOptions()
-          .setType(config.getJsonObject("jwt", JsonObject()).getString("type", "jceks"))
-          .setPath(config.getJsonObject("jwt", JsonObject()).getString("keystore", "keystore.jceks"))
+          .setType(config.getJsonObject("jwt", JsonObject()).getString("type", "pkcs12"))
+          .setPath(config.getJsonObject("jwt", JsonObject()).getString("keystore", "keystore.p12"))
           .setPassword(config.getJsonObject("jwt", JsonObject()).getString("secret", "")),
       )
 
@@ -32,6 +33,7 @@ object JWT {
     JWTOptions()
       .addAudience("run.galley.api")
       .setIssuer("run.galley.auth")
+      .setAlgorithm("HS512")
 
   // Keep a short expiration time for access tokens
   val TTL_ACCESS_TOKEN: Int =

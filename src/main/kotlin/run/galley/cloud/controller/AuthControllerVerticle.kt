@@ -12,8 +12,9 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.ext.CoroutineEventBusSupport
+import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
-import nl.kleilokaal.queue.modules.coroutineConsumer
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
@@ -23,7 +24,9 @@ import run.galley.cloud.web.getVesselId
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
 
-class AuthControllerVerticle : CoroutineVerticle() {
+class AuthControllerVerticle :
+  CoroutineVerticle(),
+  CoroutineEventBusSupport {
   companion object {
     const val ISSUE_REFRESH_TOKEN = "auth.refreshToken.cmd.issue"
     const val ISSUE_ACCESS_TOKEN = "auth.accessToken.cmd.issue"
@@ -33,9 +36,11 @@ class AuthControllerVerticle : CoroutineVerticle() {
   override suspend fun start() {
     super.start()
 
-    vertx.eventBus().coroutineConsumer(coroutineContext, ISSUE_REFRESH_TOKEN, ::issueRefreshToken)
-    vertx.eventBus().coroutineConsumer(coroutineContext, ISSUE_ACCESS_TOKEN, ::issueAccessToken)
-    vertx.eventBus().coroutineConsumer(coroutineContext, SIGN_IN, ::signIn)
+    coroutineEventBus {
+      vertx.eventBus().coConsumer(ISSUE_REFRESH_TOKEN, handler = ::issueRefreshToken)
+      vertx.eventBus().coConsumer(ISSUE_ACCESS_TOKEN, handler = ::issueAccessToken)
+      vertx.eventBus().coConsumer(SIGN_IN, handler = ::signIn)
+    }
   }
 
   private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {

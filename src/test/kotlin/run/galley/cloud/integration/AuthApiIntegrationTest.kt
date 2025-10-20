@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import run.galley.cloud.TestJWTHelper
+import run.galley.cloud.model.UserRole
+import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 
 class AuthApiIntegrationTest : BaseIntegrationTest() {
@@ -55,8 +57,8 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
         INSERT INTO vessels (id, name, user_id, created_at)
         VALUES ('$vesselId', 'Test Vessel', '$userId', NOW())
         ON CONFLICT (id) DO NOTHING;
-        INSERT INTO crew (id, user_id, vessel_id, vessel_role, status, created_at)
-        VALUES (gen_random_uuid(), '$userId', '$vesselId', 'captain', 'active', NOW())
+        INSERT INTO crew (id, user_id, vessel_id, vessel_role, status, activated_at, created_at)
+        VALUES (gen_random_uuid(), '$userId', '$vesselId', 'captain', 'active', '2025-09-01T00:00:00Z', NOW())
         ON CONFLICT DO NOTHING;
         INSERT INTO crew (id, user_id, vessel_id, vessel_role, created_at)
         VALUES (gen_random_uuid(), '$inactiveUserId', '$vesselId', 'captain', NOW())
@@ -251,7 +253,7 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
         TestJWTHelper.generateAccessToken(
           getJWTAuth(),
           userId,
-          vesselId,
+          listOf(VesselCrewAccess(vesselId, UserRole.VESSEL_CAPTAIN)),
         )
 
       val body = JsonObject().put("refreshToken", expiredToken)

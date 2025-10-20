@@ -17,7 +17,8 @@ import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
-import run.galley.cloud.model.getUserRole
+import nl.clicqo.ext.toUUID
+import run.galley.cloud.model.getCrewAccess
 
 class OpenApiBridge(
   override val vertx: Vertx,
@@ -26,12 +27,12 @@ class OpenApiBridge(
   val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun buildRouter(): RouterBuilder {
-    /**
-     * Add security handlers for each scope.
-     */
+//    /**
+//     * Add security handlers for each scope.
+//     */
     openAPIRouterBuilder
       .security("vesselCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("VESSEL_CAPTAIN"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("VESSEL_CAPTAIN"))
       .security("charterCaptain")
       .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_CAPTAIN"))
       .security("charterPurser")
@@ -69,23 +70,21 @@ class OpenApiBridge(
 
           if (params.contains("vesselId")) {
             val requestedVesselId = params["vesselId"]?.string
-            val jwtVesselId = routingContext.user().principal().getString("vesselId")
-            val userRole = routingContext.user().getUserRole()
+            val userRole = requestedVesselId?.let { routingContext.user().getCrewAccess(it.toUUID()) }
 
             // Check if vesselId in JWT matches the requested Vessel ID
-            if (jwtVesselId == requestedVesselId) {
-              // Check if user is vessel captain of this vessel
-              if (userRole == run.galley.cloud.model.UserRole.VESSEL_CAPTAIN) {
-                // All good - user is captain of their own vessel
-                routingContext.next()
-                return@catchAll
-              }
-              // Is user vessel member? -> go on to next check
-              // Continue to allow vessel members access (will be checked by other security handlers)
-            } else {
-              // vesselId doesn't match JWT - throw 403 Forbidden
+            if (userRole == null) {
               throw run.galley.cloud.ApiStatus.CREW_NO_VESSEL_MEMBER
             }
+
+            // Check if user is vessel captain of this vessel
+            if (userRole == run.galley.cloud.model.UserRole.VESSEL_CAPTAIN) {
+              // All good - user is captain of their own vessel
+              routingContext.next()
+              return@catchAll
+            }
+
+            // Continue to allow vessel members access (will be checked by other security handlers)
           }
 
           if (params.contains("charterId")) {

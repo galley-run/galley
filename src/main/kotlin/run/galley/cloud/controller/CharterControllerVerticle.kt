@@ -22,7 +22,7 @@ import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.UserRole
-import run.galley.cloud.model.getUserRole
+import run.galley.cloud.model.getCrewAccess
 import run.galley.cloud.model.toJsonAPIResourceObject
 
 class CharterControllerVerticle :
@@ -50,7 +50,6 @@ class CharterControllerVerticle :
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val userRole = apiRequest.user?.getUserRole()
 
     // Convert API query params to filters
     val filters = mutableMapOf<String, List<String>>()
@@ -63,6 +62,8 @@ class CharterControllerVerticle :
         ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+
+    val userRole = apiRequest.user?.getCrewAccess(vesselId)
 
     filters["vesselId"] = listOf(vesselId.toString())
     if (userRole != UserRole.VESSEL_CAPTAIN) {

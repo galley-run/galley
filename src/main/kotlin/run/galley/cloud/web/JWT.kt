@@ -9,7 +9,7 @@ import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
 import nl.clicqo.ext.getUUID
 import nl.clicqo.system.Debug
-import run.galley.cloud.model.UserRole
+import run.galley.cloud.model.CrewAccess
 import java.util.UUID
 
 object JWT {
@@ -58,9 +58,20 @@ object JWT {
 
 fun JWTAuth.issueAccessToken(
   userId: UUID,
-  userRole: UserRole,
+  crewAccess: List<CrewAccess>,
   extraClaims: JsonObject = JsonObject(),
-): String = generateToken(JsonObject().put("scope", userRole.name).mergeIn(extraClaims), JWT.accessToken(userId.toString()))
+): String =
+  generateToken(
+    JsonObject().mergeIn(extraClaims).put(
+      "scp",
+      JsonObject().apply {
+        crewAccess.forEach {
+          this.mergeIn(it.toJson())
+        }
+      },
+    ),
+    JWT.accessToken(userId.toString()),
+  )
 
 fun JWTAuth.issueRefreshToken(
   userId: UUID,

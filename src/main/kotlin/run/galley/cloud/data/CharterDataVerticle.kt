@@ -2,7 +2,6 @@ package run.galley.cloud.data
 
 import generated.jooq.tables.pojos.Charters
 import io.vertx.core.eventbus.Message
-import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonObject
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
@@ -12,7 +11,7 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.model.Charter
+import run.galley.cloud.model.factory.CharterFactory
 import run.galley.cloud.sql.CharterSql
 
 class CharterDataVerticle : PostgresDataVerticle() {
@@ -40,7 +39,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.listCharters(request))
 
-    val charters = results?.map(Charter::from) ?: emptyList()
+    val charters = results?.map(CharterFactory::from) ?: emptyList()
 
     val metadata =
       request.pagination?.let {
@@ -65,7 +64,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val charter =
       results
         ?.firstOrNull()
-        ?.let(Charter::from)
+        ?.let(CharterFactory::from)
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
@@ -79,7 +78,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.createCharter(request))
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
+    val charter = results?.firstOrNull()?.let(CharterFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(
@@ -92,7 +91,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     val results = pool.executePreparedQuery(CharterSql.patchCharter(request))
 
-    val charter = results?.firstOrNull()?.let(Charter::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
+    val charter = results?.firstOrNull()?.let(CharterFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(
       EventBusDataResponse(

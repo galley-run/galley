@@ -13,6 +13,10 @@ import run.galley.cloud.sql.ProjectSql
 class ProjectDataVerticle : PostgresDataVerticle() {
   companion object {
     const val LIST = "data.project.query.list"
+    const val GET = "data.project.query.get"
+    const val CREATE = "data.project.cmd.create"
+    const val PATCH = "data.project.cmd.patch"
+    const val ARCHIVE = "data.project.cmd.archive"
   }
 
   override suspend fun start() {

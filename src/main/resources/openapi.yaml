@@ -670,9 +670,6 @@ components:
                   type: string
                 purpose:
                   type: string
-                deletedAt:
-                  type: string
-                  format: date-time
     RefreshToken:
       type: object
       required:

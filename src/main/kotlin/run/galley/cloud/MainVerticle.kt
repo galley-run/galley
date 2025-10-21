@@ -35,9 +35,11 @@ import nl.clicqo.ext.setupFailureHandler
 import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
+import run.galley.cloud.controller.ProjectControllerVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
+import run.galley.cloud.data.ProjectDataVerticle
 import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
@@ -99,10 +101,12 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CrewDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CrewCharterMemberDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(ProjectDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles
-    vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(ProjectControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort =
       config

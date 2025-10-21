@@ -224,6 +224,47 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/projects:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+    get:
+      tags:
+        - project
+      summary: List projects for charter
+      operationId: project.query.list
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterBoatswain: []
+        - charterDeckhand: []
+        - charterSteward: []
+        - charterPurser: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListProjects
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProjectSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -502,6 +543,45 @@ components:
             - 'null'
           examples:
             - Clicqo
+    ProjectSummary:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: Simplified project representation used for listings.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Project ID (UUID)
+            type:
+              type: string
+              enum:
+                - Project
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - charterId
+                - name
+                - environment
+              properties:
+                charterId:
+                  type: string
+                  description: Charter ID (UUID)
+                name:
+                  type: string
+                environment:
+                  type: string
+                  description: Environment name (e.g. production, staging)
+                purpose:
+                  type: string
+                deletedAt:
+                  type: string
+                  format: date-time
     RefreshToken:
       type: object
       required:
@@ -525,7 +605,6 @@ components:
       properties:
         email:
           type: string
-          minLength: 3
           format: email
           description: User's email address
   responses:

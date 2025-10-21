@@ -3,7 +3,6 @@ package run.galley.cloud.controller
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
 import io.vertx.core.eventbus.Message
-import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.Pagination
@@ -15,20 +14,18 @@ import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.CoroutineEventBusSupport
-import nl.clicqo.ext.camelCaseToSnakeCase
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.UserRole
 import run.galley.cloud.crew.getCharters
-import run.galley.cloud.crew.getVessels
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
 import java.util.UUID
 
 class CharterControllerVerticle :
-  CoroutineVerticle(),
+  ControllerVerticle(),
   CoroutineEventBusSupport {
   companion object {
     const val LIST = "charter.query.list"
@@ -51,25 +48,17 @@ class CharterControllerVerticle :
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
+    val apiRequest = getApiRequest(message)
 
-    // Convert API query params to filters
     val filters = mutableMapOf<String, List<String>>()
-    apiRequest.query?.forEach { (key, value) ->
-      filters[key.camelCaseToSnakeCase()] = listOf(value.string)
-    }
 
-    val requestedVesselId =
-      apiRequest.pathParams
-        ?.get("vesselId")
-        ?.string
-        ?.toUUID()
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+    val vesselId = apiRequest.vesselId
 
-    filters[CHARTERS.VESSEL_ID.name] = listOf(requestedVesselId.toString())
+    filters[CHARTERS.VESSEL_ID.name] = listOf(vesselId.toString())
 
     if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
-      val charterIds = apiRequest.user?.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+      val charterIds =
+        apiRequest.user?.getCharters(vesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
 
       filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
     }
@@ -92,22 +81,14 @@ class CharterControllerVerticle :
         ?.toMany()
         ?.toJsonAPIResourceObject()
 
-    // Convert back to API response
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun get(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
+    val apiRequest = getApiRequest(message)
 
-    val vesselId =
-      apiRequest.pathParams?.get("vesselId")?.string ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
-    val charterId =
-      apiRequest.pathParams["charterId"]?.string?.toUUID()
-        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
+    val vesselId = apiRequest.vesselId
+    val charterId = apiRequest.charterId
 
     // Build data request with identifier
     val dataRequest =
@@ -115,7 +96,7 @@ class CharterControllerVerticle :
         identifiers = mapOf("id" to charterId.toString()),
         filters =
           mapOf(
-            CHARTERS.VESSEL_ID.name to listOf(vesselId),
+            CHARTERS.VESSEL_ID.name to listOf(vesselId.toString()),
           ),
         user = apiRequest.user?.principal(),
       )
@@ -130,26 +111,16 @@ class CharterControllerVerticle :
         ?.toOne()
         ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    // Convert back to API response
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun create(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
+    val apiRequest = getApiRequest(message)
     val userId = apiRequest.user?.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
-    val vesselId =
-      apiRequest.pathParams
-        ?.get("vesselId")
-        ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+    val vesselId = apiRequest.vesselId
 
     val charter = apiRequest.body ?: throw ApiStatusReplyException(ApiStatus.REQUEST_BODY_MISSING)
-    // Ensure UUID is serialized as String for downstream getUUID extraction
     charter.put(CHARTERS.VESSEL_ID.name, vesselId.toString())
 
     val dataRequest =
@@ -177,16 +148,9 @@ class CharterControllerVerticle :
   }
 
   private suspend fun patch(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
-    val vesselId =
-      apiRequest.pathParams
-        ?.get("vesselId")
-        ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
-    val charterId =
-      apiRequest.pathParams["charterId"]
-        ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
+    val apiRequest = getApiRequest(message)
+    val vesselId = apiRequest.vesselId
+    val charterId = apiRequest.charterId
 
     val dataRequest =
       EventBusCmdDataRequest(
@@ -208,23 +172,13 @@ class CharterControllerVerticle :
         ?.toOne()
         ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun delete(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
-    val vesselId =
-      apiRequest.pathParams
-        ?.get("vesselId")
-        ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
-    val charterId =
-      apiRequest.pathParams["charterId"]?.string?.toUUID()
-        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
+    val apiRequest = getApiRequest(message)
+    val vesselId = apiRequest.vesselId
+    val charterId = apiRequest.charterId
 
     // Prerequisite:
     // Check if there are any active projects for this charter

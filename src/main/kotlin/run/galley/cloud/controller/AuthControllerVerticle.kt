@@ -7,7 +7,6 @@ import generated.jooq.tables.pojos.Users
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.authentication.TokenCredentials
-import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.eventbus.EventBusApiRequest
@@ -31,7 +30,7 @@ import run.galley.cloud.web.issueRefreshToken
 import java.util.UUID
 
 class AuthControllerVerticle :
-  CoroutineVerticle(),
+  ControllerVerticle(),
   CoroutineEventBusSupport {
   companion object {
     const val ISSUE_REFRESH_TOKEN = "auth.refreshToken.cmd.issue"
@@ -49,8 +48,7 @@ class AuthControllerVerticle :
     }
   }
 
-  private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
+  private suspend fun getUser(apiRequest: EventBusApiRequest): Users {
     val refreshToken =
       apiRequest.body?.getString("refreshToken") ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_MISSING)
 
@@ -64,19 +62,23 @@ class AuthControllerVerticle :
 
     val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
 
-    val user =
-      vertx
-        .eventBus()
-        .request<EventBusDataResponse<Users>>(
-          UserDataVerticle.GET,
-          EventBusQueryDataRequest(
-            identifiers = mapOf("id" to userId.toString()),
-          ),
-        ).coAwait()
-        ?.body()
-        ?.payload
-        ?.toOne()
-        ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
+    return vertx
+      .eventBus()
+      .request<EventBusDataResponse<Users>>(
+        UserDataVerticle.GET,
+        EventBusQueryDataRequest(
+          identifiers = mapOf("id" to userId.toString()),
+        ),
+      ).coAwait()
+      ?.body()
+      ?.payload
+      ?.toOne()
+      ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
+  }
+
+  private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {
+    val apiRequest = getApiRequest(message)
+    val user = getUser(apiRequest)
 
     val newToken =
       JWT.authProvider(vertx, config).issueRefreshToken(
@@ -84,13 +86,7 @@ class AuthControllerVerticle :
       )
 
     message.reply(
-      EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "refreshToken",
-            newToken,
-          ),
-      ),
+      EventBusApiResponse(JsonObject().put("refreshToken", newToken)),
     )
   }
 
@@ -100,33 +96,8 @@ class AuthControllerVerticle :
    * These are things the refreshToken will not contain since the access tokens are short-lived.
    */
   private suspend fun issueAccessToken(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
-    val refreshToken =
-      apiRequest.body?.getString("refreshToken") ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_MISSING)
-
-    val refreshTokenUser =
-      try {
-        JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
-          ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
-      } catch (_: Exception) {
-        throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
-      }
-
-    val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
-
-    val user =
-      vertx
-        .eventBus()
-        .request<EventBusDataResponse<Users>>(
-          UserDataVerticle.GET,
-          EventBusQueryDataRequest(
-            identifiers = mapOf("id" to userId.toString()),
-          ),
-        ).coAwait()
-        ?.body()
-        ?.payload
-        ?.toOne()
-        ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
+    val apiRequest = getApiRequest(message)
+    val user = getUser(apiRequest)
 
     val vesselCrewResponse =
       vertx
@@ -195,17 +166,13 @@ class AuthControllerVerticle :
 
     message.reply(
       EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "accessToken",
-            newToken,
-          ),
+        JsonObject().put("accessToken", newToken),
       ),
     )
   }
 
   private suspend fun signIn(message: Message<EventBusApiRequest>) {
-    val apiRequest = message.body()
+    val apiRequest = getApiRequest(message)
     val email = apiRequest.body?.getString("email") ?: throw ApiStatusReplyException(ApiStatus.ID_MISSING)
 
     val user =
@@ -246,13 +213,7 @@ class AuthControllerVerticle :
 
     message.reply(
       EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "refreshToken",
-            JWT.authProvider(vertx, config).issueRefreshToken(
-              user.id!!,
-            ),
-          ),
+        JsonObject().put("refreshToken", JWT.authProvider(vertx, config).issueRefreshToken(user.id!!)),
       ),
     )
   }

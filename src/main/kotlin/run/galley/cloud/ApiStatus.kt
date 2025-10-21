@@ -31,4 +31,7 @@ object ApiStatus {
   val CREW_NO_VESSEL_MEMBER = ApiStatus(1600, "The user is not a member of this Vessel crew", HttpStatus.Forbidden)
   val CREW_NO_VESSEL_CAPTAIN = ApiStatus(1601, "The user is not a captain of this Vessel", HttpStatus.Forbidden)
   val CREW_NO_CHARTER_MEMBER = ApiStatus(1602, "The user is not a member of this Charter crew", HttpStatus.Forbidden)
+
+  val PROJECT_CREATE_FAILURE = ApiStatus(1700, "The project could not be created")
+  val PROJECT_NOT_FOUND = ApiStatus(1701, "The project could not be found", HttpStatus.NotFound)
 }

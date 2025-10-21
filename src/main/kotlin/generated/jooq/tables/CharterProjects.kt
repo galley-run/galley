@@ -5,10 +5,13 @@ package generated.jooq.tables
 
 
 import generated.jooq.Public
+import generated.jooq.indexes.IDX_CHARTER_PROJECTS_VESSEL_ID
 import generated.jooq.indexes.IDX_PROJECTS_CHARTER
 import generated.jooq.indexes.IDX_PROJECTS_CHARTER_DELETED
+import generated.jooq.indexes.IDX_PROJECTS_CHARTER_VESSEL_DELETED
 import generated.jooq.indexes.UQ_PROJECTS_NAME_ENV
 import generated.jooq.keys.CHARTER_PROJECTS_PKEY
+import generated.jooq.keys.CHARTER_PROJECTS__FK_CHARTER_PROJECTS_VESSEL
 import generated.jooq.keys.CHARTER_PROJECTS__FK_PROJECTS_CHARTER
 import generated.jooq.keys.OUTBOX_EVENTS__FK_OUTBOX_PROJECT
 import generated.jooq.keys.PROJECT_API_GATEWAY__FK_GW_PROJECT
@@ -24,6 +27,7 @@ import generated.jooq.tables.ProjectApplications.ProjectApplicationsPath
 import generated.jooq.tables.ProjectConfigs.ProjectConfigsPath
 import generated.jooq.tables.ProjectDatabases.ProjectDatabasesPath
 import generated.jooq.tables.ProjectSecrets.ProjectSecretsPath
+import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.WebhookSubscriptions.WebhookSubscriptionsPath
 import generated.jooq.tables.records.CharterProjectsRecord
 
@@ -124,6 +128,11 @@ open class CharterProjects(
      */
     val DELETED_AT: TableField<CharterProjectsRecord, OffsetDateTime?> = createField(DSL.name("deleted_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "")
 
+    /**
+     * The column <code>public.charter_projects.vessel_id</code>.
+     */
+    val VESSEL_ID: TableField<CharterProjectsRecord, UUID?> = createField(DSL.name("vessel_id"), SQLDataType.UUID, this, "")
+
     private constructor(alias: Name, aliased: Table<CharterProjectsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<CharterProjectsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<CharterProjectsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -156,9 +165,15 @@ open class CharterProjects(
         override fun `as`(alias: Table<*>): CharterProjectsPath = CharterProjectsPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_PROJECTS_CHARTER, IDX_PROJECTS_CHARTER_DELETED, UQ_PROJECTS_NAME_ENV)
+    override fun getIndexes(): List<Index> = listOf(IDX_CHARTER_PROJECTS_VESSEL_ID, IDX_PROJECTS_CHARTER, IDX_PROJECTS_CHARTER_DELETED, IDX_PROJECTS_CHARTER_VESSEL_DELETED, UQ_PROJECTS_NAME_ENV)
     override fun getPrimaryKey(): UniqueKey<CharterProjectsRecord> = CHARTER_PROJECTS_PKEY
-    override fun getReferences(): List<ForeignKey<CharterProjectsRecord, *>> = listOf(CHARTER_PROJECTS__FK_PROJECTS_CHARTER)
+    override fun getReferences(): List<ForeignKey<CharterProjectsRecord, *>> = listOf(CHARTER_PROJECTS__FK_CHARTER_PROJECTS_VESSEL, CHARTER_PROJECTS__FK_PROJECTS_CHARTER)
+
+    /**
+     * Get the implicit join path to the <code>public.vessels</code> table.
+     */
+    fun vessels(): VesselsPath = vessels
+    val vessels: VesselsPath by lazy { VesselsPath(this, CHARTER_PROJECTS__FK_CHARTER_PROJECTS_VESSEL, null) }
 
     /**
      * Get the implicit join path to the <code>public.charters</code> table.

@@ -1,4 +1,4 @@
-package run.galley.cloud.model
+package run.galley.cloud.crew
 
 import io.vertx.core.json.JsonObject
 

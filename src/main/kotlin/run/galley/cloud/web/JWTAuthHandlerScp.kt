@@ -15,7 +15,7 @@ import io.vertx.ext.web.handler.impl.HTTPAuthorizationHandler
 import io.vertx.ext.web.impl.RoutingContextInternal
 import io.vertx.ext.web.internal.handler.ScopedAuthentication
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.model.UserRole
+import run.galley.cloud.crew.UserRole
 import java.util.Objects
 import java.util.function.Function
 
@@ -132,6 +132,11 @@ class JWTAuthHandlerScp :
             )
           ) {
             throw ApiStatus.CREW_NO_VESSEL_CAPTAIN
+          } else if (!ctx.pathParam("vesselId").isNullOrBlank() &&
+            target.getString("vessel:${ctx.pathParam("vesselId")}") == UserRole.VESSEL_CAPTAIN.name
+          ) {
+            ctx.next()
+            return
           }
 
           if (!ctx.pathParam("charterId").isNullOrBlank() &&

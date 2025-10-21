@@ -20,9 +20,9 @@ import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.getUserRole
 import run.galley.cloud.data.CharterDataVerticle
-import run.galley.cloud.model.UserRole
-import run.galley.cloud.model.getCrewAccess
 import run.galley.cloud.model.toJsonAPIResourceObject
 
 class CharterControllerVerticle :
@@ -63,7 +63,7 @@ class CharterControllerVerticle :
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
-    val userRole = apiRequest.user?.getCrewAccess(vesselId)
+    val userRole = apiRequest.user?.getUserRole(vesselId)
 
     filters["vesselId"] = listOf(vesselId.toString())
     if (userRole != UserRole.VESSEL_CAPTAIN) {

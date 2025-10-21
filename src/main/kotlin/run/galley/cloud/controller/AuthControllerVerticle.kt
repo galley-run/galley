@@ -18,12 +18,12 @@ import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.CharterCrewAccess
+import run.galley.cloud.crew.CrewAccess
+import run.galley.cloud.crew.UserRole
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
-import run.galley.cloud.model.CharterCrewAccess
-import run.galley.cloud.model.CrewAccess
-import run.galley.cloud.model.UserRole
 import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
 import run.galley.cloud.web.issueAccessToken

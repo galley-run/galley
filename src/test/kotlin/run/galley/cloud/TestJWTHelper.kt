@@ -1,9 +1,9 @@
 package run.galley.cloud
 
 import io.vertx.ext.auth.jwt.JWTAuth
-import run.galley.cloud.model.CharterCrewAccess
-import run.galley.cloud.model.CrewAccess
-import run.galley.cloud.model.UserRole
+import run.galley.cloud.crew.CharterCrewAccess
+import run.galley.cloud.crew.CrewAccess
+import run.galley.cloud.crew.UserRole
 import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.issueAccessToken
 import java.util.UUID

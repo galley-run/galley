@@ -9,7 +9,7 @@ import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
 import nl.clicqo.ext.getUUID
 import nl.clicqo.system.Debug
-import run.galley.cloud.model.CrewAccess
+import run.galley.cloud.crew.CrewAccess
 import java.util.UUID
 
 object JWT {

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import run.galley.cloud.TestJWTHelper
-import run.galley.cloud.model.UserRole
+import run.galley.cloud.crew.UserRole
 import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 

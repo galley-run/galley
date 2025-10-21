@@ -12,13 +12,14 @@ import io.vertx.openapi.validation.ResponseValidator
 import io.vertx.openapi.validation.ValidatedRequest
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
-import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
-import run.galley.cloud.model.getCrewAccess
+import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.getUserRole
 
 class OpenApiBridge(
   override val vertx: Vertx,
@@ -70,15 +71,15 @@ class OpenApiBridge(
 
           if (params.contains("vesselId")) {
             val requestedVesselId = params["vesselId"]?.string
-            val userRole = requestedVesselId?.let { routingContext.user().getCrewAccess(it.toUUID()) }
+            val userRole = requestedVesselId?.let { routingContext.user().getUserRole(it.toUUID()) }
 
             // Check if vesselId in JWT matches the requested Vessel ID
             if (userRole == null) {
-              throw run.galley.cloud.ApiStatus.CREW_NO_VESSEL_MEMBER
+              throw ApiStatus.CREW_NO_VESSEL_MEMBER
             }
 
             // Check if user is vessel captain of this vessel
-            if (userRole == run.galley.cloud.model.UserRole.VESSEL_CAPTAIN) {
+            if (userRole == UserRole.VESSEL_CAPTAIN) {
               // All good - user is captain of their own vessel
               routingContext.next()
               return@catchAll
@@ -102,7 +103,7 @@ class OpenApiBridge(
               return@catchAll
             } else {
               // No access - throw 403 Forbidden
-              throw run.galley.cloud.ApiStatus.CREW_NO_CHARTER_MEMBER
+              throw ApiStatus.CREW_NO_CHARTER_MEMBER
             }
           }
 
@@ -184,7 +185,7 @@ class OpenApiBridge(
               // Check if all required properties are present
               val missingRequired = requiredProperties.filterNot { filteredBody.containsKey(it) }
               if (missingRequired.isNotEmpty()) {
-                throw ApiStatus.REQUEST_BODY_MISSING_REQUIRED_FIELDS
+                throw nl.clicqo.api.ApiStatus.REQUEST_BODY_MISSING_REQUIRED_FIELDS
               }
 
               JsonObject(filteredBody)

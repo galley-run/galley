@@ -424,7 +424,7 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
   // ==================== Edge Cases ====================
 
   @Test
-  fun `test POST charter with invalid UUID for vessel returns 400`(testContext: VertxTestContext) =
+  fun `test POST charter with invalid UUID for vessel returns 403`(testContext: VertxTestContext) =
     runTest {
       val body = JsonObject().put("name", "Test Charter")
 
@@ -438,7 +438,7 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
           .coAwait()
 
       testContext.verify {
-        assertEquals(400, resp.statusCode())
+        assertEquals(403, resp.statusCode())
         testContext.completeNow()
       }
     }

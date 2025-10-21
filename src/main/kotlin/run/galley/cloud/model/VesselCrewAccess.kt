@@ -9,5 +9,5 @@ data class VesselCrewAccess(
   val vesselId: UUID,
   val role: UserRole,
 ) : CrewAccess() {
-  override fun toJson(): JsonObject = JsonObject().put("vessel:$vesselId", role)
+  override fun toJson(): JsonObject = JsonObject().put(vesselId.toString(), role)
 }

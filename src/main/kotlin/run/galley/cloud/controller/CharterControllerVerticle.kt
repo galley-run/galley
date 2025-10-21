@@ -21,7 +21,8 @@ import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.UserRole
-import run.galley.cloud.crew.getUserRole
+import run.galley.cloud.crew.getCharters
+import run.galley.cloud.crew.getVessels
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
 
@@ -57,17 +58,24 @@ class CharterControllerVerticle :
       filters[key.camelCaseToSnakeCase()] = listOf(value.string)
     }
 
-    val vesselId =
+    val requestedVesselId =
       apiRequest.identifiers
         ?.get("vesselId")
         ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+        ?.toUUID()
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
-    filters["vesselId"] = listOf(vesselId.toString())
+    filters[CHARTERS.VESSEL_ID.name] =
+      apiRequest.user
+        ?.getVessels()
+        ?.contains(requestedVesselId)
+        ?.let { listOf(requestedVesselId.toString()) }
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+
     if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
-      filters["id"] =
-        listOf(apiRequest.user?.get<String>("charterIds") ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS))
-      TODO("Not implemented")
+      val charterIds = apiRequest.user.getCharters() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+
+      filters[CHARTERS.ID.name] = charterIds.map { it.toString() }
     }
 
     // Build data request with filters, sort, and pagination

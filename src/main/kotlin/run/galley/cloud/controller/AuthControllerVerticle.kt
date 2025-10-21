@@ -28,6 +28,7 @@ import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
+import java.util.UUID
 
 class AuthControllerVerticle :
   CoroutineVerticle(),
@@ -144,14 +145,14 @@ class AuthControllerVerticle :
         ?.toMany()
         ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
-    val crewMemberIds = mutableListOf<String>()
+    val crewMemberIds = mutableMapOf<String, UUID>()
     val crewAccess = mutableListOf<CrewAccess>()
     vesselCrewResponse
       .forEach {
         if (it.vesselRole == VesselRole.captain) {
           crewAccess.add(VesselCrewAccess(it.vesselId!!, UserRole.VESSEL_CAPTAIN))
         } else {
-          crewMemberIds.add(it.id.toString())
+          crewMemberIds[it.id.toString()] = it.vesselId!!
         }
       }
 
@@ -163,7 +164,7 @@ class AuthControllerVerticle :
           EventBusQueryDataRequest(
             filters =
               mapOf(
-                "crewId" to crewMemberIds,
+                "crewId" to crewMemberIds.keys.toList(),
               ),
           ),
         ).coAwait()
@@ -175,6 +176,7 @@ class AuthControllerVerticle :
     }?.forEach {
       crewAccess.add(
         CharterCrewAccess(
+          crewMemberIds[it.crewId.toString()] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
           it.charterId!!,
           UserRole.valueOf("CHARTER_" + it.charterRole?.name?.uppercase()),
         ),

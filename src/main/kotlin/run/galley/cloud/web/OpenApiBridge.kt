@@ -17,9 +17,9 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.crew.CrewAccessLevel
 import run.galley.cloud.crew.UserRole
 import run.galley.cloud.crew.getUserRole
+import run.galley.cloud.crew.getVessels
 
 class OpenApiBridge(
   override val vertx: Vertx,
@@ -31,19 +31,21 @@ class OpenApiBridge(
 //    /**
 //     * Add security handlers for each scope.
 //     */
+    val scpAuthHandler = JWTAuthHandlerScp(authProvider)
+
     openAPIRouterBuilder
-      .security("vesselCaptain")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("VESSEL_CAPTAIN"))
-      .security("charterCaptain")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_CAPTAIN"))
-      .security("charterPurser")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_PURSER"))
-      .security("charterBoatswain")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_BOATSWAIN"))
-      .security("charterDeckhand")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_DECKHAND"))
       .security("charterSteward")
-      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_STEWARD"))
+      .httpHandler(scpAuthHandler)
+      .security("charterDeckhand")
+      .httpHandler(scpAuthHandler)
+      .security("charterBoatswain")
+      .httpHandler(scpAuthHandler)
+      .security("charterPurser")
+      .httpHandler(scpAuthHandler)
+      .security("charterCaptain")
+      .httpHandler(scpAuthHandler)
+      .security("vesselCaptain")
+      .httpHandler(scpAuthHandler)
 
     /**
      * Add eventbus handlers for each operation.
@@ -71,32 +73,34 @@ class OpenApiBridge(
 
           if (params.contains("vesselId")) {
             val requestedVesselId = params["vesselId"]?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
-            val userRole =
-              requestedVesselId.let(routingContext.user()::getUserRole) ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
+            val userRole = requestedVesselId.let(routingContext.user()::getUserRole)
 
+            if (routingContext.user().getVessels()?.contains(requestedVesselId) == false) {
+              throw ApiStatus.CREW_NO_VESSEL_MEMBER
+            }
             // Check if vesselId in JWT matches the requested Vessel ID
 
             // Check if user is vessel captain of this vessel
-            if (userRole == UserRole.VESSEL_CAPTAIN) {
+            if (userRole != null && userRole == UserRole.VESSEL_CAPTAIN) {
               // All good - user is captain of their own vessel
               routingContext.put("userRole", userRole)
               routingContext.next()
               return@catchAll
             }
-          }
 
-          if (params.contains("charterId")) {
-            val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
+            if (params.contains("charterId")) {
+              val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
-            // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-            val userRole =
-              routingContext.user().getUserRole(requestedCharterId, CrewAccessLevel.CHARTER)
-                ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
+              // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
+              val userRole =
+                routingContext.user().getUserRole(requestedVesselId, requestedCharterId)
+                  ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
 
-            routingContext.put("userRole", userRole)
+              routingContext.put("userRole", userRole)
 
-            routingContext.next()
-            return@catchAll
+              routingContext.next()
+              return@catchAll
+            }
           }
 
           // TODO: Possibly add crew_project_member later? Don't see big benefits for it now..

@@ -14,6 +14,7 @@ import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.handler.impl.HTTPAuthorizationHandler
 import io.vertx.ext.web.impl.RoutingContextInternal
 import io.vertx.ext.web.internal.handler.ScopedAuthentication
+import io.vertx.openapi.contract.Operation
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.UserRole
 import java.util.Objects
@@ -49,7 +50,7 @@ class JWTAuthHandlerScp :
 
   override fun authenticate(context: RoutingContext): Future<User?>? {
     return parseAuthorization(context)
-      .compose<User?>(
+      .compose(
         Function { token: String? ->
           var segments = 0
           for (i in 0..<token!!.length) {
@@ -107,7 +108,10 @@ class JWTAuthHandlerScp :
       return
     }
     // the user is authenticated, however the user may not have all the required scopes
-    val scopes = getScopesOrSearchMetadata(this.scopes, ctx)
+    val scopes =
+      (ctx.currentRoute().metadata()["openApiOperation"] as Operation).securityRequirements.mapNotNull {
+        it.names.first()
+      }
 
     if (scopes.isNotEmpty()) {
       val jwt = user.get<JsonObject?>("accessToken")
@@ -128,20 +132,20 @@ class JWTAuthHandlerScp :
               ctx
                 .pathParam("vesselId")
                 .isNullOrBlank() ||
-                target.getString("vessel:${ctx.pathParam("vesselId")}") != UserRole.VESSEL_CAPTAIN.name
+                target.getString(ctx.pathParam("vesselId")) != UserRole.VESSEL_CAPTAIN.name
             )
           ) {
             throw ApiStatus.CREW_NO_VESSEL_CAPTAIN
           } else if (!ctx.pathParam("vesselId").isNullOrBlank() &&
-            target.getString("vessel:${ctx.pathParam("vesselId")}") == UserRole.VESSEL_CAPTAIN.name
+            target.getString(ctx.pathParam("vesselId")) == UserRole.VESSEL_CAPTAIN.name
           ) {
             ctx.next()
             return
           }
 
-          if (!ctx.pathParam("charterId").isNullOrBlank() &&
+          if (!ctx.pathParam("vesselId").isNullOrBlank() && !ctx.pathParam("charterId").isNullOrBlank() &&
             target
-              .getString("charter:${ctx.pathParam("charterId")}") != scope
+              .getString("${ctx.pathParam("vesselId")}:${ctx.pathParam("charterId")}") != scope
           ) {
             throw ApiStatus.USER_ROLE_FORBIDDEN
           }

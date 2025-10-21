@@ -80,6 +80,7 @@ object CharterSql {
     filters
       .mapNotNull { (field, values) ->
         when (field) {
+          CHARTERS.ID.name -> CHARTERS.ID.`in`(values.map { UUID.fromString(it) })
           CHARTERS.USER_ID.name -> CHARTERS.USER_ID.`in`(values.map { UUID.fromString(it) })
           CHARTERS.VESSEL_ID.name -> CHARTERS.VESSEL_ID.`in`(values.map { UUID.fromString(it) })
           else -> null

@@ -1,10 +1,19 @@
 package run.galley.cloud.controller
 
+import generated.jooq.tables.pojos.CharterProjects
 import generated.jooq.tables.references.CHARTERS
+import generated.jooq.tables.references.CHARTER_PROJECTS
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.CoroutineVerticle
+import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
+import nl.clicqo.api.Pagination
+import nl.clicqo.api.SortDirection
+import nl.clicqo.api.SortField
 import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.camelCaseToSnakeCase
 import nl.clicqo.ext.coroutineEventBus
@@ -12,9 +21,9 @@ import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.UserRole
 import run.galley.cloud.crew.getCharters
-import run.galley.cloud.crew.getVessels
+import run.galley.cloud.data.ProjectDataVerticle
+import run.galley.cloud.model.toJsonAPIResourceObject
 import java.util.UUID
-import javax.annotation.processing.Messager
 
 class ProjectControllerVerticle :
   CoroutineVerticle(),
@@ -53,12 +62,26 @@ class ProjectControllerVerticle :
         ?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
 
-    filters[CHARTERS.VESSEL_ID.name] = listOf(requestedVesselId.toString())
+    filters[CHARTER_PROJECTS.VESSEL_ID.name] = listOf(requestedVesselId.toString())
+    filters[CHARTER_PROJECTS.CHARTER_ID.name] = listOf(requestedCharterId.toString())
 
-    if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
-      val charterIds = apiRequest.user?.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+    val dataRequest =
+      EventBusQueryDataRequest(
+        filters = filters,
+        sort = listOf(SortField("id", SortDirection.ASC)),
+        pagination = Pagination(offset = 0, limit = 10),
+      )
 
-      filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
-    }
+    val dataResponse =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<CharterProjects>>(ProjectDataVerticle.LIST, dataRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toMany()
+        ?.toJsonAPIResourceObject()
+
+    message.reply(EventBusApiResponse(dataResponse))
   }
 }

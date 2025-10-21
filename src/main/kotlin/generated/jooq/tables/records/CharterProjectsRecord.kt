@@ -43,6 +43,10 @@ open class CharterProjectsRecord() : UpdatableRecordImpl<CharterProjectsRecord>(
         set(value): Unit = set(5, value)
         get(): OffsetDateTime? = get(5) as OffsetDateTime?
 
+    open var vesselId: UUID?
+        set(value): Unit = set(6, value)
+        get(): UUID? = get(6) as UUID?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -52,13 +56,14 @@ open class CharterProjectsRecord() : UpdatableRecordImpl<CharterProjectsRecord>(
     /**
      * Create a detached, initialised CharterProjectsRecord
      */
-    constructor(id: UUID? = null, charterId: UUID? = null, name: String? = null, environment: String? = null, purpose: String? = null, deletedAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, charterId: UUID? = null, name: String? = null, environment: String? = null, purpose: String? = null, deletedAt: OffsetDateTime? = null, vesselId: UUID? = null): this() {
         this.id = id
         this.charterId = charterId
         this.name = name
         this.environment = environment
         this.purpose = purpose
         this.deletedAt = deletedAt
+        this.vesselId = vesselId
         resetTouchedOnNotNull()
     }
 
@@ -73,6 +78,7 @@ open class CharterProjectsRecord() : UpdatableRecordImpl<CharterProjectsRecord>(
             this.environment = value.environment
             this.purpose = value.purpose
             this.deletedAt = value.deletedAt
+            this.vesselId = value.vesselId
             resetTouchedOnNotNull()
         }
     }

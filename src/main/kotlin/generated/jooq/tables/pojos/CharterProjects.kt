@@ -21,7 +21,8 @@ data class CharterProjects(
     var name: String? = null,
     var environment: String? = null,
     var purpose: String? = null,
-    var deletedAt: OffsetDateTime? = null
+    var deletedAt: OffsetDateTime? = null,
+    var vesselId: UUID? = null
 ): BaseModel, Serializable {
 
 
@@ -69,6 +70,12 @@ data class CharterProjects(
         }
         else if (this.deletedAt != o.deletedAt)
             return false
+        if (this.vesselId == null) {
+            if (o.vesselId != null)
+                return false
+        }
+        else if (this.vesselId != o.vesselId)
+            return false
         return true
     }
 
@@ -81,6 +88,7 @@ data class CharterProjects(
         result = prime * result + (if (this.environment == null) 0 else this.environment.hashCode())
         result = prime * result + (if (this.purpose == null) 0 else this.purpose.hashCode())
         result = prime * result + (if (this.deletedAt == null) 0 else this.deletedAt.hashCode())
+        result = prime * result + (if (this.vesselId == null) 0 else this.vesselId.hashCode())
         return result
     }
 
@@ -93,6 +101,7 @@ data class CharterProjects(
         sb.append(", ").append(environment)
         sb.append(", ").append(purpose)
         sb.append(", ").append(deletedAt)
+        sb.append(", ").append(vesselId)
 
         sb.append(")")
         return sb.toString()

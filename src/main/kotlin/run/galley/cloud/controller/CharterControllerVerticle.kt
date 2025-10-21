@@ -93,11 +93,7 @@ class CharterControllerVerticle :
         ?.toJsonAPIResourceObject()
 
     // Convert back to API response
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun get(message: Message<EventBusApiRequest>) {
@@ -131,11 +127,7 @@ class CharterControllerVerticle :
         ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     // Convert back to API response
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun create(message: Message<EventBusApiRequest>) {
@@ -208,11 +200,7 @@ class CharterControllerVerticle :
         ?.toOne()
         ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    message.reply(
-      EventBusApiResponse(
-        data = dataResponse,
-      ),
-    )
+    message.reply(EventBusApiResponse(dataResponse))
   }
 
   private suspend fun delete(message: Message<EventBusApiRequest>) {

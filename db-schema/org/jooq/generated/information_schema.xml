@@ -784,6 +784,21 @@
         <column>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <column_name>vessel_id</column_name>
+            <data_type>uuid</data_type>
+            <character_maximum_length>0</character_maximum_length>
+            <numeric_precision>0</numeric_precision>
+            <numeric_scale>0</numeric_scale>
+            <ordinal_position>7</ordinal_position>
+            <is_nullable>true</is_nullable>
+            <comment></comment>
+            <hidden>false</hidden>
+            <readonly>false</readonly>
+        </column>
+        <column>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
             <table_name>charters</table_name>
             <column_name>id</column_name>
             <data_type>uuid</data_type>
@@ -5679,6 +5694,17 @@
         <table_constraint>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
+            <constraint_name>fk_charter_projects_vessel</constraint_name>
+            <constraint_type>FOREIGN KEY</constraint_type>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <comment></comment>
+            <enforced>true</enforced>
+        </table_constraint>
+        <table_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
             <constraint_name>fk_projects_charter</constraint_name>
             <constraint_type>FOREIGN KEY</constraint_type>
             <table_catalog></table_catalog>
@@ -6742,6 +6768,16 @@
             <table_name>charter_billing_profile</table_name>
         </key_column_usage>
         <key_column_usage>
+            <column_name>vessel_id</column_name>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>fk_charter_projects_vessel</constraint_name>
+            <ordinal_position>1</ordinal_position>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+        </key_column_usage>
+        <key_column_usage>
             <column_name>charter_id</column_name>
             <constraint_catalog></constraint_catalog>
             <constraint_schema>public</constraint_schema>
@@ -7301,6 +7337,16 @@
             <unique_constraint_schema>public</unique_constraint_schema>
             <unique_constraint_name>vessels_pkey</unique_constraint_name>
             <delete_rule>CASCADE</delete_rule>
+            <update_rule>NO ACTION</update_rule>
+        </referential_constraint>
+        <referential_constraint>
+            <constraint_catalog></constraint_catalog>
+            <constraint_schema>public</constraint_schema>
+            <constraint_name>fk_charter_projects_vessel</constraint_name>
+            <unique_constraint_catalog></unique_constraint_catalog>
+            <unique_constraint_schema>public</unique_constraint_schema>
+            <unique_constraint_name>vessels_pkey</unique_constraint_name>
+            <delete_rule>NO ACTION</delete_rule>
             <update_rule>NO ACTION</update_rule>
         </referential_constraint>
         <referential_constraint>
@@ -7968,6 +8014,16 @@
         <index>
             <index_catalog></index_catalog>
             <index_schema>public</index_schema>
+            <index_name>idx_charter_projects_vessel_id</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <is_unique>false</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
             <index_name>idx_charters_deleted_at</index_name>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
@@ -8409,6 +8465,16 @@
             <index_catalog></index_catalog>
             <index_schema>public</index_schema>
             <index_name>idx_projects_charter_deleted</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <is_unique>false</is_unique>
+            <comment></comment>
+        </index>
+        <index>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>idx_projects_charter_vessel_deleted</index_name>
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>charter_projects</table_name>
@@ -8958,6 +9024,17 @@
             <table_catalog></table_catalog>
             <table_schema>public</table_schema>
             <table_name>charter_billing_profile</table_name>
+            <column_name>vessel_id</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>idx_charter_projects_vessel_id</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
             <column_name>vessel_id</column_name>
             <ordinal_position>1</ordinal_position>
             <is_descending>false</is_descending>
@@ -9675,6 +9752,39 @@
             <table_name>charter_projects</table_name>
             <column_name>deleted_at</column_name>
             <ordinal_position>2</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>idx_projects_charter_vessel_deleted</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <column_name>charter_id</column_name>
+            <ordinal_position>1</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>idx_projects_charter_vessel_deleted</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <column_name>vessel_id</column_name>
+            <ordinal_position>2</ordinal_position>
+            <is_descending>false</is_descending>
+        </index_column_usage>
+        <index_column_usage>
+            <index_catalog></index_catalog>
+            <index_schema>public</index_schema>
+            <index_name>idx_projects_charter_vessel_deleted</index_name>
+            <table_catalog></table_catalog>
+            <table_schema>public</table_schema>
+            <table_name>charter_projects</table_name>
+            <column_name>deleted_at</column_name>
+            <ordinal_position>3</ordinal_position>
             <is_descending>false</is_descending>
         </index_column_usage>
         <index_column_usage>

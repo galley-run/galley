@@ -84,13 +84,7 @@ class AuthControllerVerticle :
       )
 
     message.reply(
-      EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "refreshToken",
-            newToken,
-          ),
-      ),
+      EventBusApiResponse(JsonObject().put("refreshToken", newToken)),
     )
   }
 
@@ -195,11 +189,7 @@ class AuthControllerVerticle :
 
     message.reply(
       EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "accessToken",
-            newToken,
-          ),
+        JsonObject().put("accessToken", newToken),
       ),
     )
   }
@@ -246,13 +236,7 @@ class AuthControllerVerticle :
 
     message.reply(
       EventBusApiResponse(
-        data =
-          JsonObject().put(
-            "refreshToken",
-            JWT.authProvider(vertx, config).issueRefreshToken(
-              user.id!!,
-            ),
-          ),
+        JsonObject().put("refreshToken", JWT.authProvider(vertx, config).issueRefreshToken(user.id!!)),
       ),
     )
   }

@@ -5,7 +5,6 @@ import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.openapi.validation.ResponseValidator
@@ -18,6 +17,7 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.CrewAccessLevel
 import run.galley.cloud.crew.UserRole
 import run.galley.cloud.crew.getUserRole
 
@@ -70,44 +70,34 @@ class OpenApiBridge(
           routingContext.put("vesselId", routingContext.user().principal().getString("vesselId"))
 
           if (params.contains("vesselId")) {
-            val requestedVesselId = params["vesselId"]?.string
-            val userRole = requestedVesselId?.let { routingContext.user().getUserRole(it.toUUID()) }
+            val requestedVesselId = params["vesselId"]?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+            val userRole =
+              requestedVesselId.let(routingContext.user()::getUserRole) ?: throw ApiStatus.CREW_NO_VESSEL_MEMBER
 
             // Check if vesselId in JWT matches the requested Vessel ID
-            if (userRole == null) {
-              throw ApiStatus.CREW_NO_VESSEL_MEMBER
-            }
 
             // Check if user is vessel captain of this vessel
             if (userRole == UserRole.VESSEL_CAPTAIN) {
               // All good - user is captain of their own vessel
+              routingContext.put("userRole", userRole)
               routingContext.next()
               return@catchAll
             }
-
-            // Continue to allow vessel members access (will be checked by other security handlers)
           }
 
           if (params.contains("charterId")) {
-            val requestedCharterId = params["charterId"]?.string
-            val charterIds = routingContext.user().principal().getJsonArray("charterIds")
+            val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
             // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-            val hasCharterAccess =
-              requestedCharterId != null && charterIds != null &&
-                charterIds.toList().map { it?.toString() }.contains(requestedCharterId)
+            routingContext.user().getUserRole(requestedCharterId, CrewAccessLevel.CHARTER)
+              ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
 
-            if (hasCharterAccess) {
-              // User has access to this charter
-              routingContext.next()
-              return@catchAll
-            } else {
-              // No access - throw 403 Forbidden
-              throw ApiStatus.CREW_NO_CHARTER_MEMBER
-            }
+            routingContext.next()
+            return@catchAll
           }
 
-          // Possibly add crew_project_member later? Don't see big benefits for it now..
+          // TODO: Possibly add crew_project_member later? Don't see big benefits for it now..
+
           routingContext.next()
         }
       }

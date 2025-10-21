@@ -60,21 +60,16 @@ class CharterControllerVerticle :
     }
 
     val requestedVesselId =
-      apiRequest.identifiers
+      apiRequest.pathParams
         ?.get("vesselId")
         ?.string
         ?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
-    filters[CHARTERS.VESSEL_ID.name] =
-      apiRequest.user
-        ?.getVessels()
-        ?.contains(requestedVesselId)
-        ?.let { listOf(requestedVesselId.toString()) }
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+    filters[CHARTERS.VESSEL_ID.name] = listOf(requestedVesselId.toString())
 
     if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
-      val charterIds = apiRequest.user.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+      val charterIds = apiRequest.user?.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
 
       filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
     }
@@ -109,9 +104,9 @@ class CharterControllerVerticle :
     val apiRequest = message.body()
 
     val vesselId =
-      apiRequest.identifiers?.get("vesselId")?.string ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+      apiRequest.pathParams?.get("vesselId")?.string ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
     val charterId =
-      apiRequest.identifiers["charterId"]?.string?.toUUID()
+      apiRequest.pathParams["charterId"]?.string?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
 
     // Build data request with identifier
@@ -148,7 +143,7 @@ class CharterControllerVerticle :
     val userId = apiRequest.user?.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     val vesselId =
-      apiRequest.identifiers
+      apiRequest.pathParams
         ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
@@ -184,12 +179,12 @@ class CharterControllerVerticle :
   private suspend fun patch(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
     val vesselId =
-      apiRequest.identifiers
+      apiRequest.pathParams
         ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
     val charterId =
-      apiRequest.identifiers["charterId"]
+      apiRequest.pathParams["charterId"]
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
 
@@ -223,12 +218,12 @@ class CharterControllerVerticle :
   private suspend fun delete(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
     val vesselId =
-      apiRequest.identifiers
+      apiRequest.pathParams
         ?.get("vesselId")
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
     val charterId =
-      apiRequest.identifiers["charterId"]?.string?.toUUID()
+      apiRequest.pathParams["charterId"]?.string?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
 
     // Prerequisite:

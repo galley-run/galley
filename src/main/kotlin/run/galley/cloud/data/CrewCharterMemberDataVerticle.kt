@@ -2,7 +2,7 @@ package run.galley.cloud.data
 
 import io.vertx.core.eventbus.Message
 import nl.clicqo.data.DataPayload
-import nl.clicqo.data.executePreparedQuery
+import nl.clicqo.data.execute
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
@@ -24,7 +24,7 @@ class CrewCharterMemberDataVerticle : PostgresDataVerticle() {
 
   private suspend fun listByUser(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CrewCharterMemberSql.listByCrewId(request))
+    val results = pool.execute(CrewCharterMemberSql.listByCrewId(request))
 
     val crew =
       results

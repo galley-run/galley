@@ -5,7 +5,7 @@ import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
-import nl.clicqo.data.executePreparedQuery
+import nl.clicqo.data.execute
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
@@ -37,7 +37,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun list(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CharterSql.listCharters(request))
+    val results = pool.execute(CharterSql.listCharters(request))
 
     val charters = results?.map(CharterFactory::from) ?: emptyList()
 
@@ -59,7 +59,7 @@ class CharterDataVerticle : PostgresDataVerticle() {
 
   private suspend fun get(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CharterSql.getCharter(request))
+    val results = pool.execute(CharterSql.getCharter(request))
 
     val charter =
       results
@@ -67,49 +67,35 @@ class CharterDataVerticle : PostgresDataVerticle() {
         ?.let(CharterFactory::from)
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.one(charter),
-      ),
-    )
+    message.reply(EventBusDataResponse(DataPayload.one(charter)))
   }
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CharterSql.createCharter(request))
+    val results = pool.execute(CharterSql.createCharter(request))
 
     val charter = results?.firstOrNull()?.let(CharterFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.one(charter),
-      ),
-    )
+    message.reply(EventBusDataResponse(DataPayload.one(charter)))
   }
 
   private suspend fun patch(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CharterSql.patchCharter(request))
+    val results = pool.execute(CharterSql.patchCharter(request))
 
     val charter = results?.firstOrNull()?.let(CharterFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
-    message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.one(charter),
-      ),
-    )
+    message.reply(EventBusDataResponse(DataPayload.one(charter)))
   }
 
   private suspend fun archive(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-    val updated = pool.executePreparedQuery(CharterSql.archiveCharter(request))
+    val updated = pool.execute(CharterSql.archiveCharter(request))
 
     if (updated?.rowCount() == 0) {
       throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
     }
 
-    message.reply(
-      EventBusDataResponse.noContent<Charters>(),
-    )
+    message.reply(EventBusDataResponse.noContent<Charters>())
   }
 }

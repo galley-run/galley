@@ -63,10 +63,8 @@ class CharterControllerVerticle :
         ?.string
         ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
-    val userRole = apiRequest.user?.getUserRole(vesselId)
-
     filters["vesselId"] = listOf(vesselId.toString())
-    if (userRole != UserRole.VESSEL_CAPTAIN) {
+    if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
       filters["id"] =
         listOf(apiRequest.user?.get<String>("charterIds") ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS))
       TODO("Not implemented")
@@ -78,7 +76,6 @@ class CharterControllerVerticle :
         filters = filters,
         sort = listOf(SortField("id", SortDirection.ASC)),
         pagination = Pagination(offset = 0, limit = 10),
-        user = apiRequest.user.principal(),
       )
 
     val dataResponse =

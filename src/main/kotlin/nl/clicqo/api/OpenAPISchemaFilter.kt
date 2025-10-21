@@ -37,6 +37,10 @@ object OpenAPISchemaFilter {
   ): JsonObject {
     val filtered = JsonObject()
 
+    if (!obj.containsKey("attributes")) {
+      return JsonObject(obj.map.filterKeys { it in allowedFields })
+    }
+
     // Always preserve id, type - these are JSON:API top-level fields
     obj.getString("id")?.let { filtered.put("id", it) }
     obj.getString("type")?.let { filtered.put("type", it) }
@@ -161,8 +165,7 @@ object OpenAPISchemaFilter {
       // Extract properties from the 'attributes' object specifically
       val attributesFields = extractAttributesFields(objectSchema)
       if (attributesFields.isEmpty()) {
-        logger.warn("No attributes properties found in object schema")
-        return null
+        return dataSchema.getJsonObject("properties").map.keys
       }
 
       return attributesFields

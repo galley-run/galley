@@ -46,9 +46,9 @@ object CharterSql {
       .insertInto(CHARTERS)
       .set(
         mapOf(
+          CHARTERS.VESSEL_ID to payload.getUUID(CHARTERS.VESSEL_ID.name),
           CHARTERS.NAME to payload.getString(CHARTERS.NAME.name),
           CHARTERS.DESCRIPTION to payload.getString(CHARTERS.DESCRIPTION.name),
-          CHARTERS.VESSEL_ID to payload.getUUID(CHARTERS.VESSEL_ID.name),
           CHARTERS.USER_ID to userId,
         ),
       ).returning()

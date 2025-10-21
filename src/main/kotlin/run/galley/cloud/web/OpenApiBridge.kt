@@ -113,7 +113,7 @@ class OpenApiBridge(
         catchAll(routingContext) {
           val validatedRequest = routingContext.get<ValidatedRequest>(RouterBuilder.KEY_META_DATA_VALIDATED_REQUEST)
 
-          val params = validatedRequest.pathParameters
+          val pathParams = validatedRequest.pathParameters
           val rawBody = validatedRequest.body.jsonObject
           val query = validatedRequest.query
 
@@ -198,7 +198,7 @@ class OpenApiBridge(
                 address,
                 EventBusApiRequest(
                   user = routingContext.user(),
-                  identifiers = params,
+                  pathParams = pathParams,
                   userRole = routingContext.get<UserRole?>("userRole"),
                   body = body,
                   query = query,

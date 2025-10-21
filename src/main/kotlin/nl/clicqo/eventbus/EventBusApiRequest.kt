@@ -11,7 +11,7 @@ class EventBusApiRequest(
   val version: String = "v1",
   val userRole: UserRole? = null,
   // Request Payload
-  val identifiers: MutableMap<String, RequestParameter>? = null,
+  val pathParams: MutableMap<String, RequestParameter>? = null,
   val body: JsonObject? = null,
   val query: MutableMap<String, RequestParameter>? = null,
   val user: User? = null,

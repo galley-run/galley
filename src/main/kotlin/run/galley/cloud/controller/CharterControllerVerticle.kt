@@ -25,6 +25,7 @@ import run.galley.cloud.crew.getCharters
 import run.galley.cloud.crew.getVessels
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
+import java.util.UUID
 
 class CharterControllerVerticle :
   CoroutineVerticle(),
@@ -73,9 +74,9 @@ class CharterControllerVerticle :
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
-      val charterIds = apiRequest.user.getCharters() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+      val charterIds = apiRequest.user.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
 
-      filters[CHARTERS.ID.name] = charterIds.map { it.toString() }
+      filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
     }
 
     // Build data request with filters, sort, and pagination

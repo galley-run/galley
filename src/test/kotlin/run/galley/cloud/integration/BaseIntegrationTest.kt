@@ -86,7 +86,7 @@ abstract class BaseIntegrationTest {
           .build()
 
       // Choose random HTTP port for tests
-      httpPort = "4${now().minute.toString().padStart(2, 0.toChar())}${now().second}".toInt()
+      httpPort = "4${now().minute.toString().padStart(2, '0')}${now().second.toString().padStart(2, '0')}".toInt()
 
       // Create test config with Testcontainers PostgreSQL
       testConfig =

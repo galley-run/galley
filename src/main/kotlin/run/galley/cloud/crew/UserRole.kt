@@ -17,12 +17,15 @@ enum class UserRole {
 
 fun User.getScopes(): JsonObject? = principal().getJsonObject("scp")
 
-fun User.getCharters(): List<UUID>? =
+fun User.getCharters(vesselId: UUID? = null): List<UUID>? =
   principal()
     .getJsonObject("scp")
     .map.keys
     .mapNotNull {
       if (!it.contains(":")) {
+        return@mapNotNull null
+      }
+      if (vesselId != null && !it.startsWith(vesselId.toString())) {
         return@mapNotNull null
       }
       it.substringAfterLast(":").toUUID()

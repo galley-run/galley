@@ -3,11 +3,13 @@ package nl.clicqo.eventbus
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.User
 import io.vertx.openapi.validation.RequestParameter
+import run.galley.cloud.crew.UserRole
 
 class EventBusApiRequest(
   // Headers
   val format: String = "v1",
   val version: String = "v1",
+  val userRole: UserRole? = null,
   // Request Payload
   val identifiers: MutableMap<String, RequestParameter>? = null,
   val body: JsonObject? = null,

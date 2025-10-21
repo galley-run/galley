@@ -195,6 +195,7 @@ class OpenApiBridge(
                 EventBusApiRequest(
                   user = routingContext.user(),
                   identifiers = params,
+                  userRole = routingContext.get<UserRole?>("userRole"),
                   body = body,
                   query = query,
                   format = requestedFormat,

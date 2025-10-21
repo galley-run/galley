@@ -89,8 +89,11 @@ class OpenApiBridge(
             val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
             // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-            routingContext.user().getUserRole(requestedCharterId, CrewAccessLevel.CHARTER)
-              ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
+            val userRole =
+              routingContext.user().getUserRole(requestedCharterId, CrewAccessLevel.CHARTER)
+                ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
+
+            routingContext.put("userRole", userRole)
 
             routingContext.next()
             return@catchAll

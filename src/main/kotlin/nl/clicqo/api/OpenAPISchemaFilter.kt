@@ -165,7 +165,7 @@ object OpenAPISchemaFilter {
       // Extract properties from the 'attributes' object specifically
       val attributesFields = extractAttributesFields(objectSchema)
       if (attributesFields.isEmpty()) {
-        return dataSchema.getJsonObject("properties").map.keys
+        return dataSchema.getJsonObject("properties")?.map?.keys
       }
 
       return attributesFields

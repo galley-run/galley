@@ -35,15 +35,15 @@ class OpenApiBridge(
       .security("vesselCaptain")
       .httpHandler(JWTAuthHandlerScp(authProvider).withScope("VESSEL_CAPTAIN"))
       .security("charterCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_CAPTAIN"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_CAPTAIN"))
       .security("charterPurser")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_PURSER"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_PURSER"))
       .security("charterBoatswain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_BOATSWAIN"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_BOATSWAIN"))
       .security("charterDeckhand")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_DECKHAND"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_DECKHAND"))
       .security("charterSteward")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_STEWARD"))
+      .httpHandler(JWTAuthHandlerScp(authProvider).withScope("CHARTER_STEWARD"))
 
     /**
      * Add eventbus handlers for each operation.

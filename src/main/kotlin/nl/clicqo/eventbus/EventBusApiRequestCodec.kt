@@ -12,9 +12,9 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
     buffer: Buffer,
     s: EventBusApiRequest,
   ) {
-    val identifiersJson = JsonObject()
-    s.identifiers?.forEach { (key, value) ->
-      identifiersJson.put(key, value.toString())
+    val pathParamsJson = JsonObject()
+    s.pathParams?.forEach { (key, value) ->
+      pathParamsJson.put(key, value.toString())
     }
 
     val queryJson = JsonObject()
@@ -24,7 +24,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
 
     val jsonObject =
       JsonObject()
-        .put("identifiers", identifiersJson)
+        .put("pathParams", pathParamsJson)
         .put("body", s.body)
         .put("query", queryJson)
         .put("user", s.user?.principal())
@@ -50,11 +50,11 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
 
     // Note: This is a simplified deserialization. You may need to properly
     // reconstruct RequestParameter objects based on your requirements.
-    val identifiers = mutableMapOf<String, RequestParameter>()
+    val pathParams = mutableMapOf<String, RequestParameter>()
     val query = mutableMapOf<String, RequestParameter>()
 
     return EventBusApiRequest(
-      identifiers = identifiers,
+      pathParams = pathParams,
       body = json.getJsonObject("body"),
       query = query,
       user = User.create(json.getJsonObject("user")),

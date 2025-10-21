@@ -1,10 +1,10 @@
-package run.galley.cloud.model
+package run.galley.cloud.model.factory
 
 import generated.jooq.tables.pojos.Users
 import generated.jooq.tables.references.USERS
 import io.vertx.sqlclient.Row
 
-object User {
+object UserFactory {
   fun from(row: Row) =
     Users(
       id = row.getUUID(USERS.ID.name),

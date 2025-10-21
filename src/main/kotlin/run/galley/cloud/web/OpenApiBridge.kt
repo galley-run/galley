@@ -5,19 +5,21 @@ import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.handler.JWTAuthHandler
 import io.vertx.ext.web.openapi.router.RouterBuilder
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.openapi.validation.ResponseValidator
 import io.vertx.openapi.validation.ValidatedRequest
 import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
-import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
-import run.galley.cloud.model.getUserRole
+import nl.clicqo.ext.toUUID
+import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.getUserRole
+import run.galley.cloud.crew.getVessels
 
 class OpenApiBridge(
   override val vertx: Vertx,
@@ -26,22 +28,24 @@ class OpenApiBridge(
   val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun buildRouter(): RouterBuilder {
-    /**
-     * Add security handlers for each scope.
-     */
+//    /**
+//     * Add security handlers for each scope.
+//     */
+    val scpAuthHandler = JWTAuthHandlerScp(authProvider)
+
     openAPIRouterBuilder
-      .security("vesselCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("VESSEL_CAPTAIN"))
-      .security("charterCaptain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_CAPTAIN"))
-      .security("charterPurser")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_PURSER"))
-      .security("charterBoatswain")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_BOATSWAIN"))
-      .security("charterDeckhand")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_DECKHAND"))
       .security("charterSteward")
-      .httpHandler(JWTAuthHandler.create(authProvider).withScope("CHARTER_STEWARD"))
+      .httpHandler(scpAuthHandler)
+      .security("charterDeckhand")
+      .httpHandler(scpAuthHandler)
+      .security("charterBoatswain")
+      .httpHandler(scpAuthHandler)
+      .security("charterPurser")
+      .httpHandler(scpAuthHandler)
+      .security("charterCaptain")
+      .httpHandler(scpAuthHandler)
+      .security("vesselCaptain")
+      .httpHandler(scpAuthHandler)
 
     /**
      * Add eventbus handlers for each operation.
@@ -68,46 +72,39 @@ class OpenApiBridge(
           routingContext.put("vesselId", routingContext.user().principal().getString("vesselId"))
 
           if (params.contains("vesselId")) {
-            val requestedVesselId = params["vesselId"]?.string
-            val jwtVesselId = routingContext.user().principal().getString("vesselId")
-            val userRole = routingContext.user().getUserRole()
+            val requestedVesselId = params["vesselId"]?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+            val userRole = requestedVesselId.let(routingContext.user()::getUserRole)
 
-            // Check if vesselId in JWT matches the requested Vessel ID
-            if (jwtVesselId == requestedVesselId) {
-              // Check if user is vessel captain of this vessel
-              if (userRole == run.galley.cloud.model.UserRole.VESSEL_CAPTAIN) {
-                // All good - user is captain of their own vessel
-                routingContext.next()
-                return@catchAll
-              }
-              // Is user vessel member? -> go on to next check
-              // Continue to allow vessel members access (will be checked by other security handlers)
-            } else {
-              // vesselId doesn't match JWT - throw 403 Forbidden
-              throw run.galley.cloud.ApiStatus.CREW_NO_VESSEL_MEMBER
+            if (routingContext.user().getVessels()?.contains(requestedVesselId) == false) {
+              throw ApiStatus.CREW_NO_VESSEL_MEMBER
             }
-          }
+            // Check if vesselId in JWT matches the requested Vessel ID
 
-          if (params.contains("charterId")) {
-            val requestedCharterId = params["charterId"]?.string
-            val charterIds = routingContext.user().principal().getJsonArray("charterIds")
-
-            // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-            val hasCharterAccess =
-              requestedCharterId != null && charterIds != null &&
-                charterIds.toList().map { it?.toString() }.contains(requestedCharterId)
-
-            if (hasCharterAccess) {
-              // User has access to this charter
+            // Check if user is vessel captain of this vessel
+            if (userRole != null && userRole == UserRole.VESSEL_CAPTAIN) {
+              // All good - user is captain of their own vessel
+              routingContext.put("userRole", userRole)
               routingContext.next()
               return@catchAll
-            } else {
-              // No access - throw 403 Forbidden
-              throw run.galley.cloud.ApiStatus.CREW_NO_CHARTER_MEMBER
+            }
+
+            if (params.contains("charterId")) {
+              val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
+
+              // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
+              val userRole =
+                routingContext.user().getUserRole(requestedVesselId, requestedCharterId)
+                  ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
+
+              routingContext.put("userRole", userRole)
+
+              routingContext.next()
+              return@catchAll
             }
           }
 
-          // Possibly add crew_project_member later? Don't see big benefits for it now..
+          // TODO: Possibly add crew_project_member later? Don't see big benefits for it now..
+
           routingContext.next()
         }
       }
@@ -185,7 +182,7 @@ class OpenApiBridge(
               // Check if all required properties are present
               val missingRequired = requiredProperties.filterNot { filteredBody.containsKey(it) }
               if (missingRequired.isNotEmpty()) {
-                throw ApiStatus.REQUEST_BODY_MISSING_REQUIRED_FIELDS
+                throw nl.clicqo.api.ApiStatus.REQUEST_BODY_MISSING_REQUIRED_FIELDS
               }
 
               JsonObject(filteredBody)
@@ -202,6 +199,7 @@ class OpenApiBridge(
                 EventBusApiRequest(
                   user = routingContext.user(),
                   identifiers = params,
+                  userRole = routingContext.get<UserRole?>("userRole"),
                   body = body,
                   query = query,
                   format = requestedFormat,

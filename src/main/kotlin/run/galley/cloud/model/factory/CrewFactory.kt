@@ -1,4 +1,4 @@
-package run.galley.cloud.model
+package run.galley.cloud.model.factory
 
 import generated.jooq.enums.MemberStatus
 import generated.jooq.enums.VesselRole
@@ -6,7 +6,7 @@ import generated.jooq.tables.pojos.Crew
 import generated.jooq.tables.references.CREW
 import io.vertx.sqlclient.Row
 
-object Crew {
+object CrewFactory {
   fun from(row: Row) =
     Crew(
       id = row.getUUID(CREW.ID.name),

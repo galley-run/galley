@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
 import run.galley.cloud.data.CharterDataVerticle
+import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
@@ -96,6 +97,7 @@ class MainVerticle : CoroutineVerticle() {
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CrewDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CrewCharterMemberDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles

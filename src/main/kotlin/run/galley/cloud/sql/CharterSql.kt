@@ -5,11 +5,12 @@ import generated.jooq.tables.references.CHARTERS
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.ext.andNotDeleted
 import nl.clicqo.ext.applyConditions
+import nl.clicqo.ext.applyPagination
 import nl.clicqo.ext.getUUID
 import nl.clicqo.ext.toRecord
 import nl.clicqo.ext.toUUID
-import nl.clicqo.ext.whereNotDeleted
 import org.jooq.Condition
 import org.jooq.Query
 import org.jooq.impl.DSL.currentOffsetDateTime
@@ -22,7 +23,8 @@ object CharterSql {
     return Jooq.postgres
       .selectFrom(CHARTERS)
       .applyConditions(*conditions)
-      .whereNotDeleted(CHARTERS.DELETED_AT)
+      .andNotDeleted(CHARTERS.DELETED_AT)
+      .applyPagination(request.pagination)
   }
 
   fun getCharter(request: EventBusQueryDataRequest): Query {
@@ -33,7 +35,7 @@ object CharterSql {
       .selectFrom(CHARTERS)
       .where(CHARTERS.ID.eq(identifier?.toUUID()))
       .applyConditions(requiredConditions = listOf(CHARTERS.VESSEL_ID), *conditions)
-      .whereNotDeleted(CHARTERS.DELETED_AT)
+      .andNotDeleted(CHARTERS.DELETED_AT)
   }
 
   fun createCharter(request: EventBusCmdDataRequest): Query {
@@ -62,7 +64,7 @@ object CharterSql {
         payload.toRecord<ChartersRecord>(CHARTERS),
       ).where(CHARTERS.ID.eq(identifier))
       .applyConditions(requiredConditions = listOf(CHARTERS.VESSEL_ID), *buildConditions(request.filters))
-      .whereNotDeleted(CHARTERS.DELETED_AT)
+      .andNotDeleted(CHARTERS.DELETED_AT)
       .returning()
   }
 
@@ -72,12 +74,13 @@ object CharterSql {
       .set(CHARTERS.DELETED_AT, currentOffsetDateTime())
       .where(CHARTERS.ID.eq(request.identifier))
       .applyConditions(requiredConditions = listOf(CHARTERS.VESSEL_ID), *buildConditions(request.filters))
-      .whereNotDeleted(CHARTERS.DELETED_AT)
+      .andNotDeleted(CHARTERS.DELETED_AT)
 
   private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> =
     filters
       .mapNotNull { (field, values) ->
         when (field) {
+          CHARTERS.ID.name -> CHARTERS.ID.`in`(values.map { UUID.fromString(it) })
           CHARTERS.USER_ID.name -> CHARTERS.USER_ID.`in`(values.map { UUID.fromString(it) })
           CHARTERS.VESSEL_ID.name -> CHARTERS.VESSEL_ID.`in`(values.map { UUID.fromString(it) })
           else -> null

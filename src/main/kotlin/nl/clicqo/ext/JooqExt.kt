@@ -1,14 +1,13 @@
 package nl.clicqo.ext
 
 import io.vertx.core.json.JsonObject
-import nl.clicqo.api.ApiPagination
 import nl.clicqo.api.ApiStatus
+import nl.clicqo.api.Pagination
 import org.jooq.Condition
 import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.SelectWhereStep
 import org.jooq.TableField
-import org.jooq.Update
 import org.jooq.UpdateConditionStep
 import org.jooq.UpdateWhereStep
 import org.jooq.impl.TableRecordImpl
@@ -17,15 +16,15 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
-fun <R : Record?> SelectWhereStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> =
+fun <R : Record?> SelectWhereStep<R>.applyPagination(pagination: Pagination?): SelectConditionStep<R> =
   this.where().applyPagination(pagination)
 
-fun <R : Record?> SelectConditionStep<R>.applyPagination(pagination: ApiPagination?): SelectConditionStep<R> {
+fun <R : Record?> SelectConditionStep<R>.applyPagination(pagination: Pagination?): SelectConditionStep<R> {
   if (pagination == null) {
     return this
   }
 
-  this.limit(pagination.sqlOffset, pagination.limit)
+  this.limit(pagination.offset, pagination.limit)
 
   return this
 }
@@ -36,11 +35,23 @@ fun <R : Record?> SelectWhereStep<R>.whereNotDeleted(deletedAtField: TableField<
 fun <R : Record?> UpdateWhereStep<R>.whereNotDeleted(deletedAtField: TableField<R, OffsetDateTime?>): UpdateConditionStep<R> =
   this.where(deletedAtField.isNull.or(deletedAtField.gt(OffsetDateTime.now())))
 
-fun <R : Record?> SelectConditionStep<R>.whereNotDeleted(deletedAtField: TableField<R, OffsetDateTime?>): SelectConditionStep<R> =
+fun <R : Record?> SelectConditionStep<R>.andNotDeleted(deletedAtField: TableField<R, OffsetDateTime?>): SelectConditionStep<R> =
   this.and(deletedAtField.isNull.or(deletedAtField.gt(OffsetDateTime.now())))
 
-fun <R : Record?> UpdateConditionStep<R>.whereNotDeleted(deletedAtField: TableField<R, OffsetDateTime?>): UpdateConditionStep<R> =
+fun <R : Record?> UpdateConditionStep<R>.andNotDeleted(deletedAtField: TableField<R, OffsetDateTime?>): UpdateConditionStep<R> =
   this.and(deletedAtField.isNull.or(deletedAtField.gt(OffsetDateTime.now())))
+
+fun <R : Record?> SelectWhereStep<R>.whereActivated(activatedAtField: TableField<R, OffsetDateTime?>): SelectConditionStep<R> =
+  this.where(activatedAtField.isNotNull.and(activatedAtField.le(OffsetDateTime.now())))
+
+fun <R : Record?> UpdateWhereStep<R>.whereActivated(activatedAtField: TableField<R, OffsetDateTime?>): UpdateConditionStep<R> =
+  this.where(activatedAtField.isNotNull.and(activatedAtField.le(OffsetDateTime.now())))
+
+fun <R : Record?> SelectConditionStep<R>.andActivated(activatedAtField: TableField<R, OffsetDateTime?>): SelectConditionStep<R> =
+  this.and(activatedAtField.isNotNull.and(activatedAtField.le(OffsetDateTime.now())))
+
+fun <R : Record?> UpdateConditionStep<R>.andActivated(activatedAtField: TableField<R, OffsetDateTime?>): UpdateConditionStep<R> =
+  this.and(activatedAtField.isNotNull.and(activatedAtField.le(OffsetDateTime.now())))
 
 // Overload for type-safe JOOQ Condition objects
 private fun <R : Record?> checkRequiredConditions(
@@ -208,6 +219,7 @@ fun convertValue(
             OffsetDateTime.parse(value)
           }
         }
+
         is Instant -> value.atOffset(ZoneOffset.UTC)
         else -> null
       }

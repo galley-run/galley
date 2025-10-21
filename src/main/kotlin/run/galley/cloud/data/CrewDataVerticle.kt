@@ -1,19 +1,17 @@
 package run.galley.cloud.data
 
 import io.vertx.core.eventbus.Message
-import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.executePreparedQuery
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
-import run.galley.cloud.ApiStatus
-import run.galley.cloud.model.Crew
+import run.galley.cloud.model.factory.CrewFactory
 import run.galley.cloud.sql.CrewSql
 
 class CrewDataVerticle : PostgresDataVerticle() {
   companion object {
-    const val GET_BY_USER_AND_VESSEL = "data.crew.query.get_by_user_and_vessel"
+    const val LIST_BY_USER = "data.crew.query.list_by_user"
     const val LIST_ACTIVE = "data.crew.query.list_active"
   }
 
@@ -21,24 +19,22 @@ class CrewDataVerticle : PostgresDataVerticle() {
     super.start()
 
     coroutineEventBus {
-      vertx.eventBus().coConsumer(GET_BY_USER_AND_VESSEL, handler = ::getByUserAndVessel)
+      vertx.eventBus().coConsumer(LIST_BY_USER, handler = ::listByUser)
       vertx.eventBus().coConsumer(LIST_ACTIVE, handler = ::listActive)
     }
   }
 
-  private suspend fun getByUserAndVessel(message: Message<EventBusQueryDataRequest>) {
+  private suspend fun listByUser(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.executePreparedQuery(CrewSql.getCrewMemberByUserAndVessel(request))
+    val results = pool.executePreparedQuery(CrewSql.listActive(request))
 
     val crew =
       results
-        ?.firstOrNull()
-        ?.let(Crew::from)
-        ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
+        ?.map(CrewFactory::from)
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.one(crew),
+        payload = DataPayload.many(crew),
       ),
     )
   }
@@ -49,7 +45,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
 
     message.reply(
       EventBusDataResponse(
-        payload = DataPayload.many(results?.map(Crew::from) ?: emptyList()),
+        payload = DataPayload.many(results?.map(CrewFactory::from) ?: emptyList()),
       ),
     )
   }

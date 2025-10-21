@@ -13,10 +13,15 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import run.galley.cloud.TestJWTHelper
+import run.galley.cloud.crew.CharterCrewAccess
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 
 class CharterApiIntegrationTest : BaseIntegrationTest() {
   private val vesselId = UUID.randomUUID()
+  private val vesselId2 = UUID.randomUUID()
+  private val charterId = UUID.randomUUID()
   private val userId = UUID.randomUUID()
   private lateinit var validToken: String
   private lateinit var client: WebClient
@@ -28,13 +33,17 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
       TestJWTHelper.generateVesselCaptainToken(
         getJWTAuth(),
         userId = userId,
-        vesselId = vesselId,
+        crewAccess =
+          listOf(
+            VesselCrewAccess(vesselId, UserRole.VESSEL_CAPTAIN),
+            CharterCrewAccess(vesselId2, charterId, UserRole.CHARTER_BOATSWAIN),
+          ),
       )
 
     // Clean database and preload required data
     runTest {
       destroyVessel()
-      preloadVessel(vesselId, userId)
+      preloadVessel(vesselId, vesselId2, userId)
     }
   }
 
@@ -46,6 +55,7 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
 
   private suspend fun preloadVessel(
     vesselId: UUID,
+    vesselId2: UUID,
     userId: UUID,
   ) {
     pg
@@ -56,6 +66,15 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
         ON CONFLICT (id) DO NOTHING;
         INSERT INTO vessels (id, name, user_id, created_at)
         VALUES ('$vesselId', 'Test Vessel', '$userId', NOW())
+        ON CONFLICT (id) DO NOTHING;
+        INSERT INTO vessels (id, name, user_id, created_at)
+        VALUES ('$vesselId2', 'Test Vessel 2', '$userId', NOW())
+        ON CONFLICT (id) DO NOTHING;
+        INSERT INTO charters (id, vessel_id, name, user_id, created_at)
+        VALUES ('$charterId', '$vesselId2', 'Test Vessel 1 Charter 1', '$userId', NOW())
+        ON CONFLICT (id) DO NOTHING;
+        INSERT INTO charters (vessel_id, name, user_id, created_at)
+        VALUES ('$vesselId2', 'Test Vessel 1 Charter 2', '$userId', NOW())
         ON CONFLICT (id) DO NOTHING;
         """.trimIndent(),
       ).execute()
@@ -270,18 +289,50 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
           .send()
           .coAwait()
 
+      val json = resp.bodyAsJsonObject()
+
       testContext.verify {
         assertEquals(200, resp.statusCode())
-        val json = resp.bodyAsJsonObject()
-        assertEquals(json.getJsonArray("data").size(), 1)
+        assertEquals(1, json.getJsonArray("data").size())
         assertEquals(
+          charterName,
           json
             .getJsonArray("data")
             .getJsonObject(0)
             .getJsonObject("attributes")
             .getString("name"),
-          charterName,
         )
+        testContext.completeNow()
+      }
+    }
+
+  @Test
+  fun `test GET charters list with access to multiple vessels returns only charters of requested vessel`(testContext: VertxTestContext) =
+    runTest {
+      val resp =
+        client
+          .get("/vessels/$vesselId/charters")
+          .putHeader("Authorization", "Bearer $validToken")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .send()
+          .coAwait()
+
+      val resp2 =
+        client
+          .get("/vessels/$vesselId2/charters")
+          .putHeader("Authorization", "Bearer $validToken")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .send()
+          .coAwait()
+
+      val json = resp.bodyAsJsonObject()
+      val json2 = resp2.bodyAsJsonObject()
+
+      testContext.verify {
+        assertEquals(200, resp.statusCode())
+        assertEquals(200, resp2.statusCode())
+        assertEquals(0, json.getJsonArray("data").size())
+        assertEquals(1, json2.getJsonArray("data").size())
         testContext.completeNow()
       }
     }

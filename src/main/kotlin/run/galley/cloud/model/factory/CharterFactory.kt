@@ -1,10 +1,10 @@
-package run.galley.cloud.model
+package run.galley.cloud.model.factory
 
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
 import io.vertx.sqlclient.Row
 
-object Charter {
+object CharterFactory {
   fun from(row: Row) =
     Charters(
       id = row.getUUID(CHARTERS.ID.name),

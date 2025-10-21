@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import run.galley.cloud.MainVerticle
 import run.galley.cloud.web.JWT
+import java.time.LocalDateTime.now
 
 @Testcontainers
 @ExtendWith(VertxExtension::class)
@@ -84,8 +85,8 @@ abstract class BaseIntegrationTest {
           .with(PoolOptions().setMaxSize(20))
           .build()
 
-      // Choose HTTP port for tests
-      httpPort = 19233
+      // Choose random HTTP port for tests
+      httpPort = "4${now().minute.toString().padStart(2, '0')}${now().second.toString().padStart(2, '0')}".toInt()
 
       // Create test config with Testcontainers PostgreSQL
       testConfig =

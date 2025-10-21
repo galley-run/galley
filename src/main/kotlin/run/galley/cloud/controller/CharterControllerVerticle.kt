@@ -20,10 +20,12 @@ import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.getCharters
+import run.galley.cloud.crew.getVessels
 import run.galley.cloud.data.CharterDataVerticle
-import run.galley.cloud.model.UserRole
-import run.galley.cloud.model.getUserRole
 import run.galley.cloud.model.toJsonAPIResourceObject
+import java.util.UUID
 
 class CharterControllerVerticle :
   CoroutineVerticle(),
@@ -50,7 +52,6 @@ class CharterControllerVerticle :
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val userRole = apiRequest.user?.getUserRole()
 
     // Convert API query params to filters
     val filters = mutableMapOf<String, List<String>>()
@@ -58,17 +59,24 @@ class CharterControllerVerticle :
       filters[key.camelCaseToSnakeCase()] = listOf(value.string)
     }
 
-    val vesselId =
+    val requestedVesselId =
       apiRequest.identifiers
         ?.get("vesselId")
         ?.string
-        ?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+        ?.toUUID()
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
-    filters["vesselId"] = listOf(vesselId.toString())
-    if (userRole != UserRole.VESSEL_CAPTAIN) {
-      filters["id"] =
-        listOf(apiRequest.user?.get<String>("charterIds") ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS))
-      TODO("Not implemented")
+    filters[CHARTERS.VESSEL_ID.name] =
+      apiRequest.user
+        ?.getVessels()
+        ?.contains(requestedVesselId)
+        ?.let { listOf(requestedVesselId.toString()) }
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
+
+    if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
+      val charterIds = apiRequest.user.getCharters(requestedVesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
+
+      filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
     }
 
     // Build data request with filters, sort, and pagination
@@ -77,7 +85,6 @@ class CharterControllerVerticle :
         filters = filters,
         sort = listOf(SortField("id", SortDirection.ASC)),
         pagination = Pagination(offset = 0, limit = 10),
-        user = apiRequest.user.principal(),
       )
 
     val dataResponse =

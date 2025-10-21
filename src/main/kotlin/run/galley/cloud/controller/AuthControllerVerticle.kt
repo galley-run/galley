@@ -2,6 +2,7 @@ package run.galley.cloud.controller
 
 import generated.jooq.enums.VesselRole
 import generated.jooq.tables.pojos.Crew
+import generated.jooq.tables.pojos.CrewCharterMember
 import generated.jooq.tables.pojos.Users
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
@@ -17,13 +18,17 @@ import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.crew.CharterCrewAccess
+import run.galley.cloud.crew.CrewAccess
+import run.galley.cloud.crew.UserRole
+import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
-import run.galley.cloud.model.UserRole
+import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
-import run.galley.cloud.web.getVesselId
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
+import java.util.UUID
 
 class AuthControllerVerticle :
   CoroutineVerticle(),
@@ -58,7 +63,6 @@ class AuthControllerVerticle :
       }
 
     val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
-    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     val user =
       vertx
@@ -71,37 +75,12 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
-
-    val crewResponse =
-      vertx
-        .eventBus()
-        .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.GET_BY_USER_AND_VESSEL,
-          EventBusQueryDataRequest(
-            identifiers =
-              mapOf(
-                "userId" to user.id.toString(),
-                "vesselId" to vesselId.toString(),
-              ),
-          ),
-        ).coAwait()
-        ?.body()
-        ?.payload
-        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
-
-    when (crewResponse.vesselRole) {
-      VesselRole.captain -> UserRole.VESSEL_CAPTAIN
-      else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
-    }
-
-    // We don't need to add the user role into the refresh token, since the refresh token is only here to create
-    // an access token and roles may change over time.
+        ?.toOne()
+        ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
     val newToken =
       JWT.authProvider(vertx, config).issueRefreshToken(
         user.id!!,
-        JWT.claims(vesselId),
       )
 
     message.reply(
@@ -134,7 +113,6 @@ class AuthControllerVerticle :
       }
 
     val userId = refreshTokenUser.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.REFRESH_TOKEN_INVALID)
-    val vesselId = refreshTokenUser.getVesselId() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     val user =
       vertx
@@ -147,36 +125,72 @@ class AuthControllerVerticle :
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
+        ?.toOne()
+        ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
 
-    val crewResponse =
+    val vesselCrewResponse =
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.GET_BY_USER_AND_VESSEL,
+          CrewDataVerticle.LIST_BY_USER,
           EventBusQueryDataRequest(
-            identifiers =
+            filters =
               mapOf(
-                "userId" to user.id.toString(),
-                "vesselId" to vesselId.toString(),
+                "userId" to listOf(user.id.toString()),
               ),
           ),
         ).coAwait()
         ?.body()
         ?.payload
-        ?.toOne() ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
+        ?.toMany()
+        ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
-    val userRole =
-      when (crewResponse.vesselRole) {
-        VesselRole.captain -> UserRole.VESSEL_CAPTAIN
-        else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
+    val crewMemberIds = mutableMapOf<String, UUID>()
+    val crewAccess = mutableListOf<CrewAccess>()
+    vesselCrewResponse
+      .forEach {
+        if (it.vesselRole == VesselRole.captain) {
+          crewAccess.add(VesselCrewAccess(it.vesselId!!, UserRole.VESSEL_CAPTAIN))
+        } else {
+          crewMemberIds[it.id.toString()] = it.vesselId!!
+        }
       }
+
+    if (crewMemberIds.isNotEmpty()) {
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<CrewCharterMember>>(
+          CrewCharterMemberDataVerticle.LIST_BY_USER,
+          EventBusQueryDataRequest(
+            filters =
+              mapOf(
+                "crewId" to crewMemberIds.keys.toList(),
+              ),
+          ),
+        ).coAwait()
+        ?.body()
+        ?.payload
+        ?.toMany()
+    } else {
+      listOf()
+    }?.forEach {
+      crewAccess.add(
+        CharterCrewAccess(
+          crewMemberIds[it.crewId.toString()] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
+          it.charterId!!,
+          UserRole.valueOf("CHARTER_" + it.charterRole?.name?.uppercase()),
+        ),
+      )
+    }
+
+    if (crewAccess.isEmpty()) {
+      throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
+    }
 
     val newToken =
       JWT.authProvider(vertx, config).issueAccessToken(
         user.id!!,
-        userRole,
-        JWT.claims(vesselId),
+        crewAccess,
       )
 
     message.reply(
@@ -237,7 +251,6 @@ class AuthControllerVerticle :
             "refreshToken",
             JWT.authProvider(vertx, config).issueRefreshToken(
               user.id!!,
-              JWT.claims(crewMembership.vesselId!!),
             ),
           ),
       ),

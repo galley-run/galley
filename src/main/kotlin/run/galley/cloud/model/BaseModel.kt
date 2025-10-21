@@ -2,9 +2,14 @@ package run.galley.cloud.model
 
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
+import io.vertx.sqlclient.Row
 import nl.clicqo.ext.toSingular
 
 interface BaseModel {
+  companion object {
+    fun from(row: Row): BaseModel = error("BaseModel.from(Row) is abstract: call <Concrete>.Companion.from(Row)")
+  }
+
   fun toJsonAPIResourceObject(): JsonObject {
     val attributes =
       JsonObject()

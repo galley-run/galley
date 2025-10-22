@@ -1,8 +1,6 @@
 package run.galley.cloud.integration
 
 import io.vertx.core.json.JsonObject
-import io.vertx.ext.web.client.WebClient
-import io.vertx.ext.web.client.WebClientOptions
 import io.vertx.junit5.VertxTestContext
 import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.test.runTest
@@ -14,36 +12,37 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import run.galley.cloud.TestJWTHelper
 import run.galley.cloud.crew.CharterCrewAccess
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 
 class CharterApiIntegrationTest : BaseIntegrationTest() {
   private val vesselId = UUID.randomUUID()
   private val vesselId2 = UUID.randomUUID()
+  private val vesselId3 = UUID.randomUUID()
   private val charterId = UUID.randomUUID()
   private val userId = UUID.randomUUID()
   private lateinit var validToken: String
-  private lateinit var client: WebClient
 
   @BeforeEach
   override fun setupEach() {
-    client = WebClient.create(vertx, WebClientOptions().setDefaultPort(httpPort).setDefaultHost("localhost"))
+    super.setupEach()
+
     validToken =
-      TestJWTHelper.generateVesselCaptainToken(
+      TestJWTHelper.generateAccessToken(
         getJWTAuth(),
         userId = userId,
         crewAccess =
           listOf(
-            VesselCrewAccess(vesselId, UserRole.VESSEL_CAPTAIN),
-            CharterCrewAccess(vesselId2, charterId, UserRole.CHARTER_BOATSWAIN),
+            VesselCrewAccess(vesselId, CrewRole.VESSEL_CAPTAIN),
+            CharterCrewAccess(vesselId2, charterId, CrewRole.CHARTER_BOATSWAIN),
           ),
       )
 
     // Clean database and preload required data
     runTest {
       destroyVessel()
-      preloadVessel(vesselId, vesselId2, userId)
+      preloadVessel()
     }
   }
 
@@ -53,11 +52,7 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
     client.close()
   }
 
-  private suspend fun preloadVessel(
-    vesselId: UUID,
-    vesselId2: UUID,
-    userId: UUID,
-  ) {
+  private suspend fun preloadVessel() {
     pg
       .query(
         """
@@ -69,6 +64,9 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
         ON CONFLICT (id) DO NOTHING;
         INSERT INTO vessels (id, name, user_id, created_at)
         VALUES ('$vesselId2', 'Test Vessel 2', '$userId', NOW())
+        ON CONFLICT (id) DO NOTHING;
+        INSERT INTO vessels (id, name, user_id, created_at)
+        VALUES ('$vesselId3', 'Test Vessel 3', '$userId', NOW())
         ON CONFLICT (id) DO NOTHING;
         INSERT INTO charters (id, vessel_id, name, user_id, created_at)
         VALUES ('$charterId', '$vesselId2', 'Test Vessel 1 Charter 1', '$userId', NOW())
@@ -325,12 +323,21 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
           .send()
           .coAwait()
 
+      val resp3 =
+        client
+          .get("/vessels/$vesselId3/charters")
+          .putHeader("Authorization", "Bearer $validToken")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .send()
+          .coAwait()
+
       val json = resp.bodyAsJsonObject()
       val json2 = resp2.bodyAsJsonObject()
 
       testContext.verify {
         assertEquals(200, resp.statusCode())
         assertEquals(200, resp2.statusCode())
+        assertEquals(403, resp3.statusCode())
         assertEquals(0, json.getJsonArray("data").size())
         assertEquals(1, json2.getJsonArray("data").size())
         testContext.completeNow()

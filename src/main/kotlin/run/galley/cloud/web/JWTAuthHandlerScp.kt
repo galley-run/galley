@@ -15,8 +15,10 @@ import io.vertx.ext.web.handler.impl.HTTPAuthorizationHandler
 import io.vertx.ext.web.impl.RoutingContextInternal
 import io.vertx.ext.web.internal.handler.ScopedAuthentication
 import io.vertx.openapi.contract.Operation
+import nl.clicqo.ext.camelCaseToSnakeCase
+import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 import java.util.Objects
 import java.util.function.Function
 
@@ -110,7 +112,10 @@ class JWTAuthHandlerScp :
     // the user is authenticated, however the user may not have all the required scopes
     val scopes =
       (ctx.currentRoute().metadata()["openApiOperation"] as Operation).securityRequirements.mapNotNull {
-        it.names.first()
+        it.names
+          .first()
+          .camelCaseToSnakeCase()
+          .uppercase()
       }
 
     if (scopes.isNotEmpty()) {
@@ -124,34 +129,39 @@ class JWTAuthHandlerScp :
         ctx.fail(403, VertxException("Invalid JWT: scp claim is required", true))
         return
       }
-      val target = jwt.getJsonObject("scp")
+      val userRoles = jwt.getJsonObject("scp") ?: throw ApiStatus.USER_ROLE_FORBIDDEN
 
-      if (target != null) {
-        for (scope in scopes) {
-          if (scope == UserRole.VESSEL_CAPTAIN.name && (
-              ctx
-                .pathParam("vesselId")
-                .isNullOrBlank() ||
-                target.getString(ctx.pathParam("vesselId")) != UserRole.VESSEL_CAPTAIN.name
-            )
-          ) {
-            throw ApiStatus.CREW_NO_VESSEL_CAPTAIN
-          } else if (!ctx.pathParam("vesselId").isNullOrBlank() &&
-            target.getString(ctx.pathParam("vesselId")) == UserRole.VESSEL_CAPTAIN.name
-          ) {
-            ctx.next()
-            return
-          }
+      val vesselRole =
+        userRoles
+          .takeIf {
+            !ctx
+              .pathParam(
+                "vesselId",
+              ).isNullOrBlank()
+          }?.getString(ctx.pathParam("vesselId").toUUID().toString())
+      val exactMatchCharterRole =
+        userRoles
+          .takeIf {
+            !ctx.pathParam("vesselId").isNullOrBlank() && !ctx.pathParam("charterId").isNullOrBlank()
+          }?.getString("${ctx.pathParam("vesselId").toUUID()}:${ctx.pathParam("charterId").toUUID()}")
+      val vesselMatchCharterRole =
+        userRoles
+          .takeIf {
+            !ctx.pathParam("vesselId").isNullOrBlank()
+          }?.firstOrNull {
+            it.key.startsWith("${ctx.pathParam("vesselId").toUUID()}:")
+          }?.value
 
-          if (!ctx.pathParam("vesselId").isNullOrBlank() && !ctx.pathParam("charterId").isNullOrBlank() &&
-            target
-              .getString("${ctx.pathParam("vesselId")}:${ctx.pathParam("charterId")}") != scope
-          ) {
-            throw ApiStatus.USER_ROLE_FORBIDDEN
-          }
-        }
+      // TODO: Fix vessels/X/charters is now not allowed for charter captain
+
+      if (scopes.contains(vesselRole) || scopes.contains(exactMatchCharterRole) || scopes.contains(vesselMatchCharterRole)) {
+        ctx.next()
+        return
       }
+
+      throw ApiStatus.USER_ROLE_FORBIDDEN
     }
+
     ctx.next()
   }
 }

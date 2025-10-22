@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import run.galley.cloud.TestJWTHelper
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 
@@ -20,7 +20,6 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
   private val vesselId = UUID.randomUUID()
   private val userId = UUID.randomUUID()
   private val inactiveUserId = UUID.randomUUID()
-  private lateinit var client: WebClient
 
   @BeforeEach
   override fun setupEach() {
@@ -253,7 +252,7 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
         TestJWTHelper.generateAccessToken(
           getJWTAuth(),
           userId,
-          listOf(VesselCrewAccess(vesselId, UserRole.VESSEL_CAPTAIN)),
+          listOf(VesselCrewAccess(vesselId, CrewRole.VESSEL_CAPTAIN)),
         )
 
       val body = JsonObject().put("refreshToken", expiredToken)

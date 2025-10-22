@@ -5,7 +5,7 @@ import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.User
 import io.vertx.openapi.validation.RequestParameter
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 
 class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequest> {
   override fun encodeToWire(
@@ -30,7 +30,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
         .put("user", s.user?.principal())
         .put("version", s.version)
         .put("format", s.format)
-        .put("userRole", s.userRole?.name)
+        .put("crewRole", s.crewRole?.name)
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -60,7 +60,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
       user = User.create(json.getJsonObject("user")),
       version = json.getString("version", "v1"),
       format = json.getString("format", "json"),
-      userRole = json.getString("userRole")?.let(UserRole::valueOf),
+      crewRole = json.getString("crewRole")?.let(CrewRole::valueOf),
     )
   }
 

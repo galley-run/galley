@@ -596,7 +596,7 @@ components:
             type:
               type: string
               enum:
-                - Project
+                - CharterProject
               description: Resource type
             attributes:
               type: object
@@ -615,15 +615,11 @@ components:
                   description: Environment name (e.g. production, staging)
                 purpose:
                   type: string
-                deletedAt:
-                  type: string
-                  format: date-time
     ProjectCreate:
       type: object
       required:
         - name
         - environment
-        - purpose
       description: Data transfer object for creating a new Project.
       properties:
         name:
@@ -635,7 +631,9 @@ components:
           examples:
             - production
         purpose:
-          type: string
+          type:
+            - string
+            - 'null'
           examples:
             - Web application
     Project:
@@ -653,23 +651,22 @@ components:
             type:
               type: string
               enum:
-                - Project
+                - CharterProject
               description: Resource type
             attributes:
               type: object
               required:
-                - charterId
                 - name
                 - environment
               properties:
-                charterId:
-                  type: string
                 name:
                   type: string
                 environment:
                   type: string
                 purpose:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
     RefreshToken:
       type: object
       required:

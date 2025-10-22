@@ -3,6 +3,8 @@ package run.galley.cloud.integration
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
+import io.vertx.ext.web.client.WebClient
+import io.vertx.ext.web.client.WebClientOptions
 import io.vertx.junit5.VertxExtension
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.pgclient.PgBuilder
@@ -28,6 +30,8 @@ import java.time.LocalDateTime.now
 @ExtendWith(VertxExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BaseIntegrationTest {
+  protected lateinit var client: WebClient
+
   companion object {
     @Container
     @JvmStatic
@@ -124,6 +128,11 @@ abstract class BaseIntegrationTest {
       deploymentId = vertx.deployVerticle(MainVerticle(), deployOptions).coAwait()
     }
 
+  @BeforeEach
+  open fun setupEach() {
+    client = WebClient.create(vertx, WebClientOptions().setDefaultPort(httpPort).setDefaultHost("localhost"))
+  }
+
   @AfterAll
   fun teardown() =
     runTest {
@@ -139,7 +148,4 @@ abstract class BaseIntegrationTest {
   fun getJWTAuth() =
     JWT
       .authProvider(vertx, testConfig)
-
-  @BeforeEach
-  abstract fun setupEach()
 }

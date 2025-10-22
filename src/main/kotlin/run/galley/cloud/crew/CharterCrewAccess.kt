@@ -6,7 +6,7 @@ import java.util.UUID
 data class CharterCrewAccess(
   val vesselId: UUID,
   val charterId: UUID,
-  val role: UserRole,
+  val role: CrewRole,
 ) : CrewAccess() {
   override fun toJson(): JsonObject = JsonObject().put("$vesselId:$charterId", role)
 }

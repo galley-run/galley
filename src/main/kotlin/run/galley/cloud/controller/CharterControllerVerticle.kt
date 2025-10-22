@@ -18,7 +18,7 @@ import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.crew.getCharters
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
@@ -56,7 +56,7 @@ class CharterControllerVerticle :
 
     filters[CHARTERS.VESSEL_ID.name] = listOf(vesselId.toString())
 
-    if (apiRequest.userRole != UserRole.VESSEL_CAPTAIN) {
+    if (apiRequest.crewRole != CrewRole.VESSEL_CAPTAIN) {
       val charterIds =
         apiRequest.user?.getCharters(vesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
 

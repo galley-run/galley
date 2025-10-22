@@ -11,10 +11,4 @@ object TestJWTHelper {
     userId: UUID,
     crewAccess: List<CrewAccess>,
   ): String = jwtAuth.issueAccessToken(userId, crewAccess)
-
-  fun generateVesselCaptainToken(
-    jwtAuth: JWTAuth,
-    userId: UUID = UUID.randomUUID(),
-    crewAccess: List<CrewAccess>,
-  ): String = generateAccessToken(jwtAuth, userId, crewAccess)
 }

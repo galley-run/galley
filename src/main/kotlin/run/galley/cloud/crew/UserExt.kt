@@ -4,16 +4,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.User
 import nl.clicqo.ext.toUUID
 import java.util.UUID
-
-enum class UserRole {
-  VESSEL_CAPTAIN,
-  VESSEL_MEMBER,
-  CHARTER_CAPTAIN,
-  CHARTER_BOATSWAIN,
-  CHARTER_PURSER,
-  CHARTER_STEWARD,
-  CHARTER_DECKHAND,
-}
+import kotlin.collections.ifEmpty
 
 fun User.getScopes(): JsonObject? = principal().getJsonObject("scp")
 
@@ -42,7 +33,13 @@ fun User.getVessels(): List<UUID>? =
       }
     }.ifEmpty { null }
 
-fun User.getUserRole(
+fun User.getCrewRole(
   vesselId: UUID,
   charterId: UUID? = null,
-): UserRole? = this.getScopes()?.getString("$vesselId${charterId?.let { ":$it" } ?: ""}")?.let(UserRole::valueOf)
+): CrewRole? =
+  this
+    .getScopes()
+    ?.getString("$vesselId${charterId?.let { ":$it" } ?: ""}")
+    ?.let { roleName ->
+      CrewRole.valueOf(roleName)
+    }

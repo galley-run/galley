@@ -19,7 +19,7 @@ import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CharterCrewAccess
 import run.galley.cloud.crew.CrewAccess
-import run.galley.cloud.crew.UserRole
+import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.UserDataVerticle
@@ -121,7 +121,7 @@ class AuthControllerVerticle :
     vesselCrewResponse
       .forEach {
         if (it.vesselRole == VesselRole.captain) {
-          crewAccess.add(VesselCrewAccess(it.vesselId!!, UserRole.VESSEL_CAPTAIN))
+          crewAccess.add(VesselCrewAccess(it.vesselId!!, CrewRole.VESSEL_CAPTAIN))
         } else {
           crewMemberIds[it.id.toString()] = it.vesselId!!
         }
@@ -145,13 +145,16 @@ class AuthControllerVerticle :
     } else {
       listOf()
     }?.forEach {
-      crewAccess.add(
-        CharterCrewAccess(
-          crewMemberIds[it.crewId.toString()] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
-          it.charterId!!,
-          UserRole.valueOf("CHARTER_" + it.charterRole?.name?.uppercase()),
-        ),
-      )
+      val role = it.charterRole?.name?.uppercase()
+      if (role != null) {
+        crewAccess.add(
+          CharterCrewAccess(
+            crewMemberIds[it.crewId.toString()] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
+            it.charterId!!,
+            CrewRole.valueOf("CHARTER_$role"),
+          ),
+        )
+      }
     }
 
     if (crewAccess.isEmpty()) {
@@ -207,7 +210,7 @@ class AuthControllerVerticle :
     val crewMembership = crewMemberships?.firstOrNull() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND)
 
     when (crewMembership.vesselRole) {
-      VesselRole.captain -> UserRole.VESSEL_CAPTAIN
+      VesselRole.captain -> CrewRole.VESSEL_CAPTAIN
       else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
     }
 

@@ -17,8 +17,8 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.crew.UserRole
-import run.galley.cloud.crew.getUserRole
+import run.galley.cloud.crew.CrewRole
+import run.galley.cloud.crew.getCrewRole
 import run.galley.cloud.crew.getVessels
 
 class OpenApiBridge(
@@ -73,17 +73,22 @@ class OpenApiBridge(
 
           if (params.contains("vesselId")) {
             val requestedVesselId = params["vesselId"]?.string?.toUUID() ?: throw ApiStatus.VESSEL_ID_INCORRECT
-            val userRole = requestedVesselId.let(routingContext.user()::getUserRole)
+            val crewRole = requestedVesselId.let(routingContext.user()::getCrewRole)
 
+            // Check if vesselId in JWT matches the requested Vessel ID
             if (routingContext.user().getVessels()?.contains(requestedVesselId) == false) {
               throw ApiStatus.CREW_NO_VESSEL_MEMBER
+            } else if (!params.contains("charterId")) {
+              // Allow it
+              routingContext.put("crewRole", crewRole)
+              routingContext.next()
+              return@catchAll
             }
-            // Check if vesselId in JWT matches the requested Vessel ID
 
             // Check if user is vessel captain of this vessel
-            if (userRole != null && userRole == UserRole.VESSEL_CAPTAIN) {
+            if (crewRole != null && crewRole == CrewRole.VESSEL_CAPTAIN) {
               // All good - user is captain of their own vessel
-              routingContext.put("userRole", userRole)
+              routingContext.put("crewRole", crewRole)
               routingContext.next()
               return@catchAll
             }
@@ -92,12 +97,11 @@ class OpenApiBridge(
               val requestedCharterId = params["charterId"]?.string?.toUUID() ?: throw ApiStatus.CHARTER_ID_INCORRECT
 
               // Check if user has access to the charter (charter ids should be in JWT, added from table crew_charter_member)
-              val userRole =
-                routingContext.user().getUserRole(requestedVesselId, requestedCharterId)
+              val crewRole =
+                routingContext.user().getCrewRole(requestedVesselId, requestedCharterId)
                   ?: throw ApiStatus.CREW_NO_CHARTER_MEMBER
 
-              routingContext.put("userRole", userRole)
-
+              routingContext.put("crewRole", crewRole)
               routingContext.next()
               return@catchAll
             }
@@ -199,7 +203,7 @@ class OpenApiBridge(
                 EventBusApiRequest(
                   user = routingContext.user(),
                   pathParams = pathParams,
-                  userRole = routingContext.get<UserRole?>("userRole"),
+                  crewRole = routingContext.get<CrewRole?>("crewRole"),
                   body = body,
                   query = query,
                   format = requestedFormat,

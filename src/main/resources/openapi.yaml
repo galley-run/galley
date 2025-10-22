@@ -265,6 +265,42 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - project
+      summary: Create project
+      operationId: project.cmd.create
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterBoatswain: []
+      requestBody:
+        required: true
+        description: Project creation data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -560,7 +596,7 @@ components:
             type:
               type: string
               enum:
-                - Project
+                - CharterProject
               description: Resource type
             attributes:
               type: object
@@ -579,9 +615,58 @@ components:
                   description: Environment name (e.g. production, staging)
                 purpose:
                   type: string
-                deletedAt:
+    ProjectCreate:
+      type: object
+      required:
+        - name
+        - environment
+      description: Data transfer object for creating a new Project.
+      properties:
+        name:
+          type: string
+          examples:
+            - Clicqo
+        environment:
+          type: string
+          examples:
+            - production
+        purpose:
+          type:
+            - string
+            - 'null'
+          examples:
+            - Web application
+    Project:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - CharterProject
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - environment
+              properties:
+                name:
                   type: string
-                  format: date-time
+                environment:
+                  type: string
+                purpose:
+                  type:
+                    - string
+                    - 'null'
     RefreshToken:
       type: object
       required:

@@ -1,0 +1,12 @@
+package run.galley.cloud.crew
+
+enum class CrewRole {
+  VESSEL_CAPTAIN,
+  VESSEL_MEMBER,
+
+  CHARTER_CAPTAIN,
+  CHARTER_BOATSWAIN,
+  CHARTER_PURSER,
+  CHARTER_STEWARD,
+  CHARTER_DECKHAND,
+}

@@ -58,7 +58,7 @@ open class ApiStatus : Throwable {
         102,
         FAILED,
       )
-    val UUID_PARSE_EXCEPTION = ApiStatus(103, "A UUID couldn't be processed")
+    val UUID_PARSE_EXCEPTION = ApiStatus(103, "A UUID couldn't be processed", HttpStatus.BadRequest)
     val DATE_PARSE_EXCEPTION = ApiStatus(104, "A local date string couldn't be processed")
     val FAILED_FIND = ApiStatus(110, "The requested resource could not be found", HttpStatus.NotFound)
     val FAILED_VALIDATION = ApiStatus(111, "The resource failed on validation", HttpStatus.BadRequest)

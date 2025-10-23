@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.HttpException
+import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.json.schema.JsonSchemaValidationException
 import io.vertx.openapi.validation.SchemaValidationException
 import io.vertx.openapi.validation.ValidatorErrorType
@@ -18,12 +19,12 @@ import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.ApiStatusReplyException
 import org.slf4j.LoggerFactory
 
-fun Router.setupCorsHandler(config: JsonObject): Router {
+fun Router.setupCorsHandler(corsConfig: JsonArray): Router {
   route()
     .handler(
       CorsHandler
         .create()
-        .addOriginsWithRegex(config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")).map { it.toString() })
+        .addOriginsWithRegex(corsConfig.map { it.toString() })
         .allowedMethod(HttpMethod.GET)
         .allowedMethod(HttpMethod.DELETE)
         .allowedMethod(HttpMethod.OPTIONS)

@@ -10,8 +10,15 @@ import io.vertx.config.ConfigRetrieverOptions
 import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.eventbus.MessageCodec
+import io.vertx.core.http.HttpServerOptions
+import io.vertx.core.http.HttpVersion
+import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
+import io.vertx.core.net.PemKeyCertOptions
+import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.BodyHandler
+import io.vertx.ext.web.handler.HttpException
+import io.vertx.ext.web.handler.StaticHandler
 import io.vertx.kotlin.core.deploymentOptionsOf
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
@@ -70,10 +77,12 @@ class MainVerticle : CoroutineVerticle() {
     )
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
+    val mainRouter = Router.router(vertx)
+
     val openApiBridge = OpenApiBridge(vertx, config).initialize()
-    val router = openApiBridge.buildRouter().createRouter()
-    router.run {
-      setupCorsHandler(config)
+    val openApiRouter = openApiBridge.buildRouter().createRouter()
+    openApiRouter.run {
+      setupCorsHandler(config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")))
       setupDefaultOptionsHandler()
       setupDefaultResponse()
       setupFailureHandler()
@@ -81,6 +90,39 @@ class MainVerticle : CoroutineVerticle() {
       patch().handler(BodyHandler.create())
       put().handler(BodyHandler.create())
     }
+    mainRouter.route().virtualHost(config.getJsonObject("api").getString("host", "localhost")).subRouter(openApiRouter)
+
+    val webAppRouter = Router.router(vertx)
+    webAppRouter.run {
+//      setupCorsHandler(config.getJsonObject("webapp").getJsonArray("cors", JsonArray().add(".*")))
+//      setupDefaultOptionsHandler()
+//      setupDefaultResponse()
+//      setupFailureHandler()
+
+      route(
+        "/*",
+      ).handler(
+        StaticHandler
+          .create(
+            "webroot",
+          ).setCachingEnabled(false)
+          .setDirectoryListing(false)
+          .setIncludeHidden(false),
+      )
+      errorHandler(404) { ctx ->
+        val req = ctx.request()
+        if (req.headers().get("Accept")?.contains("text/html") == true) {
+          ctx.response().sendFile("webroot/index.html")
+        } else {
+          ctx.fail(HttpException(404, "Not Found"))
+        }
+      }
+
+//      post().handler(BodyHandler.create())
+//      patch().handler(BodyHandler.create())
+//      put().handler(BodyHandler.create())
+    }
+    mainRouter.route().virtualHost(config.getJsonObject("webapp").getString("host", "localhost")).subRouter(webAppRouter)
 
     // Deploy verticles
     val deploymentOptions =
@@ -112,13 +154,33 @@ class MainVerticle : CoroutineVerticle() {
       config
         .getJsonObject("http", JsonObject())
         .getInteger("port", 9233)
+    val certPath =
+      config
+        .getJsonObject("http", JsonObject())
+        .getString("certPath")
+    val keyPath =
+      config
+        .getJsonObject("http", JsonObject())
+        .getString("keyPath")
+
+    val httpServerOptions =
+      HttpServerOptions()
+        .setPort(httpPort)
+        .applyIf(!certPath.isNullOrBlank() && !keyPath.isNullOrBlank()) {
+          this
+            .setUseAlpn(true)
+            .setAlpnVersions(listOf(HttpVersion.HTTP_2, HttpVersion.HTTP_1_1))
+            .setSni(true)
+            .setSsl(true)
+            .setKeyCertOptions(PemKeyCertOptions().setCertPath(certPath).setKeyPath(keyPath))
+        }
 
     try {
       // Start to run the HTTP server
       vertx
-        .createHttpServer()
-        .requestHandler(router)
-        .listen(httpPort)
+        .createHttpServer(httpServerOptions)
+        .requestHandler(mainRouter)
+        .listen()
         .coAwait()
 
       logger.info("HTTP server started on port $httpPort")

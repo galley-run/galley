@@ -1,9 +1,12 @@
 package run.galley.cloud.controller
 
 import generated.jooq.enums.VesselRole
+import generated.jooq.tables.Crew.Companion.CREW
+import generated.jooq.tables.Users.Companion.USERS
 import generated.jooq.tables.pojos.Crew
 import generated.jooq.tables.pojos.CrewCharterMember
 import generated.jooq.tables.pojos.Users
+import generated.jooq.tables.references.CREW_CHARTER_MEMBER
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.authentication.TokenCredentials
@@ -13,9 +16,11 @@ import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
+import org.jooq.impl.DSL.user
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CharterCrewAccess
 import run.galley.cloud.crew.CrewAccess
@@ -106,9 +111,9 @@ class AuthControllerVerticle :
           CrewDataVerticle.LIST_BY_USER,
           EventBusQueryDataRequest(
             filters =
-              mapOf(
-                "userId" to listOf(user.id.toString()),
-              ),
+              filters {
+                CREW.USER_ID eq (user.id ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND))
+              },
           ),
         ).coAwait()
         ?.body()
@@ -134,9 +139,9 @@ class AuthControllerVerticle :
           CrewCharterMemberDataVerticle.LIST_BY_USER,
           EventBusQueryDataRequest(
             filters =
-              mapOf(
-                "crewId" to crewMemberIds.keys.toList(),
-              ),
+              filters {
+                CREW_CHARTER_MEMBER.CREW_ID isIn crewMemberIds.keys
+              },
           ),
         ).coAwait()
         ?.body()
@@ -184,7 +189,10 @@ class AuthControllerVerticle :
         .request<EventBusDataResponse<Users>>(
           UserDataVerticle.GET_BY_EMAIL,
           EventBusQueryDataRequest(
-            filters = mapOf("email" to listOf(email)),
+            filters =
+              filters {
+                USERS.EMAIL eq email
+              },
           ),
         ).coAwait()
         ?.body()
@@ -198,9 +206,9 @@ class AuthControllerVerticle :
           CrewDataVerticle.LIST_ACTIVE,
           EventBusQueryDataRequest(
             filters =
-              mapOf(
-                "userId" to listOf(user.id!!.toString()),
-              ),
+              filters {
+                CREW.USER_ID eq (user.id ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND))
+              },
           ),
         ).coAwait()
         ?.body()

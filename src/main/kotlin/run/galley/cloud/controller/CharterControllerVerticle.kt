@@ -2,6 +2,7 @@ package run.galley.cloud.controller
 
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
+import generated.jooq.tables.references.VESSELS
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
@@ -13,6 +14,7 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
@@ -50,23 +52,25 @@ class CharterControllerVerticle :
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = getApiRequest(message)
 
-    val filters = mutableMapOf<String, List<String>>()
-
     val vesselId = apiRequest.vesselId
 
-    filters[CHARTERS.VESSEL_ID.name] = listOf(vesselId.toString())
-
-    if (apiRequest.crewRole != CrewRole.VESSEL_CAPTAIN) {
-      val charterIds =
+    val charterIds: List<UUID>? =
+      if (apiRequest.crewRole != CrewRole.VESSEL_CAPTAIN) {
         apiRequest.user?.getCharters(vesselId) ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NO_ACCESS)
-
-      filters[CHARTERS.ID.name] = charterIds.map(UUID::toString)
-    }
+      } else {
+        null
+      }
 
     // Build data request with filters, sort, and pagination
     val dataRequest =
       EventBusQueryDataRequest(
-        filters = filters,
+        filters =
+          filters {
+            CHARTERS.VESSEL_ID eq vesselId
+            if (!charterIds.isNullOrEmpty()) {
+              CHARTERS.ID isIn charterIds
+            }
+          },
         sort = listOf(SortField("id", SortDirection.ASC)),
         pagination = Pagination(offset = 0, limit = 10),
       )
@@ -95,9 +99,9 @@ class CharterControllerVerticle :
       EventBusQueryDataRequest(
         identifiers = mapOf("id" to charterId.toString()),
         filters =
-          mapOf(
-            CHARTERS.VESSEL_ID.name to listOf(vesselId.toString()),
-          ),
+          filters {
+            CHARTERS.VESSEL_ID eq vesselId
+          },
         user = apiRequest.user?.principal(),
       )
 
@@ -157,9 +161,9 @@ class CharterControllerVerticle :
         payload = apiRequest.body,
         identifier = charterId,
         filters =
-          mapOf(
-            CHARTERS.VESSEL_ID.name to listOf(vesselId.toString()),
-          ),
+          filters {
+            CHARTERS.VESSEL_ID eq vesselId
+          },
       )
 
     val dataResponse =
@@ -187,7 +191,10 @@ class CharterControllerVerticle :
     val deleteRequest =
       EventBusCmdDataRequest(
         identifier = charterId,
-        filters = mapOf(CHARTERS.VESSEL_ID.name to listOf(vesselId.toString())),
+        filters =
+          filters {
+            CHARTERS.VESSEL_ID eq vesselId
+          },
       )
 
     // Idea: Optional, second call on delete can delete an archived charter

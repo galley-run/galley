@@ -16,7 +16,10 @@ import nl.clicqo.api.SortField
  *
  * Example LIST:
  *   EventBusDataRequest(
- *     filters = mapOf("status" to listOf("active"), "type" to listOf("sailboat", "yacht")),
+ *     filters = filters {
+ *        TABLE.FIELD eq "active",
+ *        TABLE.FIELD isIn listOfIds
+ *     },
  *     sort = listOf(SortField("name", SortDirection.ASC)),
  *     pagination = Pagination(offset = 0, limit = 50)
  *   )

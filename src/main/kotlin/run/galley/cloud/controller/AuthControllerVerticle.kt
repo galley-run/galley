@@ -121,14 +121,15 @@ class AuthControllerVerticle :
         ?.toMany()
         ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
-    val crewMemberIds = mutableMapOf<String, UUID>()
+    val crewMemberIds = mutableMapOf<UUID, UUID>()
     val crewAccess = mutableListOf<CrewAccess>()
     vesselCrewResponse
       .forEach {
         if (it.vesselRole == VesselRole.captain) {
           crewAccess.add(VesselCrewAccess(it.vesselId!!, CrewRole.VESSEL_CAPTAIN))
         } else {
-          crewMemberIds[it.id.toString()] = it.vesselId!!
+          val id = it.id ?: throw ApiStatusReplyException(ApiStatus.ID_MISSING)
+          crewMemberIds[id] = it.vesselId!!
         }
       }
 
@@ -154,7 +155,7 @@ class AuthControllerVerticle :
       if (role != null) {
         crewAccess.add(
           CharterCrewAccess(
-            crewMemberIds[it.crewId.toString()] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
+            crewMemberIds[it.crewId] ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND),
             it.charterId!!,
             CrewRole.valueOf("CHARTER_$role"),
           ),

@@ -24,6 +24,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import run.galley.cloud.MainVerticle
 import run.galley.cloud.web.JWT
+import java.time.Instant
 import java.time.LocalDateTime.now
 
 @Testcontainers
@@ -90,7 +91,7 @@ abstract class BaseIntegrationTest {
           .build()
 
       // Choose random HTTP port for tests
-      httpPort = "4${now().minute.toString().padStart(2, '0')}${now().second.toString().padStart(2, '0')}".toInt()
+      httpPort = "4${Instant.now().toEpochMilli().toString().substring(9)}".toInt()
 
       // Create test config with Testcontainers PostgreSQL
       testConfig =

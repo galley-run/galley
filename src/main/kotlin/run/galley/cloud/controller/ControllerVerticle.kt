@@ -26,4 +26,12 @@ open class ControllerVerticle : CoroutineVerticle() {
         ?.string
         ?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_ID_INCORRECT)
+
+  val EventBusApiRequest.projectId: UUID
+    get() =
+      this.pathParams
+        ?.get("projectId")
+        ?.string
+        ?.toUUID()
+        ?: throw ApiStatusReplyException(ApiStatus.PROJECT_ID_INCORRECT)
 }

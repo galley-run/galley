@@ -4,6 +4,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.junit5.VertxTestContext
 import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.test.runTest
+import nl.clicqo.ext.getUUID
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,7 +16,7 @@ import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
 
-class ProjectIntegrationTest : BaseIntegrationTest() {
+class ProjectApiIntegrationTest : BaseIntegrationTest() {
   private val vesselId = UUID.randomUUID()
   private val vesselId2 = UUID.randomUUID()
   private val charterId = UUID.randomUUID()
@@ -295,6 +296,70 @@ class ProjectIntegrationTest : BaseIntegrationTest() {
         assertTrue(json1.getJsonObject(0).getString("title").contains("\"environment\""))
         assertEquals(400, resp2.statusCode())
         assertTrue(json2.getJsonObject(0).getString("title").contains("\"name\""))
+        testContext.completeNow()
+      }
+    }
+
+  @Test
+  fun `test PATCH project fails when changing project of different charter or vessel`(testContext: VertxTestContext) =
+    runTest {
+      val project1 =
+        JsonObject()
+          .put("name", "website.com")
+          .put("environment", "production")
+
+      val resp1 =
+        client
+          .post("/vessels/$vesselId/charters/$charterId/projects")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .putHeader("Authorization", "Bearer $vesselCaptain")
+          .sendJsonObject(project1)
+          .coAwait()
+
+      val project2 =
+        JsonObject()
+          .put("name", "update.com")
+          .put("environment", "staging")
+
+      val projectId = resp1.bodyAsJsonObject().getJsonObject("data").getUUID("id")
+
+      val resp2 =
+        client
+          .patch("/vessels/$vesselId/charters/$charterId2/projects/$projectId")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .putHeader("Authorization", "Bearer $vesselCaptain")
+          .sendJsonObject(project2)
+          .coAwait()
+
+      val resp3 =
+        client
+          .patch("/vessels/$vesselId2/charters/$charterId/projects/$projectId")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .putHeader("Authorization", "Bearer $vesselCaptain")
+          .sendJsonObject(project2)
+          .coAwait()
+
+      val resp4 =
+        client
+          .patch("/vessels/$vesselId2/charters/$charterId2/projects/$projectId")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .putHeader("Authorization", "Bearer $vesselCaptain")
+          .sendJsonObject(project2)
+          .coAwait()
+
+      testContext.verify {
+        // Post is allowed, I'm vessel owner of this vessel
+        assertEquals(201, resp1.statusCode())
+        // Patch is not allowed, even though I'm vessel owner of this vessel
+        assertEquals(404, resp2.statusCode())
+        // Patch is not allowed, I have no rights on this charter
+        assertEquals(403, resp3.statusCode())
+        // Patch is not allowed, the project id doesn't match vessel and charter even though I'm charter captain
+        assertEquals(404, resp4.statusCode())
         testContext.completeNow()
       }
     }

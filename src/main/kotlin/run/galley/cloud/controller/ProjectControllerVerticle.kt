@@ -13,6 +13,7 @@ import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
@@ -27,6 +28,8 @@ class ProjectControllerVerticle :
   companion object {
     const val LIST = "project.query.list"
     const val CREATE = "project.cmd.create"
+    const val PATCH = "project.cmd.patch"
+    const val DELETE = "project.cmd.delete"
   }
 
   override suspend fun start() {
@@ -35,23 +38,24 @@ class ProjectControllerVerticle :
     coroutineEventBus {
       vertx.eventBus().coConsumer(LIST, handler = ::list)
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
+      vertx.eventBus().coConsumer(PATCH, handler = ::patch)
+      vertx.eventBus().coConsumer(DELETE, handler = ::delete)
     }
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = getApiRequest(message)
 
-    val filters = mutableMapOf<String, List<String>>()
-
     val vesselId = apiRequest.vesselId
     val charterId = apiRequest.charterId
 
-    filters[CHARTER_PROJECTS.VESSEL_ID.name] = listOf(vesselId.toString())
-    filters[CHARTER_PROJECTS.CHARTER_ID.name] = listOf(charterId.toString())
-
     val dataRequest =
       EventBusQueryDataRequest(
-        filters = filters,
+        filters =
+          filters {
+            CHARTER_PROJECTS.VESSEL_ID eq vesselId
+            CHARTER_PROJECTS.CHARTER_ID eq charterId
+          },
         sort = listOf(SortField("id", SortDirection.ASC)),
         pagination = Pagination(offset = 0, limit = 10),
       )
@@ -97,5 +101,65 @@ class ProjectControllerVerticle :
         ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.PROJECT_CREATE_FAILURE)
 
     message.reply(EventBusApiResponse(dataResponse, httpStatus = HttpStatus.Created))
+  }
+
+  private suspend fun patch(message: Message<EventBusApiRequest>) {
+    val apiRequest = getApiRequest(message)
+
+    val vesselId = apiRequest.vesselId
+    val charterId = apiRequest.charterId
+    val projectId = apiRequest.projectId
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        payload = apiRequest.body,
+        identifier = projectId,
+        filters =
+          filters {
+            CHARTER_PROJECTS.VESSEL_ID eq vesselId
+            CHARTER_PROJECTS.CHARTER_ID eq charterId
+          },
+      )
+
+    val dataResponse =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<CharterProjects>>(ProjectDataVerticle.PATCH, dataRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.PROJECT_NOT_FOUND)
+
+    message.reply(EventBusApiResponse(dataResponse))
+  }
+
+  private suspend fun delete(message: Message<EventBusApiRequest>) {
+    val apiRequest = getApiRequest(message)
+
+    val vesselId = apiRequest.vesselId
+    val charterId = apiRequest.charterId
+    val projectId = apiRequest.projectId
+
+    // Prerequisite:
+    // Check if there are any active applications / databases / configs / secrets for this charter
+    // TODO: Check if there are any active applications / databases for this project when the resp. data verticle are implemented
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        identifier = projectId,
+        filters =
+          filters {
+            CHARTER_PROJECTS.VESSEL_ID eq vesselId
+            CHARTER_PROJECTS.CHARTER_ID eq charterId
+          },
+      )
+
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<CharterProjects>>(ProjectDataVerticle.ARCHIVE, dataRequest)
+      .coAwait()
+
+    message.reply(EventBusApiResponse())
   }
 }

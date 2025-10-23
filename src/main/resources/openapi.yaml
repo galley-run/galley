@@ -301,6 +301,67 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/projects/{projectId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - $ref: '#/components/parameters/projectId'
+    patch:
+      tags:
+        - project
+      summary: Update project
+      operationId: project.cmd.patch
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        description: Project update data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - project
+      summary: Delete project
+      operationId: project.cmd.delete
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -437,6 +498,13 @@ components:
         format: uuid
     charterId:
       name: charterId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    projectId:
+      name: projectId
       in: path
       required: true
       schema:
@@ -601,20 +669,18 @@ components:
             attributes:
               type: object
               required:
-                - charterId
                 - name
                 - environment
               properties:
-                charterId:
-                  type: string
-                  description: Charter ID (UUID)
                 name:
                   type: string
                 environment:
                   type: string
                   description: Environment name (e.g. production, staging)
                 purpose:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
     ProjectCreate:
       type: object
       required:
@@ -667,6 +733,28 @@ components:
                   type:
                     - string
                     - 'null'
+    ProjectUpdate:
+      type: object
+      description: Request body for PATCH /projects/{id}.
+      properties:
+        name:
+          type: string
+          description: Project name
+          examples:
+            - Updated Project
+        environment:
+          type: string
+          description: Environment name
+          examples:
+            - production
+        purpose:
+          type:
+            - string
+            - 'null'
+          description: Project purpose
+          examples:
+            - Updated web application
+      additionalProperties: false
     RefreshToken:
       type: object
       required:

@@ -22,7 +22,7 @@ object CrewCharterMemberSql {
     filters
       .mapNotNull { (field, values) ->
         when (field) {
-          "crewId" -> CREW_CHARTER_MEMBER.CREW_ID.`in`(values.map { it.toUUID() })
+          CREW_CHARTER_MEMBER.CREW_ID.name -> CREW_CHARTER_MEMBER.CREW_ID.`in`(values.map { it.toUUID() })
           else -> null
         }
       }.toTypedArray()

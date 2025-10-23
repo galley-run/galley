@@ -895,6 +895,51 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
       }
     }
 
+  @Test
+  fun `test DELETE charter with active projects returns 409`(testContext: VertxTestContext) =
+    runTest {
+      // Create a charter first
+      val charterName = "Charter to Delete ${UUID.randomUUID()}"
+      val charterBody = JsonObject().put("name", charterName)
+
+      val resp1 =
+        client
+          .post("/vessels/$vesselId/charters")
+          .putHeader("Authorization", "Bearer $validToken")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .sendJsonObject(charterBody)
+          .coAwait()
+
+      val charterId = resp1.bodyAsJsonObject().getJsonObject("data").getString("id")
+
+      val projectBody = JsonObject().put("name", "website").put("environment", "production")
+
+      val resp2 =
+        client
+          .post("/vessels/$vesselId/charters/$charterId/projects")
+          .putHeader("Authorization", "Bearer $validToken")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
+          .sendJsonObject(projectBody)
+          .coAwait()
+
+      // Delete the charter
+      val resp3 =
+        client
+          .delete("/vessels/$vesselId/charters/$charterId")
+          .putHeader("Authorization", "Bearer $validToken")
+          .send()
+          .coAwait()
+
+      testContext.verify {
+        assertEquals(201, resp1.statusCode())
+        assertEquals(201, resp2.statusCode())
+        assertEquals(409, resp3.statusCode())
+        testContext.completeNow()
+      }
+    }
+
   // ==================== Content-Type and Accept Header Tests ====================
 
   @Test

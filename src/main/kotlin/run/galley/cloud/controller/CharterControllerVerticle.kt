@@ -1,7 +1,9 @@
 package run.galley.cloud.controller
 
+import generated.jooq.tables.pojos.CharterProjects
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
+import generated.jooq.tables.references.CHARTER_PROJECTS
 import generated.jooq.tables.references.VESSELS
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.coAwait
@@ -23,6 +25,7 @@ import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.crew.getCharters
 import run.galley.cloud.data.CharterDataVerticle
+import run.galley.cloud.data.ProjectDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
 import java.util.UUID
 
@@ -184,9 +187,25 @@ class CharterControllerVerticle :
     val vesselId = apiRequest.vesselId
     val charterId = apiRequest.charterId
 
-    // Prerequisite:
-    // Check if there are any active projects for this charter
-    // TODO: Check if there are any active projects for this charter when the projects data verticle is implemented
+    val projectsRequest =
+      EventBusQueryDataRequest(
+        filters =
+          filters {
+            CHARTER_PROJECTS.VESSEL_ID eq vesselId
+            CHARTER_PROJECTS.CHARTER_ID eq charterId
+          },
+      )
+    val activeProjects =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<CharterProjects>>(ProjectDataVerticle.LIST, projectsRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toMany()
+    if (activeProjects != null && activeProjects.isNotEmpty()) {
+      throw ApiStatusReplyException(ApiStatus.CHARTER_DELETE_FAILURE_ACTIVE_PROJECTS)
+    }
 
     val deleteRequest =
       EventBusCmdDataRequest(
@@ -203,7 +222,6 @@ class CharterControllerVerticle :
       .eventBus()
       .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ARCHIVE, deleteRequest)
       .coAwait()
-      .body()
 
     message.reply(EventBusApiResponse())
   }

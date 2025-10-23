@@ -25,6 +25,8 @@ object ApiStatus {
   val CHARTER_NOT_FOUND = ApiStatus(1401, "The charter could not be found", HttpStatus.NotFound)
   val CHARTER_CREATE_FAILURE = ApiStatus(1402, "The charter could not be created")
   val CHARTER_ID_INCORRECT = ApiStatus(1403, "The charter id is incorrect")
+  val CHARTER_DELETE_FAILURE_ACTIVE_PROJECTS =
+    ApiStatus(1404, "The charter could not be deleted, due to active projects", HttpStatus.Conflict)
 
   val USER_NOT_FOUND = ApiStatus(1500, "The user could not be found", HttpStatus.NotFound)
 
@@ -34,4 +36,5 @@ object ApiStatus {
 
   val PROJECT_CREATE_FAILURE = ApiStatus(1700, "The project could not be created")
   val PROJECT_NOT_FOUND = ApiStatus(1701, "The project could not be found", HttpStatus.NotFound)
+  val PROJECT_ID_INCORRECT = ApiStatus(1702, "The project id is incorrect")
 }

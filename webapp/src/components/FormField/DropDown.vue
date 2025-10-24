@@ -140,7 +140,7 @@ watch(
       <span class="font-semibold tracking-tight truncate max-w-52">
         {{ selectedItem?.label ?? placeholder ?? 'Select...' }}
       </span>
-      <DoubleAltArrowDown weight="LineDuotone" size="20" :class="isOpen ? 'rotate-180' : ''" />
+      <DoubleAltArrowDown size="20" :class="isOpen ? 'rotate-180' : ''" />
     </button>
     <button v-else>DROPDOWN NOT IMPLENTED YET</button>
 

@@ -22,7 +22,8 @@
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.16",
     "vue": "^3.5.22",
-    "vue-router": "^4.6.3"
+    "vue-router": "^4.6.3",
+    "vue3-flag-icons": "^0.0.3"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.2",

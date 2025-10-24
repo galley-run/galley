@@ -160,6 +160,12 @@
   }
 }
 
+@layer components {
+  .card {
+    @apply bg-white gap-4 p-4 flex flex-col border-tides-300 border rounded-lg;
+  }
+}
+
 @utility heading-h1 {
   @apply font-sans text-[2rem] font-extrabold tracking-[-0.03em] leading-[1.2];
 }
@@ -181,7 +187,7 @@
 }
 
 @utility heading-h6 {
-  @apply font-sans text-xs font-black leading-[1.4] uppercase;
+  @apply font-sans text-sm font-black leading-[1.4] uppercase;
 }
 
 @utility badge-text {

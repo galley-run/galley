@@ -2,12 +2,12 @@
   <TopBar />
   <div class="flex min-h-main">
     <MainNavigation />
-    <main>
+    <main class="bg-tides-50 w-full p-8">
       <router-view />
     </main>
   </div>
 </template>
 <script setup lang="ts">
-import TopBar from '@/components/TopBar.vue'
-import MainNavigation from '@/components/MainNavigation.vue'
+import TopBar from '@/components/MainLayout/TopBar.vue'
+import MainNavigation from '@/components/MainLayout/MainNavigation.vue'
 </script>

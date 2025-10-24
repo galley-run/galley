@@ -24,6 +24,8 @@ coverage
 *.sln
 *.sw?
 
+.vite
+
 *.tsbuildinfo
 
 .eslintcache

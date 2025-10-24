@@ -3,14 +3,14 @@
     <section v-for="(section, sIdx) in projectSections" :key="sIdx">
       <nav>
         <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
-        <ul>
+        <ul class="flex flex-col gap-0.5">
           <li v-for="(item, idx) in section.items" :key="idx">
             <RouterLink
               :to="item.href"
-              active-class="bg-tides-200"
-              class="flex items-center gap-2 text-navy-800 hover:bg-tides-200 rounded-lg p-2 relative"
+              active-class="bg-navy-50"
+              class="flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative"
             >
-              <component :is="item.icon" weight="LineDuotone" size="20" />
+              <component :is="item.icon" size="20" />
               {{ item.label }}
             </RouterLink>
           </li>
@@ -21,17 +21,17 @@
     <section v-for="(section, sIdx) in vesselSections" :key="sIdx">
       <nav>
         <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
-        <ul>
+        <ul class="flex flex-col gap-0.5">
           <li
             v-for="(item, idx) in section.items"
             :key="idx"
           >
             <RouterLink
               :to="item.href"
-              active-class="bg-tides-200"
-              class="flex items-center gap-2 text-navy-800 hover:bg-tides-200 rounded-lg p-2 relative"
+              active-class="bg-navy-50"
+              class="flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg p-2 relative"
             >
-              <component :is="item.icon" weight="LineDuotone" size="20" />
+              <component :is="item.icon" size="20" />
               {{ item.label }}
             </RouterLink>
           </li>

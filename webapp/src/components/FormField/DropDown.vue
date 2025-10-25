@@ -1,16 +1,32 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import Button from '@/components/Button.vue'
+import router from '@/router'
+import { useClickOutside } from '@/composables/useClickOutside.ts'
 
-type Item = { label: string; value: string; disabled?: boolean }
+type Item = { label: string; value: string; disabled?: boolean; link?: 'external' | boolean }
 
-const props = defineProps<{
-  variant?: 'inline' | 'default' | 'prefix/icon' | 'suffix/icon' | 'both'
-  modelValue: string | null
+const {
+  items,
+  modelValue = null,
+  variant,
+  placeholder,
+  selectFirst = false,
+  disabled,
+  maxHeightPx,
+  icon,
+  menuPosition = 'left',
+} = defineProps<{
+  variant?: 'inline' | 'default' | 'leadingAddon' | 'trailingAddon' | 'both' | 'icon'
+  modelValue?: string | null
   items: Item[]
   placeholder?: string
   disabled?: boolean
+  selectFirst?: boolean
   maxHeightPx?: number
+  icon?: () => void
+  menuPosition?: 'left' | 'right'
 }>()
 
 const emit = defineEmits<{
@@ -23,24 +39,25 @@ const triggerEl = ref<HTMLButtonElement | null>(null)
 const listEl = ref<HTMLDivElement | null>(null)
 const activeIndex = ref<number>(-1)
 
-const selectedItem = computed(() => props.items.find((i) => i.value === props.modelValue) ?? null)
+const selectedItem = computed(() => items.find((i) => i.value === modelValue) ?? null)
 
 function open() {
-  if (props.disabled) return
+  if (disabled) return
   isOpen.value = true
-  // Set activeIndex to the selected or first enabled item
 
-  activeIndex.value = Math.max(
-    props.items.findIndex((i) => i.value === props.modelValue && !i.disabled),
-    props.items.findIndex((i) => !i.disabled),
-  )
+  // Set activeIndex to the selected
+  activeIndex.value = items.findIndex((i) => i.value === modelValue && !i.disabled)
+  if (activeIndex.value === -1 && selectFirst) {
+    // Or select first enabled item
+    activeIndex.value = items.findIndex((i) => !i.disabled)
+  }
   requestAnimationFrame(() => listEl.value?.focus())
 }
 
 function close() {
   isOpen.value = false
   activeIndex.value = -1
-  triggerEl.value?.focus()
+  triggerEl?.value?.focus?.()
 }
 
 function toggle() {
@@ -52,8 +69,20 @@ function toggle() {
 }
 
 function selectAt(index: number) {
-  const item = props.items[index]
+  const item = items[index]
+
   if (!item || item.disabled) return
+
+  if (item.link) {
+    if (item.value.startsWith("http")) {
+      window.open(item.value, item.link === 'external' ? '_blank' : '_self')
+    } else {
+      router.push(item.value)
+    }
+    close()
+    return
+  }
+
   emit('update:modelValue', item.value)
   emit('change', item.value)
   close()
@@ -61,7 +90,7 @@ function selectAt(index: number) {
 
 function onKeydownList(e: KeyboardEvent) {
   if (!isOpen.value) return
-  const enabledIndexes = props.items.map((i, idx) => (i.disabled ? -1 : idx)).filter((i) => i >= 0)
+  const enabledIndexes = items.map((i, idx) => (i.disabled ? -1 : idx)).filter((i) => i >= 0)
   const currentPos = enabledIndexes.indexOf(activeIndex.value)
   switch (e.key) {
     case 'ArrowDown':
@@ -104,23 +133,30 @@ function ensureActiveVisible() {
   opt?.scrollIntoView({ block: 'nearest' })
 }
 
-function onClickOutside(ev: MouseEvent) {
-  const t = ev.target as Node
+function onClickOutside(ev: Event) {
+  const t = ev.target as Node | null
   if (!isOpen.value) return
-  if (triggerEl.value?.contains(t)) return
-  if (listEl.value?.contains(t)) return
+  const triggerNode = (triggerEl.value as any)?.$el ?? triggerEl.value
+  if (triggerNode instanceof Node && t && triggerNode.contains(t)) return
+  const listNode = (listEl.value as any)?.$el ?? listEl.value
+  if (listNode instanceof Node && t && listNode.contains(t)) return
   close()
 }
 
-onMounted(() => document.addEventListener('mousedown', onClickOutside))
-onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
+// onMounted(() => document.addEventListener('mousedown', onClickOutside))
+// onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
+useClickOutside(
+  () => [triggerEl.value, listEl.value],
+  onClickOutside,
+)
+
 
 // Keep the active index in sync if items change
 watch(
-  () => props.items,
+  () => items,
   () => {
     if (!isOpen.value) return
-    activeIndex.value = Math.max(0, Math.min(activeIndex.value, props.items.length - 1))
+    activeIndex.value = Math.max(0, Math.min(activeIndex.value, items.length - 1))
   },
 )
 </script>
@@ -142,6 +178,16 @@ watch(
       </span>
       <DoubleAltArrowDown size="20" :class="isOpen ? 'rotate-180' : ''" />
     </button>
+    <Button
+      v-else-if="variant === 'icon'"
+      :leading-addon="icon"
+      ref="triggerEl"
+      @click="toggle"
+      :aria-expanded="isOpen"
+      :aria-haspopup="'listbox'"
+      :disabled="disabled"
+      ghost
+    />
     <button v-else>DROPDOWN NOT IMPLENTED YET</button>
 
     <div
@@ -150,7 +196,10 @@ watch(
       role="listbox"
       tabindex="0"
       :aria-activedescendant="activeIndex >= 0 ? `dd-opt-${activeIndex}` : undefined"
-      class="absolute left-0 mt-1 focus:outline-none w-max min-w-max top-full bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25"
+      :class="[
+        'absolute mt-1 focus:outline-none w-max min-w-max top-full bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25',
+        menuPosition === 'right' ? 'right-0' : 'left-0',
+      ]"
       :style="{ maxHeight: (maxHeightPx ?? 260) + 'px', overflowY: 'auto' }"
       @keydown="onKeydownList"
     >

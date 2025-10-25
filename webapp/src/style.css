@@ -132,7 +132,7 @@
 
 @layer base {
   body {
-    @apply bg-white text-black subpixel-antialiased;
+     @apply bg-white text-black antialiased font-medium;
   }
 
   h1 {
@@ -161,8 +161,49 @@
 }
 
 @layer components {
+  .main-navigation {
+    @apply border-r border-r-tides-200 px-4 py-6 gap-6 flex flex-col;
+
+    li {
+      a, button {
+        @apply flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative;
+      }
+    }
+  }
+
   .card {
     @apply bg-white gap-4 p-4 flex flex-col border-tides-300 border rounded-lg;
+
+    a {
+      @apply text-seafoam-700 hover:text-seafoam-800;
+    }
+
+    .card__title {
+      @apply flex items-center;
+
+      h6 {
+        @apply flex-1 text-seafoam-300;
+      }
+    }
+  }
+
+  .stacked-list__list-item {
+    @apply grid items-center gap-4;
+
+    div {
+      &:first-child {
+        p:first-child {
+          @apply text-seafoam-800;
+        }
+        p:last-child {
+          @apply text-tides-700 text-sm;
+        }
+      }
+
+      h6 {
+        @apply text-navy-200;
+      }
+    }
   }
 }
 

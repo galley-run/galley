@@ -4,7 +4,7 @@
     <SlashDivider />
     <DropDown v-model="project" variant="inline" :items="projects" />
     <SlashDivider />
-    <Button :icon="MenuDots" variant="neutral" ghost small />
+    <Button :leading-addon="MenuDots" variant="neutral" ghost />
   </div>
 </template>
 <script setup lang="ts">

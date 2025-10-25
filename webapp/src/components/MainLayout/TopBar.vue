@@ -5,8 +5,8 @@
       <ProjectSwitcher />
     </div>
     <div class="flex gap-2">
-      <Button :icon="MinimalisticMagnifer" variant="neutral" ghost />
-      <Button :icon="Logout" variant="neutral" ghost />
+      <Button :leading-addon="MinimalisticMagnifer" variant="neutral" ghost />
+      <Button :leading-addon="Logout" variant="neutral" ghost />
     </div>
   </header>
 </template>

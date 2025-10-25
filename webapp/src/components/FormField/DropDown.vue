@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, type PropType, ref, watch } from 'vue'
 import Button from '@/components/Button.vue'
 import router from '@/router'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
+import type { IconProps } from '@solar-icons/vue/lib'
 
 type Item = { label: string; value: string; disabled?: boolean; link?: 'external' | boolean }
 
@@ -25,7 +26,7 @@ const {
   disabled?: boolean
   selectFirst?: boolean
   maxHeightPx?: number
-  icon?: () => void
+  icon?: PropType<IconProps>
   menuPosition?: 'left' | 'right'
 }>()
 
@@ -74,7 +75,7 @@ function selectAt(index: number) {
   if (!item || item.disabled) return
 
   if (item.link) {
-    if (item.value.startsWith("http")) {
+    if (item.value.startsWith('http')) {
       window.open(item.value, item.link === 'external' ? '_blank' : '_self')
     } else {
       router.push(item.value)
@@ -145,11 +146,7 @@ function onClickOutside(ev: Event) {
 
 // onMounted(() => document.addEventListener('mousedown', onClickOutside))
 // onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
-useClickOutside(
-  () => [triggerEl.value, listEl.value],
-  onClickOutside,
-)
-
+useClickOutside(() => [triggerEl.value, listEl.value], onClickOutside)
 
 // Keep the active index in sync if items change
 watch(

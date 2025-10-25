@@ -38,6 +38,8 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import type { PropType } from 'vue'
+import type { IconProps } from '@solar-icons/vue/lib'
 
 const {
   to,
@@ -56,8 +58,8 @@ const {
   large?: boolean
   small?: boolean
   ghost?: boolean
-  leadingAddon?: () => void
-  trailingAddon?: () => void
+  leadingAddon?: PropType<IconProps>
+  trailingAddon?: PropType<IconProps>
   variant?: 'primary' | 'neutral' | 'custom' | 'icon'
 }>()
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
-import { computed, type PropType, ref, watch } from 'vue'
+import { computed, type FunctionalComponent, ref, watch } from 'vue'
 import Button from '@/components/Button.vue'
 import router from '@/router'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
@@ -26,7 +26,7 @@ const {
   disabled?: boolean
   selectFirst?: boolean
   maxHeightPx?: number
-  icon?: PropType<IconProps>
+  icon?: FunctionalComponent<IconProps>
   menuPosition?: 'left' | 'right'
 }>()
 

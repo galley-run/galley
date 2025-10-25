@@ -15,14 +15,12 @@
     </div>
 
     <div class="card">
-      <div class="flex items-center">
-        <h6 class="flex-1 text-seafoam-300">Applications</h6>
-        <div>
-          <Button :leading-addon="AddCircle" ghost />
-        </div>
+      <div class="card__header">
+        <h6>Applications</h6>
+        <Button :leading-addon="AddCircle" ghost />
       </div>
       <div
-        class="stacked-list__list-item grid-cols-[minmax(200px,_1fr)_minmax(75px,_0fr)_minmax(75px,_0fr)_minmax(100px,_1fr)_minmax(150px,_1fr)_0fr]"
+        class="stacked-list__list-item grid-cols-[minmax(200px,_1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,_1fr)_minmax(150px,_1fr)_0fr]"
       >
         <div>
           <p>Umami</p>
@@ -45,13 +43,155 @@
           <p class="truncate">2 days ago</p>
         </div>
         <div>
-          <DropDown :items="[{ label: 'clicqo.nl', value: '/edit', link: true }, { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' }, { label: 'galley.run', value: 'https://galley.run', link: true }]" :icon="MenuDotsCircle" variant="icon" menu-position="right" />
+          <DropDown
+            :items="[
+              { label: 'clicqo.nl', value: '/edit', link: true },
+              { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
+              { label: 'galley.run', value: 'https://galley.run', link: true },
+            ]"
+            :icon="MenuDotsCircle"
+            variant="icon"
+            menu-position="right"
+          />
         </div>
       </div>
     </div>
 
-    <div class="card">
-
+    <div class="grid grid-cols-2 gap-8 items-start">
+      <div class="card">
+        <div class="card__header">
+          <h6>Databases</h6>
+          <Button :leading-addon="AddCircle" ghost />
+        </div>
+        <div class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]">
+          <div>
+            <p>Postgres</p>
+            <p>15-alpine</p>
+          </div>
+          <div>
+            <h6>Ram</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>CPU</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>Last updated</h6>
+            <p>15 days ago</p>
+          </div>
+          <div>
+            <DropDown
+              :items="[
+                { label: 'clicqo.nl', value: '/edit', link: true },
+                { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
+                { label: 'galley.run', value: 'https://galley.run', link: true },
+              ]"
+              :icon="MenuDotsCircle"
+              variant="icon"
+              menu-position="right"
+            />
+          </div>
+        </div>
+        <div class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]">
+          <div>
+            <p>Redis</p>
+            <p>2.23.15-alpine</p>
+          </div>
+          <div>
+            <h6>Ram</h6>
+            <p>14%</p>
+          </div>
+          <div>
+            <h6>CPU</h6>
+            <p>3%</p>
+          </div>
+          <div>
+            <h6>Last updated</h6>
+            <p>1 hour ago</p>
+          </div>
+          <div>
+            <DropDown
+              :items="[]"
+              :icon="MenuDotsCircle"
+              variant="icon"
+              menu-position="right"
+            />
+          </div>
+        </div>
+        <div class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]">
+          <div>
+            <p>Postgres</p>
+            <p>15-alpine</p>
+          </div>
+          <div>
+            <h6>Ram</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>CPU</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>Last updated</h6>
+            <p>15 days ago</p>
+          </div>
+          <div>
+            <DropDown
+              :items="[
+                { label: 'clicqo.nl', value: '/edit', link: true },
+                { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
+                { label: 'galley.run', value: 'https://galley.run', link: true },
+              ]"
+              :icon="MenuDotsCircle"
+              variant="icon"
+              menu-position="right"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__header">
+          <h6>Object Storage</h6>
+          <Button :leading-addon="AddCircle" ghost />
+        </div>
+        <div class="stacked-list__list-item grid-cols-[repeat(4,auto)_min-content]">
+          <div>
+            <p>Postgres</p>
+            <p>15-alpine</p>
+          </div>
+          <div>
+            <h6>Ram</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>CPU</h6>
+            <p>33%</p>
+          </div>
+          <div>
+            <h6>Last updated</h6>
+            <p>15 days ago</p>
+          </div>
+          <div>
+            <DropDown
+              :items="[
+                { label: 'clicqo.nl', value: '/edit', link: true },
+                { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
+                { label: 'galley.run', value: 'https://galley.run', link: true },
+              ]"
+              :icon="MenuDotsCircle"
+              variant="icon"
+              menu-position="right"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card__header">
+          <h6>Object Storage</h6>
+          <Button :leading-addon="AddCircle" ghost />
+        </div>
+      </div>
     </div>
   </div>
 </template>

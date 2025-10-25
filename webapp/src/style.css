@@ -2,6 +2,8 @@
 
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'DM Sans', sans-serif;
   --font-mono: 'DM Mono', sans-serif;
@@ -67,8 +69,9 @@
   --color-white: oklch(1 0 89.876);
 }
 
-@variant dark {
-  :root {
+
+@layer base {
+  :root.dark {
     --color-coral-50: oklch(0.279 0.073 31.893);
     --color-coral-100: oklch(0.314 0.087 31.352);
     --color-coral-200: oklch(0.379 0.112 30.304);
@@ -128,9 +131,6 @@
     --color-black: oklch(0.861 0 89.876);
     --color-white: oklch(0.218 0 89.876);
   }
-}
-
-@layer base {
   body {
      @apply bg-white text-black antialiased font-medium;
   }
@@ -178,8 +178,8 @@
       @apply text-seafoam-700 hover:text-seafoam-800;
     }
 
-    .card__title {
-      @apply flex items-center;
+    .card__header {
+      @apply flex items-center justify-between;
 
       h6 {
         @apply flex-1 text-seafoam-300;

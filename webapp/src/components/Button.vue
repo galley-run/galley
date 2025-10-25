@@ -30,19 +30,20 @@
     ]"
     :to="to"
     :href="href"
-    @click="onClick"
+    v-bind="$attrs"
+    @click="emit('click', $event)"
   >
     <component
       :is="leadingAddon"
       :size="iconSize"
-      :if="leadingAddon"
+      v-if="leadingAddon"
       :class="[!$slots.default ? '-mx-1.75' : '-ml-0.5']"
     />
     <slot />
     <component
       :is="trailingAddon"
       :size="iconSize"
-      :if="trailingAddon"
+      v-if="trailingAddon"
       :class="[!$slots.default ? '-mx-1.75' : '-ml-0.5']"
     />
   </component>
@@ -56,7 +57,6 @@ import type { IconProps } from '@solar-icons/vue/lib'
 const {
   to,
   href,
-  onClick,
   large,
   small,
   ghost,
@@ -66,7 +66,6 @@ const {
 } = defineProps<{
   to?: string
   href?: string
-  onClick?: () => void
   large?: boolean
   small?: boolean
   ghost?: boolean
@@ -74,6 +73,8 @@ const {
   trailingAddon?: FunctionalComponent<IconProps>
   variant?: 'primary' | 'neutral' | 'custom' | 'icon'
 }>()
+
+const emit = defineEmits<{ (e: 'click', event: MouseEvent): void }>()
 
 let iconSize = 24
 if (large) {

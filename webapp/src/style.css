@@ -135,6 +135,10 @@
      @apply bg-white text-black antialiased font-medium;
   }
 
+  html, body, header, aside, main, .card, nav ul li a {
+    @apply transition-colors duration-150 ease-linear;
+  }
+
   h1 {
     @apply heading-h1;
   }

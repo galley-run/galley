@@ -25,7 +25,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import run.galley.cloud.MainVerticle
 import run.galley.cloud.web.JWT
 import java.time.Instant
-import java.time.LocalDateTime.now
 
 @Testcontainers
 @ExtendWith(VertxExtension::class)
@@ -104,11 +103,17 @@ abstract class BaseIntegrationTest {
               .put("keystore", "test.keystore.p12")
               .put("type", "pkcs12")
               .put("pepper", "test-pepper-key-for-testing-only-not-production")
-              .put("ttl", JsonObject().put("access", 9999999)),
+              .put("ttl", JsonObject().put("access", 90)),
           ).put(
             "api",
             JsonObject()
               .put("openApiFile", "openapi.yaml")
+              .put("host", "localhost")
+              .put("cors", listOf(".*")),
+          ).put(
+            "webapp",
+            JsonObject()
+              .put("host", "localhost")
               .put("cors", listOf(".*")),
           ).put(
             "db",

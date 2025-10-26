@@ -131,8 +131,9 @@
     --color-black: oklch(0.861 0 89.876);
     --color-white: oklch(0.218 0 89.876);
   }
+
   body {
-     @apply bg-white text-black antialiased font-medium;
+    @apply bg-white text-black antialiased font-medium;
   }
 
   html, body, header, aside, main, .card, nav ul li a {
@@ -191,21 +192,30 @@
     }
   }
 
-  .stacked-list__list-item {
-    @apply grid items-center gap-4;
+  .stacked-list {
+    @apply last:-mb-4;
 
-    div {
-      &:first-child {
-        p:first-child {
-          @apply text-seafoam-800;
-        }
-        p:last-child {
-          @apply text-tides-700 text-sm;
-        }
-      }
+    .stacked-list__list-item {
+      @apply grid items-center gap-4 hover:bg-tides-100 -mx-4 p-4 z-0;
 
-      h6 {
-        @apply text-navy-200;
+      div {
+        &:first-child {
+          a:first-child, p:first-child {
+            @apply text-seafoam-800;
+          }
+
+          a:first-child {
+            @apply hover:text-seafoam-900 hover:underline;
+          }
+
+          p:not(:first-child) {
+            @apply text-tides-700 text-sm;
+          }
+        }
+
+        h6 {
+          @apply text-navy-200;
+        }
       }
     }
   }

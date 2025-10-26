@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
-import { computed, type FunctionalComponent, ref, watch } from 'vue'
+import { computed, type FunctionalComponent, onBeforeUnmount, onMounted, ref, watch, type ComponentPublicInstance } from 'vue'
 import Button from '@/components/Button.vue'
 import router from '@/router'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
 import type { IconProps } from '@solar-icons/vue/lib'
 
-type Item = { label: string; value: string; disabled?: boolean; link?: 'external' | boolean }
+type Item = {
+  label: string
+  value: string
+  disabled?: boolean
+  link?: 'external' | boolean
+  variant?: 'danger' | undefined
+}
 
 const {
   items,
@@ -36,9 +42,40 @@ const emit = defineEmits<{
 }>()
 
 const isOpen = ref(false)
-const triggerEl = ref<HTMLButtonElement | null>(null)
+const triggerEl = ref<HTMLElement | ComponentPublicInstance | null>(null)
 const listEl = ref<HTMLDivElement | null>(null)
 const activeIndex = ref<number>(-1)
+
+const triggerNode = computed<HTMLElement | null>(() => {
+  const raw = triggerEl.value as any
+  return (raw?.$el ?? raw) ?? null
+})
+
+const triggerRect = computed<DOMRect>(() => {
+  if(!isOpen.value) return
+  const el = triggerNode.value as any
+  return el && typeof el.getBoundingClientRect === 'function'
+    ? el.getBoundingClientRect()
+    : new DOMRect(0, 0, 0, 0)
+})
+
+const listRect = computed<DOMRect>(() => {
+  if(!isOpen.value) return
+  const el = listEl.value as any
+  return el && typeof el.getBoundingClientRect === 'function'
+    ? el.getBoundingClientRect()
+    : new DOMRect(0, 0, 0, 0)
+})
+
+const menuStyle = computed(() => {
+  return ({
+    position: 'absolute',
+    top: `${triggerRect.value.bottom + window.scrollY}px`,
+    left: menuPosition === 'left' ? `${triggerRect.value.left}px` : `${triggerRect.value.left - (listRect.value.width - triggerRect.value.width) + window.scrollX}px`,
+    maxHeight: `${maxHeightPx ?? 260}px`,
+    overflowY: 'auto',
+  })
+})
 
 const selectedItem = computed(() => items.find((i) => i.value === modelValue) ?? null)
 
@@ -96,23 +133,23 @@ function onKeydownList(e: KeyboardEvent) {
   switch (e.key) {
     case 'ArrowDown':
       e.preventDefault()
-      activeIndex.value = enabledIndexes[(currentPos + 1) % enabledIndexes.length]
+      activeIndex.value = enabledIndexes[(currentPos + 1) % enabledIndexes.length] ?? -1
       ensureActiveVisible()
       break
     case 'ArrowUp':
       e.preventDefault()
       activeIndex.value =
-        enabledIndexes[(currentPos - 1 + enabledIndexes.length) % enabledIndexes.length]
+        enabledIndexes[(currentPos - 1 + enabledIndexes.length) % enabledIndexes.length] ?? -1
       ensureActiveVisible()
       break
     case 'Home':
       e.preventDefault()
-      activeIndex.value = enabledIndexes[0]
+      activeIndex.value = enabledIndexes[0] ?? -1
       ensureActiveVisible()
       break
     case 'End':
       e.preventDefault()
-      activeIndex.value = enabledIndexes[enabledIndexes.length - 1]
+      activeIndex.value = enabledIndexes[enabledIndexes.length - 1] ?? -1
       ensureActiveVisible()
       break
     case 'Enter':
@@ -144,8 +181,17 @@ function onClickOutside(ev: Event) {
   close()
 }
 
-// onMounted(() => document.addEventListener('mousedown', onClickOutside))
-// onBeforeUnmount(() => document.removeEventListener('mousedown', onClickOutside))
+function handleResize() {
+  if (isOpen.value) close()
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+})
 useClickOutside(() => [triggerEl.value, listEl.value], onClickOutside)
 
 // Keep the active index in sync if items change
@@ -187,36 +233,42 @@ watch(
     />
     <button v-else>DROPDOWN NOT IMPLENTED YET</button>
 
-    <div
-      v-if="isOpen"
-      ref="listEl"
-      role="listbox"
-      tabindex="0"
-      :aria-activedescendant="activeIndex >= 0 ? `dd-opt-${activeIndex}` : undefined"
-      :class="[
-        'absolute mt-1 focus:outline-none w-max min-w-max top-full bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25',
-        menuPosition === 'right' ? 'right-0' : 'left-0',
-      ]"
-      :style="{ maxHeight: (maxHeightPx ?? 260) + 'px', overflowY: 'auto' }"
-      @keydown="onKeydownList"
-    >
-      <template v-for="(item, idx) in items" :key="item.value">
-        <div
-          :id="`dd-opt-${idx}`"
-          role="option"
-          :aria-selected="item.value === modelValue"
-          :data-index="idx"
-          :class="[
-            'px-4 py-2.5 max-w-80 hover:bg-navy-50 aria-selected:bg-navy-600 aria-selected:text-white',
-            item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
-            idx === activeIndex ? 'bg-navy-50' : '',
-          ]"
-          @mouseenter="!item.disabled && (activeIndex = idx)"
-          @mousedown.prevent="selectAt(idx)"
-        >
-          {{ item.label }}
-        </div>
-      </template>
-    </div>
+    <Teleport to="body">
+      <div
+        v-if="isOpen"
+        ref="listEl"
+        role="listbox"
+        tabindex="0"
+        :aria-activedescendant="activeIndex >= 0 ? `dd-opt-${activeIndex}` : undefined"
+        :class="[
+          'absolute z-50 mt-1 focus:outline-none w-max min-w-max bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25',
+        ]"
+        :style="menuStyle"
+        @keydown="onKeydownList"
+      >
+        <template v-for="(item, idx) in items" :key="item.value">
+          <div
+            :id="`dd-opt-${idx}`"
+            role="option"
+            :aria-selected="item.value === modelValue"
+            :data-index="idx"
+            :class="[
+              'px-4 py-2.5 max-w-80 ',
+              item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+              !item.variant && idx === activeIndex && 'bg-navy-50',
+              item.variant === 'danger' && idx === activeIndex && 'bg-coral-100',
+              item.variant === 'danger' &&
+                'bg-coral-50 text-coral-500 hover:bg-coral-100 aria-selected:bg-coral-100 aria-selected:text-coral-600',
+              !item.variant &&
+                'hover:bg-navy-50 aria-selected:bg-navy-600 aria-selected:text-white',
+            ]"
+            @mouseenter="!item.disabled && (activeIndex = idx)"
+            @mousedown.prevent="selectAt(idx)"
+          >
+            {{ item.label }}
+          </div>
+        </template>
+      </div>
+    </Teleport>
   </div>
 </template>

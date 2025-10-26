@@ -7,7 +7,7 @@
           <li v-for="(item, idx) in section.items" :key="idx">
             <RouterLink
               :to="item.href"
-              active-class="bg-navy-50"
+              exact-active-class="bg-navy-50"
             >
               <component :is="item.icon" size="20" />
               {{ item.label }}
@@ -27,7 +27,7 @@
           >
             <RouterLink
               :to="item.href"
-              active-class="bg-navy-50"
+              exact-active-class="bg-navy-50"
             >
               <component :is="item.icon" size="20" />
               {{ item.label }}

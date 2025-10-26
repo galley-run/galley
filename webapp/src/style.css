@@ -177,10 +177,24 @@
   }
 
   .card {
-    @apply bg-white gap-4 p-4 flex flex-col border-tides-300 border rounded-lg;
+    @apply bg-white gap-4 flex flex-col border-tides-300 border rounded-lg;
+
+    &.card--compact {
+      @apply p-4
+    }
+
+    &:not(.card--compact) {
+      @apply p-8
+    }
+
+    /* Lead */
+
+    p:first-of-type {
+      @apply text-tides-900 max-w-3xl;
+    }
 
     a {
-      @apply text-seafoam-700 hover:text-seafoam-800;
+      @apply text-seafoam-700 hover:text-seafoam-800 hover:underline;
     }
 
     .card__header {
@@ -189,23 +203,36 @@
       h6 {
         @apply flex-1 text-seafoam-300;
       }
+
+      div:last-of-type {
+        @apply flex items-center;
+      }
     }
   }
 
   .stacked-list {
     @apply last:-mb-4;
 
-    .stacked-list__list-item {
+    .stacked-list__item {
       @apply grid items-center gap-4 hover:bg-tides-100 -mx-4 p-4 z-0;
+
+      .card:not(.card--compact) & {
+        @apply rounded-lg;
+      }
 
       div {
         &:first-child {
-          a:first-child, p:first-child {
-            @apply text-seafoam-800;
+          a:first-child {
+            @apply font-semibold tracking-[-0.03em];
           }
 
-          a:first-child {
-            @apply hover:text-seafoam-900 hover:underline;
+          div:first-child,
+          p:first-child {
+            @apply font-semibold tracking-[-0.03em];
+          }
+
+          div:first-child {
+            @apply mb-1;
           }
 
           p:not(:first-child) {
@@ -219,14 +246,46 @@
       }
     }
   }
+
+  .badge {
+    @apply inline-flex items-center justify-center rounded-full font-sans font-extrabold uppercase leading-none tracking-wide  border border-seafoam-300 bg-seafoam-100 text-seafoam-700 text-nowrap;
+
+    &:not(.badge--small) {
+      @apply px-3 py-1.5 text-sm;
+
+      svg {
+        @apply pl-1 -my-1 -mr-1 size-5;
+      }
+    }
+
+    &.badge--cliona {
+      @apply border-cliona-300 bg-cliona-200 text-cliona-700;
+    }
+
+    &.badge--coral {
+      @apply border-coral-300 bg-coral-200 text-coral-700;
+    }
+
+    &.badge--navy {
+      @apply border-navy-300 bg-navy-200 text-navy-700;
+    }
+
+    &.badge--small {
+      @apply px-2 py-1 text-xs;
+
+      svg {
+        @apply pl-1 -my-2 -mr-1 size-4.5;
+      }
+    }
+  }
 }
 
 @utility heading-h1 {
-  @apply font-sans text-[2rem] font-extrabold tracking-[-0.03em] leading-[1.2];
+  @apply font-sans text-[2rem] font-extrabold tracking-[-0.03em] leading-[1.2] text-navy-700;
 }
 
 @utility heading-h2 {
-  @apply font-sans text-2xl font-bold tracking-[-0.03em] leading-[1.3];
+  @apply font-sans text-2xl font-bold tracking-[-0.03em] leading-[1.3] text-navy-700;
 }
 
 @utility heading-h3 {
@@ -243,10 +302,6 @@
 
 @utility heading-h6 {
   @apply font-sans text-sm font-black leading-[1.4] uppercase;
-}
-
-@utility badge-text {
-  @apply font-sans text-[0.625rem] font-medium tracking-[-0.02em] leading-none;
 }
 
 @utility form-field-label {

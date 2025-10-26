@@ -14,17 +14,17 @@
       </DashboardCard>
     </div>
 
-    <div class="card">
+    <div class="card card--compact">
       <div class="card__header">
         <h6>Applications</h6>
-        <Button :leading-addon="AddCircle" ghost />
+        <UiButton :leading-addon="AddCircle" ghost />
       </div>
       <div class="stacked-list">
         <div
-          class="stacked-list__list-item grid-cols-[minmax(200px,_1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,_1fr)_minmax(150px,_1fr)_0fr]"
+          class="stacked-list__item grid-cols-[minmax(200px,_1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,_1fr)_minmax(150px,_1fr)_0fr]"
         >
           <div>
-            <p>Umami</p>
+            <a>Umami</a>
             <p>postgresql-v2.19.0</p>
           </div>
           <div>
@@ -50,7 +50,7 @@
                 { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
                 { label: 'galley.run', value: 'https://galley.run', link: true },
               ]"
-              :icon="MenuDotsCircle"
+              :icon="MenuDots"
               variant="icon"
               menu-position="right"
             />
@@ -60,17 +60,17 @@
     </div>
 
     <div class="grid grid-cols-2 gap-8 items-start">
-      <div class="card">
+      <div class="card card--compact">
         <div class="card__header">
           <h6>Databases</h6>
-          <Button :leading-addon="AddCircle" ghost />
+          <UiButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="stacked-list">
           <div
-            class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
+            class="stacked-list__item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
           >
             <div>
-              <p>Postgres</p>
+              <a>Postgres</a>
               <p>15-alpine</p>
             </div>
             <div>
@@ -85,21 +85,21 @@
               <h6>Last updated</h6>
               <p>15 days ago</p>
             </div>
-            <div>
+            <div class="items-center">
               <DropDown
                 :items="[
                   { label: 'clicqo.nl', value: '/edit', link: true },
                   { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
                   { label: 'galley.run', value: 'https://galley.run', link: true },
                 ]"
-                :icon="MenuDotsCircle"
+                :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
               />
             </div>
           </div>
           <div
-            class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
+            class="stacked-list__item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
           >
             <div class="relative">
               <RouterLink to="/redis"
@@ -126,17 +126,17 @@
                   { label: 'Edit', value: '/edit' },
                   { label: 'Delete', value: '/edit', variant: 'danger' },
                 ]"
-                :icon="MenuDotsCircle"
+                :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
               />
             </div>
           </div>
           <div
-            class="stacked-list__list-item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
+            class="stacked-list__item grid-cols-[minmax(100px,1fr)_minmax(75px,100px)_minmax(75px,125px)_minmax(100px,1fr)_min-content]"
           >
             <div>
-              <p>Postgres</p>
+              <a>Postgres</a>
               <p>15-alpine</p>
             </div>
             <div>
@@ -158,7 +158,7 @@
                   { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
                   { label: 'galley.run', value: 'https://galley.run', link: true },
                 ]"
-                :icon="MenuDotsCircle"
+                :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
               />
@@ -166,19 +166,19 @@
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card card--compact">
         <div class="card__header">
           <h6>Object Storage</h6>
-          <Button :leading-addon="AddCircle" ghost />
+          <UiButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="text-tides-700">Not configured</div>
       </div>
-      <div class="card">
+      <div class="card card--compact">
         <div class="card__header">
           <h6>Releases</h6>
         </div>
         <div class="stacked-list">
-          <div class="stacked-list__list-item grid-cols-[2fr_2fr_1fr_1fr_min-content]">
+          <div class="stacked-list__item grid-cols-[2fr_2fr_1fr_1fr_min-content]">
             <div class="relative">
               <a class="truncate" href="https://github.com/galley-run" target="_blank"
                 >Today, 13:15
@@ -198,7 +198,7 @@
               <p class="truncate">main</p>
             </div>
             <div>
-              <Button
+              <UiButton
                 :leading-addon="Notebook"
                 ghost
                 href="https://github.com/galley-run"
@@ -206,7 +206,7 @@
               />
             </div>
           </div>
-          <div class="stacked-list__list-item grid-cols-[2fr_2fr_1fr_1fr_min-content]">
+          <div class="stacked-list__item grid-cols-[2fr_2fr_1fr_1fr_min-content]">
             <div class="relative">
               <a class="truncate" href="https://github.com/galley-run" target="_blank"
                 >Yesterday, 21:56
@@ -226,7 +226,7 @@
               <p class="truncate">main</p>
             </div>
             <div>
-              <Button
+              <UiButton
                 :leading-addon="Notebook"
                 ghost
                 href="https://github.com/galley-run"
@@ -236,10 +236,10 @@
           </div>
         </div>
       </div>
-      <div class="card">
+      <div class="card card--compact">
         <div class="card__header">
           <h6>Alerts</h6>
-          <Button :leading-addon="AddCircle" ghost />
+          <UiButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="text-tides-700">Not configured</div>
       </div>
@@ -248,10 +248,10 @@
 </template>
 <script setup lang="ts">
 import FlagIcon from 'vue3-flag-icons'
-import { AddCircle, MenuDotsCircle, Notebook } from '@solar-icons/vue'
+import { AddCircle, MenuDots, Notebook } from '@solar-icons/vue'
 
 import DashboardCard from '@/components/Dashboard/DashboardCard.vue'
-import Button from '@/components/Button.vue'
+import UiButton from '@/components/UIButton.vue'
 import HealthStatus from '@/components/HealthStatus.vue'
 import DropDown from '@/components/FormField/DropDown.vue'
 </script>

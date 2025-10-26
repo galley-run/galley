@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
 import { computed, type FunctionalComponent, onBeforeUnmount, onMounted, ref, watch, type ComponentPublicInstance } from 'vue'
-import Button from '@/components/Button.vue'
+import UIButton from '@/components/UIButton.vue'
 import router from '@/router'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
 import type { IconProps } from '@solar-icons/vue/lib'
@@ -73,7 +73,6 @@ const menuStyle = computed(() => {
     top: `${triggerRect.value.bottom + window.scrollY}px`,
     left: menuPosition === 'left' ? `${triggerRect.value.left}px` : `${triggerRect.value.left - (listRect.value.width - triggerRect.value.width) + window.scrollX}px`,
     maxHeight: `${maxHeightPx ?? 260}px`,
-    overflowY: 'auto',
   })
 })
 
@@ -205,8 +204,8 @@ watch(
 </script>
 
 <template>
-  <div class="relative inline-block contain-layout">
-    <button
+  <div class="block contain-layout">
+    <ui-button
       ref="triggerEl"
       type="button"
       :aria-expanded="isOpen"
@@ -220,8 +219,8 @@ watch(
         {{ selectedItem?.label ?? placeholder ?? 'Select...' }}
       </span>
       <DoubleAltArrowDown size="20" :class="isOpen ? 'rotate-180' : ''" />
-    </button>
-    <Button
+    </ui-button>
+    <UIButton
       v-else-if="variant === 'icon'"
       :leading-addon="icon"
       ref="triggerEl"
@@ -231,7 +230,7 @@ watch(
       :disabled="disabled"
       ghost
     />
-    <button v-else>DROPDOWN NOT IMPLENTED YET</button>
+    <ui-button v-else>DROPDOWN NOT IMPLENTED YET</ui-button>
 
     <Teleport to="body">
       <div
@@ -240,9 +239,7 @@ watch(
         role="listbox"
         tabindex="0"
         :aria-activedescendant="activeIndex >= 0 ? `dd-opt-${activeIndex}` : undefined"
-        :class="[
-          'absolute z-50 mt-1 focus:outline-none w-max min-w-max bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25',
-        ]"
+        class="absolute z-50 mt-1 focus:outline-none w-max min-w-max bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25"
         :style="menuStyle"
         @keydown="onKeydownList"
       >

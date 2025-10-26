@@ -7,9 +7,9 @@
       <ProjectSwitcher />
     </div>
     <div class="flex gap-2">
-      <Button :leading-addon="darkModeIcon" variant="neutral" @click="toggleDarkMode" ghost />
-      <Button :leading-addon="MinimalisticMagnifer" variant="neutral" ghost />
-      <Button :leading-addon="Logout" variant="neutral" ghost />
+      <UIButton :leading-addon="darkModeIcon" variant="neutral" @click="toggleDarkMode" ghost />
+      <UIButton :leading-addon="MinimalisticMagnifer" variant="neutral" ghost />
+      <UIButton :leading-addon="Logout" variant="neutral" ghost />
     </div>
   </header>
 </template>
@@ -17,7 +17,7 @@
 import GalleyLogo from '@/assets/GalleyLogo.vue'
 import ProjectSwitcher from '@/components/MainLayout/ProjectSwitcher.vue'
 import { Logout, MinimalisticMagnifer, Moon, Sun2, SunFog } from '@solar-icons/vue'
-import Button from '@/components/Button.vue'
+import UIButton from '@/components/UIButton.vue'
 import { ref, watch } from 'vue'
 
 const darkMode = ref(localStorage.theme ?? 'auto')

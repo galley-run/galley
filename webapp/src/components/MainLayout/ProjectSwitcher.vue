@@ -4,7 +4,7 @@
     <SlashDivider />
     <DropDown v-model="project" variant="inline" :items="projects" />
     <SlashDivider />
-    <Button :leading-addon="MenuDots" variant="neutral" ghost />
+    <UIButton :leading-addon="MenuDots" variant="neutral" ghost />
   </div>
 </template>
 <script setup lang="ts">
@@ -12,7 +12,7 @@ import DropDown from '@/components/FormField/DropDown.vue'
 import SlashDivider from '@/assets/SlashDivider.vue'
 import { MenuDots } from '@solar-icons/vue'
 import { ref } from 'vue'
-import Button from '@/components/Button.vue'
+import UIButton from '@/components/UIButton.vue'
 
 const charters = [{ label: 'Clicqo', value: '2DAC9D56-1B2E-4364-9F01-1E457ACB26B4' }]
 

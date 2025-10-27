@@ -9,13 +9,6 @@
       </p>
       <div class="flex opacity-30">
         <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
-        <SlashesDivider />
       </div>
     </div>
     <div class="card">

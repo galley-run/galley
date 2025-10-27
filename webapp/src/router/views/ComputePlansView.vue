@@ -22,8 +22,8 @@
       <div class="card__header">
         <h2>Compute configurations</h2>
         <div>
-          <UiButton ghost :leading-addon="Import" title="Import compute configurations" />
-          <UiButton ghost :leading-addon="AddCircle" title="Add compute configuration" />
+          <UIButton ghost :leading-addon="Import" title="Import compute configurations" />
+          <UIButton ghost :leading-addon="AddCircle" title="Add compute configuration" />
         </div>
       </div>
       <div class="stacked-list">
@@ -40,7 +40,7 @@
             <p>€{{ shortCurrencyFormat(computeConfiguration.runningCost) }} p/m</p>
           </div>
           <div>
-            <DropDown
+            <UIDropDown
               :items="[
                 { label: 'Edit', value: 'edit' },
                 { label: 'Delete', value: 'delete', variant: 'danger' },
@@ -58,8 +58,8 @@
 <script setup lang="ts">
 import SlashesDivider from '@/assets/SlashesDivider.vue'
 import { AddCircle, Import, MenuDots } from '@solar-icons/vue'
-import DropDown from '@/components/FormField/DropDown.vue'
-import UiButton from '@/components/UIButton.vue'
+import UIDropDown from '@/components/FormField/UIDropDown.vue'
+import UIButton from '@/components/UIButton.vue'
 import shortCurrencyFormat from '@/utils/shortCurrencyFormat.ts'
 
 const computeConfigurations = [

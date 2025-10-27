@@ -171,7 +171,7 @@
 
     li {
       a, button {
-        @apply flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative;
+        @apply flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative focus:bg-navy-50 focus:outline-1 outline-offset-1 outline-navy-100;
       }
     }
   }
@@ -189,7 +189,7 @@
 
     /* Lead */
 
-    p:first-of-type {
+    > p:first-of-type {
       @apply text-tides-900 max-w-3xl;
     }
 
@@ -278,6 +278,63 @@
       }
     }
   }
+
+  .form-field {
+    @apply flex flex-col gap-2;
+
+    &:has(> .text-input) > label {
+      @apply ml-0.75;
+    }
+
+    p:last-child {
+      @apply text-tides-800 text-sm mx-0.75;
+    }
+  }
+
+  .form-footer {
+    @apply flex justify-between items-end xl:items-center xl:flex-row flex-col gap-4;
+
+    p {
+      @apply text-tides-700 text-sm;
+    }
+  }
+
+
+  label {
+    @apply grid grid-cols-[auto_1fr_0fr] items-center gap-1;
+
+    .required {
+      @apply text-tides-800;
+    }
+  }
+
+  .text-input {
+    @apply border bg-white w-full border-tides-600 rounded-lg px-3 py-0 has-focus-within:border-navy-700/50 hover:outline-1 has-focus-within:outline-1 focus:border-navy-700/50 focus:outline-1 outline-navy-100 outline-offset-1;
+
+    input {
+      @apply py-2.5 form-field-input-value w-full outline-none;
+
+      &::placeholder {
+        @apply text-tides-700;
+      }
+    }
+
+    svg:not(:last-child):first-of-type {
+      @apply mr-3;
+    }
+
+    svg:not(:first-child):last-of-type {
+      @apply ml-3;
+    }
+
+    div:not(:last-child):first-of-type {
+      @apply border-r border-tides-600 mr-3 pr-3;
+    }
+
+    div:not(:first-child):last-of-type {
+      @apply border-l border-tides-600 ml-3 pl-3;
+    }
+  }
 }
 
 @utility heading-h1 {
@@ -313,11 +370,7 @@
 }
 
 @utility form-field-input-value {
-  @apply font-sans text-sm font-normal tracking-[-0.02em] leading-none;
-}
-
-@utility form-field-input-placeholder {
-  @apply font-sans text-sm font-normal tracking-[-0.02em] leading-none;
+  @apply font-sans text-base font-normal tracking-[-0.02em] leading-none;
 }
 
 @utility form-field-dropdown-value {

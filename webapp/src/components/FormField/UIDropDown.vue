@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { DoubleAltArrowDown } from '@solar-icons/vue'
-import { computed, type FunctionalComponent, onBeforeUnmount, onMounted, ref, watch, type ComponentPublicInstance } from 'vue'
+import {
+  type ComponentPublicInstance,
+  computed,
+  type FunctionalComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import router from '@/router'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
@@ -24,11 +32,13 @@ const {
   maxHeightPx,
   icon,
   menuPosition = 'left',
+  id,
 } = defineProps<{
   variant?: 'inline' | 'default' | 'leadingAddon' | 'trailingAddon' | 'both' | 'icon'
   modelValue?: string | null
   items: Item[]
   placeholder?: string
+  id?: string
   disabled?: boolean
   selectFirst?: boolean
   maxHeightPx?: number
@@ -45,14 +55,16 @@ const isOpen = ref(false)
 const triggerEl = ref<HTMLElement | ComponentPublicInstance | null>(null)
 const listEl = ref<HTMLDivElement | null>(null)
 const activeIndex = ref<number>(-1)
+const lastLetter = ref<string | null>(null)
+const lastLetterCount = ref<number | null>(null)
 
 const triggerNode = computed<HTMLElement | null>(() => {
   const raw = triggerEl.value as any
-  return (raw?.$el ?? raw) ?? null
+  return raw?.$el ?? raw ?? null
 })
 
 const triggerRect = computed<DOMRect>(() => {
-  if(!isOpen.value) return
+  if (!isOpen.value) return
   const el = triggerNode.value as any
   return el && typeof el.getBoundingClientRect === 'function'
     ? el.getBoundingClientRect()
@@ -60,7 +72,7 @@ const triggerRect = computed<DOMRect>(() => {
 })
 
 const listRect = computed<DOMRect>(() => {
-  if(!isOpen.value) return
+  if (!isOpen.value) return
   const el = listEl.value as any
   return el && typeof el.getBoundingClientRect === 'function'
     ? el.getBoundingClientRect()
@@ -68,12 +80,16 @@ const listRect = computed<DOMRect>(() => {
 })
 
 const menuStyle = computed(() => {
-  return ({
+  return {
     position: 'absolute',
     top: `${triggerRect.value.bottom + window.scrollY}px`,
-    left: menuPosition === 'left' ? `${triggerRect.value.left}px` : `${triggerRect.value.left - (listRect.value.width - triggerRect.value.width) + window.scrollX}px`,
+    width: variant ? 'w-max min-w-max' : `${triggerRect.value.width}px`,
+    left:
+      menuPosition === 'left'
+        ? `${triggerRect.value.left}px`
+        : `${triggerRect.value.left - (listRect.value.width - triggerRect.value.width) + window.scrollX}px`,
     maxHeight: `${maxHeightPx ?? 260}px`,
-  })
+  }
 })
 
 const selectedItem = computed(() => items.find((i) => i.value === modelValue) ?? null)
@@ -95,12 +111,20 @@ function close() {
   isOpen.value = false
   activeIndex.value = -1
   triggerEl?.value?.focus?.()
+  lastLetter.value = null
+  lastLetterCount.value = null
 }
 
 function toggle() {
   if (isOpen.value) {
     close()
   } else {
+    open()
+  }
+}
+
+function toggleKey(e: KeyboardEvent) {
+  if (e.key === 'ArrowDown') {
     open()
   }
 }
@@ -129,6 +153,7 @@ function onKeydownList(e: KeyboardEvent) {
   if (!isOpen.value) return
   const enabledIndexes = items.map((i, idx) => (i.disabled ? -1 : idx)).filter((i) => i >= 0)
   const currentPos = enabledIndexes.indexOf(activeIndex.value)
+
   switch (e.key) {
     case 'ArrowDown':
       e.preventDefault()
@@ -159,6 +184,34 @@ function onKeydownList(e: KeyboardEvent) {
     case 'Escape':
       e.preventDefault()
       close()
+      break
+    default:
+      e.preventDefault()
+      if (!e.code.startsWith('Key')) {
+        break
+      }
+      const modifier = e.shiftKey ? -1 : 1
+      lastLetterCount.value =
+        lastLetter.value === e.key ? (lastLetterCount.value ?? -1) + modifier : 0
+      lastLetter.value = e.key
+      const selectNext = Object.values(items).filter(
+        (i) => !i.disabled && i.label.toLowerCase().startsWith(e.key.toLowerCase()),
+      )
+      if (selectNext.length === 0) {
+        activeIndex.value = 0
+        ensureActiveVisible()
+        break
+      }
+      const index =
+        selectNext &&
+        lastLetterCount?.value &&
+        selectNext[lastLetterCount.value] &&
+        items.indexOf(selectNext[lastLetterCount.value])
+      if (!index || index === -1) {
+        lastLetterCount.value = 0
+      }
+      activeIndex.value = items.indexOf(selectNext[lastLetterCount.value])
+      ensureActiveVisible()
       break
   }
 }
@@ -205,13 +258,14 @@ watch(
 
 <template>
   <div class="block contain-layout">
-    <ui-button
+    <button
       ref="triggerEl"
       type="button"
+      :id="id"
       :aria-expanded="isOpen"
       :aria-haspopup="'listbox'"
       :disabled="disabled"
-      class="flex items-center py-1.5 px-3 gap-1.5 text-navy-700 text-base cursor-pointer focus:outline-none focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg"
+      class="transition-all flex items-center py-1.5 px-3 gap-1.5 text-navy-700 text-base cursor-pointer focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg focus:outline-1 outline-offset-1 outline-navy-100 active:bg-navy-100"
       @click="toggle"
       v-if="variant === 'inline'"
     >
@@ -219,10 +273,11 @@ watch(
         {{ selectedItem?.label ?? placeholder ?? 'Select...' }}
       </span>
       <DoubleAltArrowDown size="20" :class="isOpen ? 'rotate-180' : ''" />
-    </ui-button>
+    </button>
     <UIButton
       v-else-if="variant === 'icon'"
       :leading-addon="icon"
+      :id="id"
       ref="triggerEl"
       @click="toggle"
       :aria-expanded="isOpen"
@@ -230,7 +285,23 @@ watch(
       :disabled="disabled"
       ghost
     />
-    <ui-button v-else>DROPDOWN NOT IMPLENTED YET</ui-button>
+    <button
+      v-else
+      class="text-input grid grid-cols-[1fr_auto_0fr] items-center gap-1.5"
+      @click="toggle"
+      @keydown="toggleKey"
+      ref="triggerEl"
+      :id="id"
+      :aria-expanded="isOpen"
+      :aria-haspopup="'listbox'"
+      :disabled="disabled"
+    >
+      <span class="flex form-field-input-value tracking-tight truncate py-3">
+        {{ selectedItem?.label ?? placeholder ?? 'Select...' }}
+      </span>
+      <slot />
+      <DoubleAltArrowDown size="20" :class="[isOpen ? 'rotate-180' : '']" />
+    </button>
 
     <Teleport to="body">
       <div
@@ -239,7 +310,7 @@ watch(
         role="listbox"
         tabindex="0"
         :aria-activedescendant="activeIndex >= 0 ? `dd-opt-${activeIndex}` : undefined"
-        class="absolute z-50 mt-1 focus:outline-none w-max min-w-max bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25"
+        class="absolute z-50 mt-1 focus:outline-none bg-white border border-tides-600 rounded-lg cursor-pointer divide-y divide-tides-200 shadow-md shadow-navy-200/25 overflow-scroll"
         :style="menuStyle"
         @keydown="onKeydownList"
       >
@@ -250,7 +321,7 @@ watch(
             :aria-selected="item.value === modelValue"
             :data-index="idx"
             :class="[
-              'px-4 py-2.5 max-w-80 ',
+              'px-4 py-2.5',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               !item.variant && idx === activeIndex && 'bg-navy-50',
               item.variant === 'danger' && idx === activeIndex && 'bg-coral-100',

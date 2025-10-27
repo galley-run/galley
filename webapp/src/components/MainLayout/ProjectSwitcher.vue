@@ -1,14 +1,14 @@
 <template>
   <div class="flex items-center gap-2">
-    <DropDown v-model="charter" variant="inline" :items="charters" />
+    <UIDropDown v-model="charter" variant="inline" :items="charters" />
     <SlashDivider />
-    <DropDown v-model="project" variant="inline" :items="projects" />
+    <UIDropDown v-model="project" variant="inline" :items="projects" />
     <SlashDivider />
     <UIButton :leading-addon="MenuDots" variant="neutral" ghost />
   </div>
 </template>
 <script setup lang="ts">
-import DropDown from '@/components/FormField/DropDown.vue'
+import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import SlashDivider from '@/assets/SlashDivider.vue'
 import { MenuDots } from '@solar-icons/vue'
 import { ref } from 'vue'

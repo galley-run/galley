@@ -8,6 +8,7 @@
             <RouterLink
               :to="item.href"
               exact-active-class="bg-navy-50"
+              :tabindex="0"
             >
               <component :is="item.icon" size="20" />
               {{ item.label }}
@@ -28,6 +29,7 @@
             <RouterLink
               :to="item.href"
               exact-active-class="bg-navy-50"
+              :tabindex="0"
             >
               <component :is="item.icon" size="20" />
               {{ item.label }}

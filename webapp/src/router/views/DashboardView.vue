@@ -17,7 +17,7 @@
     <div class="card card--compact">
       <div class="card__header">
         <h6>Applications</h6>
-        <UiButton :leading-addon="AddCircle" ghost />
+        <UIButton :leading-addon="AddCircle" ghost />
       </div>
       <div class="stacked-list">
         <div
@@ -44,7 +44,7 @@
             <p class="truncate">2 days ago</p>
           </div>
           <div>
-            <DropDown
+            <UIDropDown
               :items="[
                 { label: 'clicqo.nl', value: '/edit', link: true },
                 { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
@@ -63,7 +63,7 @@
       <div class="card card--compact">
         <div class="card__header">
           <h6>Databases</h6>
-          <UiButton :leading-addon="AddCircle" ghost />
+          <UIButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="stacked-list">
           <div
@@ -86,7 +86,7 @@
               <p>15 days ago</p>
             </div>
             <div class="items-center">
-              <DropDown
+              <UIDropDown
                 :items="[
                   { label: 'clicqo.nl', value: '/edit', link: true },
                   { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
@@ -121,7 +121,7 @@
               <p>1 hour ago</p>
             </div>
             <div>
-              <DropDown
+              <UIDropDown
                 :items="[
                   { label: 'Edit', value: '/edit' },
                   { label: 'Delete', value: '/edit', variant: 'danger' },
@@ -152,7 +152,7 @@
               <p>15 days ago</p>
             </div>
             <div>
-              <DropDown
+              <UIDropDown
                 :items="[
                   { label: 'clicqo.nl', value: '/edit', link: true },
                   { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
@@ -169,7 +169,7 @@
       <div class="card card--compact">
         <div class="card__header">
           <h6>Object Storage</h6>
-          <UiButton :leading-addon="AddCircle" ghost />
+          <UIButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="text-tides-700">Not configured</div>
       </div>
@@ -198,7 +198,7 @@
               <p class="truncate">main</p>
             </div>
             <div>
-              <UiButton
+              <UIButton
                 :leading-addon="Notebook"
                 ghost
                 href="https://github.com/galley-run"
@@ -226,7 +226,7 @@
               <p class="truncate">main</p>
             </div>
             <div>
-              <UiButton
+              <UIButton
                 :leading-addon="Notebook"
                 ghost
                 href="https://github.com/galley-run"
@@ -239,7 +239,7 @@
       <div class="card card--compact">
         <div class="card__header">
           <h6>Alerts</h6>
-          <UiButton :leading-addon="AddCircle" ghost />
+          <UIButton :leading-addon="AddCircle" ghost />
         </div>
         <div class="text-tides-700">Not configured</div>
       </div>
@@ -251,7 +251,7 @@ import FlagIcon from 'vue3-flag-icons'
 import { AddCircle, MenuDots, Notebook } from '@solar-icons/vue'
 
 import DashboardCard from '@/components/Dashboard/DashboardCard.vue'
-import UiButton from '@/components/UIButton.vue'
+import UIButton from '@/components/UIButton.vue'
 import HealthStatus from '@/components/HealthStatus.vue'
-import DropDown from '@/components/FormField/DropDown.vue'
+import UIDropDown from '@/components/FormField/UIDropDown.vue'
 </script>

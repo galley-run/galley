@@ -53,8 +53,8 @@
     </div>
     <div class="form-footer">
       <p>All fields marked with an asterisk (*) are required</p>
-      <UIButton :leading-addon="ShieldStar" to="/onboarding/first-charter">
-        Set up your first project
+      <UIButton :leading-addon="SuitcaseTag" to="/onboarding/boarding">
+        Start your journey with Galley
       </UIButton>
     </div>
   </div>
@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
-import { ShieldStar } from '@solar-icons/vue'
+import { SuitcaseTag } from '@solar-icons/vue'
 import { reactive, toRefs } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'

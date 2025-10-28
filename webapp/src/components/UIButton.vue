@@ -3,7 +3,7 @@
     :is="button"
     :tabindex="0"
     :class="[
-      'flex rounded-full items-center cursor-pointer transition-all no-underline',
+      'flex rounded-full items-center cursor-pointer transition-all no-underline aria-disabled:opacity-30 aria-disabled:pointer-events-none user-select-none',
       variant === 'primary' &&
         !ghost &&
         'bg-seafoam-500 text-white hover:bg-seafoam-600 focus:bg-seafoam-600 active:bg-seafoam-700',

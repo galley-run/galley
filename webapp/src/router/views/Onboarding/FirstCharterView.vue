@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-8 max-w-4xl">
+  <form @submit.prevent="onSubmit" ref="formRef" class="space-y-8 max-w-4xl" novalidate>
     <div class="space-y-2">
       <h1>Your First Charter</h1>
       <p class="text-tides-900">
@@ -10,19 +10,20 @@
 
     <div class="grid xl:grid-cols-2 gap-8">
       <UIFormField>
-        <UILabel required for="charterName">Charter name</UILabel>
+        <UILabel required for="charterName">Name</UILabel>
         <UITextInput
           required
           id="charterName"
           placeholder="e.g. The Yacht Club"
-          v-model="charterName"
+          v-model="charter.name"
         />
-        <p>Leave blank and we'll use your company name</p>
+        <label for="charterName" class="form-field__error-message"> This field is required. </label>
+        <label for="charterName"> We've already named your namespace after your company. </label>
       </UIFormField>
       <UIFormField>
-        <UILabel required for="charterDescription">Description</UILabel>
-        <UITextInput required id="charterDescription" v-model="charterDescription" />
-        <p>Helpful for teams or differentiating between namespaces with similar names.</p>
+        <UILabel for="charterDescription">Description</UILabel>
+        <UITextInput id="charterDescription" v-model="charter.description" placeholder="e.g. The company's blog" />
+        <label for="charterDescription">Helpful for teams or differentiating between namespaces with similar names.</label>
       </UIFormField>
     </div>
     <SlashesDivider class="opacity-30" />
@@ -47,6 +48,7 @@
             { value: 'development', label: 'Development' },
           ]"
         />
+        <label for="projectEnvironment" class="form-field__error-message"> This field is required. </label>
       </UIFormField>
       <UIFormField>
         <UILabel required for="projectName">Project name</UILabel>
@@ -56,7 +58,8 @@
           :placeholder="projectNamePlaceholder"
           v-model="projectName"
         />
-        <p>We recommend using the domain name where you will deploy to as Project name.</p>
+        <label for="projectName" class="form-field__error-message"> This field is required. </label>
+        <label for="projectName">We recommend using the domain name where you will deploy to as Project name.</label>
       </UIFormField>
       <UIFormField class="col-span-2">
         <UILabel required for="projectPurpose">Tell us what it’s for</UILabel>
@@ -70,27 +73,31 @@
             { value: 'fullstack', label: 'Full Stack Application' },
             { value: 'api', label: 'API Platform' },
             { value: 'demo', label: 'Just trying out Galley' },
-            ]"
+          ]"
         />
+        <label for="projectPurpose" class="form-field__error-message"> This field is required. </label>
       </UIFormField>
     </div>
     <div class="form-footer">
       <p>All fields marked with an asterisk (*) are required</p>
-      <UIButton :leading-addon="SuitcaseTag" to="/onboarding/boarding">
+      <UIButton :leading-addon="SuitcaseTag" type="submit">
         Start your journey with Galley
       </UIButton>
     </div>
-  </div>
+  </form>
 </template>
 <script setup lang="ts">
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import { SuitcaseTag } from '@solar-icons/vue'
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, ref, toRefs } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
+import { useOnboardingStore } from '@/stores/onboarding.ts'
+import { storeToRefs } from 'pinia'
+import router from '@/router'
 
 const state = reactive({
   charterName: '',
@@ -115,4 +122,27 @@ const projectNamePlaceholder = computed(() => {
       return 'e.g. galley.run'
   }
 })
+
+const formRef = ref<HTMLFormElement | null>(null)
+
+const onboardingStore = useOnboardingStore()
+
+const { charter, project } = storeToRefs(onboardingStore)
+
+function onSubmit() {
+  const form = formRef.value!
+
+  form.reportValidity()
+  if (!form.checkValidity()) {
+    form.reportValidity() // shows browser messages
+    return
+  }
+
+  onboardingStore.$patch({
+    charter: charter.value,
+    project: project.value,
+  })
+
+  router.push('/onboarding/boarding')
+}
 </script>

@@ -1,55 +1,44 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import vesselNameGenerator from '@/utils/vesselNameGenerator.ts'
 
-export const useOnboardingStore = defineStore('onboarding', () => {
-  const setupMode = ref<'setup'|'explore'>('setup')
-  const user = ref({
-    firstName: '',
-    lastName: '',
-    email: '',
-    experience: '',
-  })
-  const questionnaire = ref({
-    find: '',
-    role: '',
-    industry: '',
-    users: '',
-  })
+const vesselName = vesselNameGenerator()
 
-  const billing = ref({
-    companyName: '',
-    companyAddress: '',
-    companyCountry: '',
-    companyZip: '',
-    companyCity: '',
-    companyAddress1: '',
-    companyAddress2: '',
-    companyVat: '',
-    email: '',
-  })
-
-  const vessel = ref({
-    name: '',
-  })
-
-  const charter = ref({
-    name: '',
-    description: '',
-  })
-
-  const project = ref({
-    name: '',
-    environment: '',
-    purpose: '',
-  })
-
-  return {
-    setupMode,
-    user,
-    questionnaire,
-    billing,
-    vessel,
-    charter,
-    project
-  }
+export const useOnboardingStore = defineStore('onboarding', {
+  state: () => ({
+    setupMode: 'setup',
+    user: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      experience: '',
+    },
+    questionnaire: {
+      find: 'searchengine',
+      role: 'cto',
+      industry: '',
+      users: '1',
+    },
+    billing: {
+      companyName: '',
+      name: '',
+      address1: '',
+      address2: '',
+      country: 'nl',
+      postalCode: '',
+      city: '',
+      state: '',
+      vat: '',
+      email: '',
+    },
+    vessel: {
+      name: vesselName,
+    },
+    charter: {
+      name: '',
+      description: '',
+    },
+    project: {
+      name: '',
+    },
+  }),
 })

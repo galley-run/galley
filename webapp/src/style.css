@@ -318,6 +318,19 @@
     input {
       @apply py-2.5 form-field-input-value w-full outline-none;
 
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus,
+      &:-webkit-autofill:active,
+      &[data-com-onepassword-filled],
+      &[data-com-onepassword-filled]:hover,
+      &[data-com-onepassword-filled]:focus,
+      &[data-com-onepassword-filled]:active {
+          -webkit-box-shadow: 0 0 0 60px var(--color-white) inset !important;
+          background-color: var(--color-white) !important;
+          background-clip: content-box !important;
+      }
+
       &::placeholder {
         @apply text-tides-700;
       }

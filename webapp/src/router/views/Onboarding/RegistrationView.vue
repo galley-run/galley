@@ -13,15 +13,17 @@
           title="Set up for my business"
           description="You’re ready to board your company. Choose this option and we guide you through all the necessary steps to set up Galley so you can get up and running in no time."
           name="setupMode"
+          required
           value="setup"
-          v-model="form.setupMode"
+          v-model="setupMode"
         />
         <UIRadioCard
           title="Just explore Galley"
           description="Start your maiden voyage here. We help you to set up  quickly so you can discover how deploying your applications on a Kubernetes* cluster with Galley will help you and your (future) business."
+          required
           name="setupMode"
           value="explore"
-          v-model="form.setupMode"
+          v-model="setupMode"
         />
       </div>
     </div>
@@ -31,7 +33,7 @@
         <UILabel required for="firstName">First name</UILabel>
         <UITextInput
           id="firstName"
-          v-model="form.firstName"
+          v-model="user.firstName"
           placeholder="e.g. Jack"
           required
           :trailing-addon="UserRounded"
@@ -42,7 +44,7 @@
         <UILabel required for="lastName">Last name</UILabel>
         <UITextInput
           id="lastName"
-          v-model="form.lastName"
+          v-model="user.lastName"
           placeholder="e.g. Sparrow"
           required
           :trailing-addon="UserRounded"
@@ -53,7 +55,7 @@
         <UILabel required for="email">Email address</UILabel>
         <UITextInput
           id="email"
-          v-model="form.email"
+          v-model="user.email"
           type="email"
           required
           placeholder="e.g. boaty@mcboatface.com"
@@ -67,7 +69,7 @@
         <UILabel required for="experience">My technical experience</UILabel>
         <UIDropDown
           id="experience"
-          v-model="form.experience"
+          v-model="user.experience"
           required
           :items="[
             { value: 'junior', label: '1 - 3 years' },
@@ -97,21 +99,17 @@ import UILabel from '@/components/FormField/UILabel.vue'
 import { Clipboard, Letter, UserRounded } from '@solar-icons/vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import { useOnboardingStore } from '@/stores/onboarding.ts'
+import router from '@/router'
+import { storeToRefs } from 'pinia'
 
 const formRef = ref<HTMLFormElement | null>(null)
 
-const form = reactive({
-  setupMode: 'setup' as 'setup' | 'explore',
-  firstName: '',
-  lastName: '',
-  email: '',
-  experience: '',
-})
-
 const onboardingStore = useOnboardingStore()
+
+const { user, setupMode } = storeToRefs(onboardingStore)
 
 function onSubmit() {
   const form = formRef.value!
@@ -123,13 +121,10 @@ function onSubmit() {
   }
 
   onboardingStore.$patch({
-    setupMode: form.setupMode,
-    user: {
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      experience: form.experience,
-    },
+    setupMode: setupMode.value,
+    user: user.value,
   })
+
+  router.push('/onboarding/security-screening')
 }
 </script>

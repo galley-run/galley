@@ -8,6 +8,7 @@ import RegistrationView from '@/router/views/Onboarding/RegistrationView.vue'
 import SecurityScreeningView from '@/router/views/Onboarding/SecurityScreeningView.vue'
 import NamingCeremonyView from '@/router/views/Onboarding/NamingCeremonyView.vue'
 import FirstCharterView from '@/router/views/Onboarding/FirstCharterView.vue'
+import BoardingView from '@/router/views/Onboarding/BoardingView.vue'
 
 const routes = [
   {
@@ -18,6 +19,7 @@ const routes = [
       { path: 'security-screening', component: SecurityScreeningView },
       { path: 'naming-ceremony', component: NamingCeremonyView },
       { path: 'first-charter', component: FirstCharterView },
+      { path: 'boarding', component: BoardingView },
     ],
   },
   {

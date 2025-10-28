@@ -122,7 +122,7 @@ class MainVerticle : CoroutineVerticle() {
 //      patch().handler(BodyHandler.create())
 //      put().handler(BodyHandler.create())
     }
-    mainRouter.route().virtualHost(config.getJsonObject("webapp").getString("host", "localhost")).subRouter(webAppRouter)
+    mainRouter.route().virtualHost(config.getJsonObject("webapp", JsonObject()).getString("host", "localhost")).subRouter(webAppRouter)
 
     // Deploy verticles
     val deploymentOptions =

@@ -124,6 +124,14 @@ function toggle() {
 }
 
 function toggleKey(e: KeyboardEvent) {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    open()
+  }
+  if (e.key === ' ') {
+    e.preventDefault()
+    open()
+  }
   if (e.key === 'ArrowDown') {
     open()
   }
@@ -257,7 +265,7 @@ watch(
 </script>
 
 <template>
-  <div class="block contain-layout">
+  <div class="block contain-layout group">
     <button
       ref="triggerEl"
       type="button"
@@ -287,10 +295,11 @@ watch(
     />
     <button
       v-else
-      class="text-input grid grid-cols-[1fr_auto_0fr] items-center gap-1.5"
+      class="text-input grid grid-cols-[1fr_auto_0fr] items-center gap-1.5 group-has-[:user-invalid]:bg-red-50 group-has-[:user-invalid]:border-red-200"
       @click="toggle"
       @keydown="toggleKey"
       ref="triggerEl"
+      type="button"
       :id="id"
       :aria-expanded="isOpen"
       :aria-haspopup="'listbox'"
@@ -302,6 +311,23 @@ watch(
       <slot />
       <DoubleAltArrowDown size="20" :class="[isOpen ? 'rotate-180' : '']" />
     </button>
+
+    <select
+      ref="selectRef"
+      v-bind="$attrs"
+      :value="modelValue ?? ''"
+      class="sr-only hidden"
+    >
+      <option value="" disabled hidden></option>
+      <option
+        v-for="opt in items"
+        :key="opt.value"
+        :value="opt.value"
+        :disabled="opt.disabled"
+      >
+        {{ opt.label }}
+      </option>
+    </select>
 
     <Teleport to="body">
       <div

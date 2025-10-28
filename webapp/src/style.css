@@ -286,8 +286,12 @@
       @apply ml-0.75;
     }
 
-    p:last-child {
+    label:not(:first-child) {
       @apply text-tides-800 text-sm mx-0.75;
+    }
+
+    label.form-field__error-message {
+      @apply group-has-[:user-invalid]:block hidden text-coral-500;
     }
   }
 
@@ -300,7 +304,7 @@
   }
 
 
-  label {
+  label:first-of-type {
     @apply grid grid-cols-[auto_1fr_0fr] items-center gap-1;
 
     .required {
@@ -309,7 +313,7 @@
   }
 
   .text-input {
-    @apply border bg-white w-full border-tides-600 rounded-lg px-3 py-0 has-focus-within:border-navy-700/50 hover:outline-1 has-focus-within:outline-1 focus:border-navy-700/50 focus:outline-1 outline-navy-100 outline-offset-1;
+    @apply border bg-white w-full border-tides-600 rounded-lg px-3 py-0 has-focus-within:border-navy-700/50 hover:outline-1 has-focus-within:outline-1 focus:border-navy-700/50 focus:outline-1 outline-navy-100 outline-offset-1  has-[:user-invalid]:bg-red-50  has-[:user-invalid]:border-red-200;
 
     input {
       @apply py-2.5 form-field-input-value w-full outline-none;

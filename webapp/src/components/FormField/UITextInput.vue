@@ -6,7 +6,7 @@
       v-if="leadingAddon && typeof leadingAddon !== 'string'"
     />
     <div v-if="leadingAddon && typeof leadingAddon === 'string'">{{ leadingAddon }}</div>
-    <input v-bind="$attrs" :value="modelValue" @input="onInput" @change="onChange" />
+    <input v-bind="$attrs" v-model="model" @input="onInput" @change="onChange" />
     <component
       :is="trailingAddon"
       :size="20"
@@ -19,32 +19,31 @@
 import type { FunctionalComponent } from 'vue'
 import type { IconProps } from '@solar-icons/vue/lib'
 
-const { leadingAddon, trailingAddon } = withDefaults(
-  defineProps<{
-    modelValue: string
-    leadingAddon?: FunctionalComponent<IconProps> | string
-    trailingAddon?: FunctionalComponent<IconProps> | string
-  }>(),
-  {
-    modelValue: '',
-  },
-)
+defineOptions({
+  inheritAttrs: false,
+})
+
+const model = defineModel<string>({ default: '' })
+
+const { leadingAddon, trailingAddon } = defineProps<{
+  leadingAddon?: FunctionalComponent<IconProps> | string
+  trailingAddon?: FunctionalComponent<IconProps> | string
+}>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', v: string): void
   (e: 'input', v: string): void
   (e: 'change', v: string): void
 }>()
 
 function onInput(e: Event) {
   const v = (e.target as HTMLInputElement).value
-  emit('update:modelValue', v)
+  model.value = v
   emit('input', v)
 }
 
 function onChange(e: Event) {
   const v = (e.target as HTMLInputElement).value
-  emit('update:modelValue', v)
+  model.value = v
   emit('change', v)
 }
 </script>

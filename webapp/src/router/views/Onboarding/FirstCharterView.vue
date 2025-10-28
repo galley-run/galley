@@ -25,30 +25,53 @@
         <p>Helpful for teams or differentiating between namespaces with similar names.</p>
       </UIFormField>
     </div>
-    <SlashesDivider />
-    <h4 class="text-navy-700">First project for this charter</h4>
-    <p class="text-tides-900">
-      Any charter will have one or more projects. A project will contain your apps and databases.
-      This way you can combine and separate concerns wherever you need.
-    </p>
+    <SlashesDivider class="opacity-30" />
+    <div class="space-y-2">
+      <h4 class="text-navy-700">First project for this charter</h4>
+      <p class="text-tides-900">
+        Any charter will have one or more projects. A project will contain your apps and databases.
+        This way you can combine and separate concerns wherever you need.
+      </p>
+    </div>
     <div class="grid xl:grid-cols-2 gap-8">
+      <UIFormField>
+        <UILabel required for="projectEnvironment">Environment type</UILabel>
+        <UIDropDown
+          required
+          id="projectEnvironment"
+          v-model="projectEnvironment"
+          :items="[
+            { value: 'production', label: 'Production' },
+            { value: 'staging', label: 'Staging' },
+            { value: 'test', label: 'Test' },
+            { value: 'development', label: 'Development' },
+          ]"
+        />
+      </UIFormField>
       <UIFormField>
         <UILabel required for="projectName">Project name</UILabel>
         <UITextInput
           required
           id="projectName"
-          placeholder="e.g. The Yacht Club"
+          :placeholder="projectNamePlaceholder"
           v-model="projectName"
         />
         <p>We recommend using the domain name where you will deploy to as Project name.</p>
       </UIFormField>
-      <UIFormField>
-        <UILabel required for="projectEnvironment">Environment type</UILabel>
-        <UIDropDown required id="projectEnvironment" v-model="projectEnvironment" :items="[{value: 'production', label: 'Production'}, {value: 'staging', label: 'Staging'}, {value: 'test', label: 'Test'}, {value: 'development', label: 'Development'}]" />
-      </UIFormField>
       <UIFormField class="col-span-2">
         <UILabel required for="projectPurpose">Tell us what it’s for</UILabel>
-        <UIDropDown required id="projectPurpose" v-model="projectPurpose" :items="[{value: 'webapp', label: 'Web Application'}]" />
+        <UIDropDown
+          required
+          id="projectPurpose"
+          v-model="projectPurpose"
+          :items="[
+            { value: 'spa', label: 'Single-Page Application' },
+            { value: 'webapp', label: 'Web Application' },
+            { value: 'fullstack', label: 'Full Stack Application' },
+            { value: 'api', label: 'API Platform' },
+            { value: 'demo', label: 'Just trying out Galley' },
+            ]"
+        />
       </UIFormField>
     </div>
     <div class="form-footer">
@@ -63,7 +86,7 @@
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import { SuitcaseTag } from '@solar-icons/vue'
-import { reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
@@ -79,4 +102,17 @@ const state = reactive({
 
 const { charterName, charterDescription, projectName, projectEnvironment, projectPurpose } =
   toRefs(state)
+
+const projectNamePlaceholder = computed(() => {
+  switch (projectEnvironment.value) {
+    case 'staging':
+      return 'e.g. staging.galley.run'
+    case 'test':
+      return 'e.g. test.galley.run'
+    case 'development':
+      return 'e.g. dev.galley.run'
+    default:
+      return 'e.g. galley.run'
+  }
+})
 </script>

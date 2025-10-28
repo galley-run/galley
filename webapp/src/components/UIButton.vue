@@ -39,6 +39,7 @@
     ]"
     :to="to"
     :href="href"
+    :type="button === 'button' ? 'button' : undefined"
     v-bind="$attrs"
     @click="emit('click', $event)"
   >
@@ -62,6 +63,10 @@
 import { RouterLink } from 'vue-router'
 import type { FunctionalComponent } from 'vue'
 import type { IconProps } from '@solar-icons/vue/lib'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 const {
   to,

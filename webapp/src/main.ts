@@ -6,6 +6,8 @@ import { SolarIconsPlugin } from '@solar-icons/vue/lib'
 
 import App from './App.vue'
 import router from './router'
+import { VueQueryPlugin } from '@tanstack/vue-query'
+import registerAxios from '@/utils/registerAxios.ts'
 
 document.documentElement.classList.toggle(
   'dark',
@@ -17,6 +19,9 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(VueQueryPlugin)
+
+registerAxios()
 
 app.use(SolarIconsPlugin, {
   weight: 'LineDuotone',

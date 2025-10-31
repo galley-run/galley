@@ -7,6 +7,8 @@ info:
     name: Business Source License
     identifier: BUSL-1.1
 servers:
+  - url: https://api.galley.dev
+    description: Hosted Platform - Development
   - url: https://api.galley.run
     description: Hosted Platform - Production
 tags:
@@ -388,6 +390,8 @@ paths:
                     $ref: '#/components/schemas/RefreshToken'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /auth/access-token:
@@ -416,6 +420,37 @@ paths:
                     $ref: '#/components/schemas/AccessToken'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /auth/sign-up:
+    post:
+      tags:
+        - auth
+      summary: Sign up
+      operationId: auth.cmd.create
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/SignUp'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RefreshToken'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /auth/sign-in:
@@ -771,6 +806,186 @@ components:
         accessToken:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+    BillingProfile:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A Generic Billing Profile
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - BillingProfile
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - companyName
+              properties:
+                companyName:
+                  type: string
+                  description: Captures the name of the organization
+                  example: Clicqo
+                billedTo:
+                  type: string
+                  description: Captures the name of the billing contact
+                  example: Jack Sparrow
+                address1:
+                  type: string
+                  description: Captures the first line of the billing address
+                  example: 123 Main Street
+                address2:
+                  type: string
+                  description: Captures the second line of the billing address
+                postalCode:
+                  type: string
+                  description: Captures the postal code of the billing address
+                  example: 1234 AB
+                city:
+                  type: string
+                  description: Captures the city of the billing address
+                  example: Weesp
+                state:
+                  type: string
+                  description: Captures the state of the billing address
+                country:
+                  type: string
+                  description: Captures the country of the billing address in ISO 3166 format
+                  example: nl
+                vatNumber:
+                  type: string
+                  description: Captures the VAT number of the organization
+                  example: NL123456789B01
+                email:
+                  type: string
+                  description: Captures the email address of the billing contact
+                  example: finance@galley.run
+                phone:
+                  type: string
+                  description: Captures the phone number of the billing contact
+                  example: +31 123 456 7890
+    VesselCreate:
+      type: object
+      required:
+        - name
+      description: Request body for POST /vessels.
+      properties:
+        name:
+          type: string
+          description: Vessel name
+          minLength: 1
+          maxLength: 255
+          examples:
+            - My Vessel
+      additionalProperties: false
+    SignUp:
+      type: object
+      required:
+        - intent
+        - user
+        - inquiry
+        - vessel
+      properties:
+        intent:
+          type: string
+          enum:
+            - exploring
+            - business
+            - private
+          description: This field let's us know what the user's intent is when signing up.
+        user:
+          type: object
+          required:
+            - email
+            - firstName
+            - lastName
+          properties:
+            email:
+              type: string
+              format: email
+              description: User's email address
+            firstName:
+              type: string
+              description: User's first name
+            lastName:
+              type: string
+              description: User's last name
+        inquiry:
+          type: object
+          description: This field is used to capture any additional information the user provides about their business and intent.
+          properties:
+            technicalExperience:
+              type: string
+              enum:
+                - non_tech
+                - junior_dev
+                - experienced
+                - tech_leadership
+              description: This field let's us know the technical experience of the user.
+            reference:
+              type: string
+              description: Captures information about how the user discovered Galley
+              enum:
+                - search_engine
+                - social_media
+                - word_of_mouth
+                - online_community
+                - conference_event
+                - advertisement
+                - partner_referral
+                - blog_article
+                - other
+              example: search_engine
+              default: other
+            orgRole:
+              type: string
+              description: Captures information about the role of the user in the organization
+              enum:
+                - tech_leadership
+                - developer
+                - operations
+                - sales
+                - marketing
+              example: tech_leadership
+            orgIndustry:
+              type: string
+              description: Captures information about the industry of the user's organization
+              enum:
+                - finance
+                - healthcare
+                - insurance
+                - manufacturing
+                - retail
+                - technology
+                - other
+            orgTeamSize:
+              type: string
+              description: Captures information about the size of the user's organization
+              enum:
+                - '1'
+                - 2-5
+                - 5-10
+                - 10-50
+                - 50+
+              example: '1'
+        vesselBillingProfile:
+          anyOf:
+            - $ref: '#/components/schemas/BillingProfile'
+            - type: string
+              example: Boaty McBoatface
+        vessel:
+          $ref: '#/components/schemas/VesselCreate'
+        charter:
+          $ref: '#/components/schemas/CharterCreate'
+        project:
+          $ref: '#/components/schemas/ProjectCreate'
     SignIn:
       type: object
       required:

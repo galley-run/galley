@@ -26,18 +26,21 @@ import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.WebhookDeliveries.WebhookDeliveriesPath
 import generated.jooq.tables.records.OutboxEventsRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Index
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.Path
 import org.jooq.PlainSQL
@@ -142,12 +145,12 @@ open class OutboxEvents(
     /**
      * The column <code>public.outbox_events.payload</code>.
      */
-    val PAYLOAD: TableField<OutboxEventsRecord, JSONB?> = createField(DSL.name("payload"), SQLDataType.JSONB.nullable(false), this, "")
+    val PAYLOAD: TableField<OutboxEventsRecord, ClusterSerializable?> = createField(DSL.name("payload"), SQLDataType.JSONB.nullable(false), this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.outbox_events.metadata</code>.
      */
-    val METADATA: TableField<OutboxEventsRecord, JSONB?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "")
+    val METADATA: TableField<OutboxEventsRecord, ClusterSerializable?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.outbox_events.status</code>.

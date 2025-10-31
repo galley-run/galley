@@ -5,14 +5,5339 @@
 package generated.jooq.routines.references
 
 
+import generated.jooq.routines.Armor1
+import generated.jooq.routines.Armor2
+import generated.jooq.routines.Citext1
+import generated.jooq.routines.Citext2
+import generated.jooq.routines.Citext3
+import generated.jooq.routines.CitextCmp
+import generated.jooq.routines.CitextEq
+import generated.jooq.routines.CitextGe
+import generated.jooq.routines.CitextGt
+import generated.jooq.routines.CitextHash
+import generated.jooq.routines.CitextHashExtended
+import generated.jooq.routines.CitextLarger
+import generated.jooq.routines.CitextLe
+import generated.jooq.routines.CitextLt
+import generated.jooq.routines.CitextNe
+import generated.jooq.routines.CitextPatternCmp
+import generated.jooq.routines.CitextPatternGe
+import generated.jooq.routines.CitextPatternGt
+import generated.jooq.routines.CitextPatternLe
+import generated.jooq.routines.CitextPatternLt
+import generated.jooq.routines.CitextSmaller
+import generated.jooq.routines.Citextin
+import generated.jooq.routines.Citextout
+import generated.jooq.routines.Citextrecv
+import generated.jooq.routines.Citextsend
+import generated.jooq.routines.Crypt
+import generated.jooq.routines.Dearmor
+import generated.jooq.routines.Decrypt
+import generated.jooq.routines.DecryptIv
+import generated.jooq.routines.Digest1
+import generated.jooq.routines.Digest2
+import generated.jooq.routines.Encrypt
+import generated.jooq.routines.EncryptIv
+import generated.jooq.routines.GalleyCurrentUserId
+import generated.jooq.routines.GalleyHasCharterAccess
+import generated.jooq.routines.GalleyHasProjectAccess
+import generated.jooq.routines.GalleyHasVesselAccess
+import generated.jooq.routines.GalleyOutboxEnqueue
+import generated.jooq.routines.GalleyRefreshMvOutboxReady
+import generated.jooq.routines.GalleySetAuthContext
+import generated.jooq.routines.GalleySetRequestContext
+import generated.jooq.routines.GenRandomBytes
+import generated.jooq.routines.GenRandomUuid
+import generated.jooq.routines.GenSalt1
+import generated.jooq.routines.GenSalt2
+import generated.jooq.routines.GinExtractQueryTrgm
+import generated.jooq.routines.GinExtractValueTrgm
+import generated.jooq.routines.GinTrgmConsistent
+import generated.jooq.routines.GinTrgmTriconsistent
+import generated.jooq.routines.GtrgmCompress
+import generated.jooq.routines.GtrgmConsistent
+import generated.jooq.routines.GtrgmDecompress
+import generated.jooq.routines.GtrgmDistance
+import generated.jooq.routines.GtrgmIn
+import generated.jooq.routines.GtrgmOptions
+import generated.jooq.routines.GtrgmOut
+import generated.jooq.routines.GtrgmPenalty
+import generated.jooq.routines.GtrgmPicksplit
+import generated.jooq.routines.GtrgmSame
+import generated.jooq.routines.GtrgmUnion
+import generated.jooq.routines.Hmac1
+import generated.jooq.routines.Hmac2
+import generated.jooq.routines.Max
+import generated.jooq.routines.Min
+import generated.jooq.routines.PgpKeyId
+import generated.jooq.routines.PgpPubDecrypt1
+import generated.jooq.routines.PgpPubDecrypt2
+import generated.jooq.routines.PgpPubDecrypt3
+import generated.jooq.routines.PgpPubDecryptBytea1
+import generated.jooq.routines.PgpPubDecryptBytea2
+import generated.jooq.routines.PgpPubDecryptBytea3
+import generated.jooq.routines.PgpPubEncrypt1
+import generated.jooq.routines.PgpPubEncrypt2
+import generated.jooq.routines.PgpPubEncryptBytea1
+import generated.jooq.routines.PgpPubEncryptBytea2
+import generated.jooq.routines.PgpSymDecrypt1
+import generated.jooq.routines.PgpSymDecrypt2
+import generated.jooq.routines.PgpSymDecryptBytea1
+import generated.jooq.routines.PgpSymDecryptBytea2
+import generated.jooq.routines.PgpSymEncrypt1
+import generated.jooq.routines.PgpSymEncrypt2
+import generated.jooq.routines.PgpSymEncryptBytea1
+import generated.jooq.routines.PgpSymEncryptBytea2
+import generated.jooq.routines.RegexpMatch1
+import generated.jooq.routines.RegexpMatch2
+import generated.jooq.routines.RegexpReplace1
+import generated.jooq.routines.RegexpReplace2
+import generated.jooq.routines.RegexpSplitToArray1
+import generated.jooq.routines.RegexpSplitToArray2
+import generated.jooq.routines.Replace
+import generated.jooq.routines.SetLimit
+import generated.jooq.routines.ShowLimit
+import generated.jooq.routines.ShowTrgm
+import generated.jooq.routines.Similarity
+import generated.jooq.routines.SimilarityDist
+import generated.jooq.routines.SimilarityOp
+import generated.jooq.routines.SplitPart
+import generated.jooq.routines.StrictWordSimilarity
+import generated.jooq.routines.StrictWordSimilarityCommutatorOp
+import generated.jooq.routines.StrictWordSimilarityDistCommutatorOp
+import generated.jooq.routines.StrictWordSimilarityDistOp
+import generated.jooq.routines.StrictWordSimilarityOp
+import generated.jooq.routines.Strpos
+import generated.jooq.routines.Texticlike1
+import generated.jooq.routines.Texticlike2
+import generated.jooq.routines.Texticnlike1
+import generated.jooq.routines.Texticnlike2
+import generated.jooq.routines.Texticregexeq1
+import generated.jooq.routines.Texticregexeq2
+import generated.jooq.routines.Texticregexne1
+import generated.jooq.routines.Texticregexne2
+import generated.jooq.routines.Translate
+import generated.jooq.routines.UuidGenerateV1
+import generated.jooq.routines.UuidGenerateV1mc
+import generated.jooq.routines.UuidGenerateV3
+import generated.jooq.routines.UuidGenerateV4
+import generated.jooq.routines.UuidGenerateV5
+import generated.jooq.routines.UuidNil
+import generated.jooq.routines.UuidNsDns
+import generated.jooq.routines.UuidNsOid
+import generated.jooq.routines.UuidNsUrl
+import generated.jooq.routines.UuidNsX500
+import generated.jooq.routines.WordSimilarity
+import generated.jooq.routines.WordSimilarityCommutatorOp
+import generated.jooq.routines.WordSimilarityDistCommutatorOp
+import generated.jooq.routines.WordSimilarityDistOp
+import generated.jooq.routines.WordSimilarityOp
 import generated.jooq.tables.PgpArmorHeaders
+import generated.jooq.tables.RegexpMatches
+import generated.jooq.tables.RegexpSplitToTable
 import generated.jooq.tables.records.PgpArmorHeadersRecord
+import generated.jooq.tables.records.RegexpMatchesRecord
+import generated.jooq.tables.records.RegexpSplitToTableRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
+import java.util.UUID
+
+import org.jooq.AggregateFunction
 import org.jooq.Configuration
 import org.jooq.Field
 import org.jooq.Result
+import org.jooq.postgres.extensions.types.Inet
 
 
+
+/**
+ * Call <code>public.armor</code>
+ */
+fun armor1(
+      configuration: Configuration
+    , __1: ByteArray?
+): String? {
+    val f = Armor1()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.armor</code> as a field.
+ */
+fun armor1(
+      __1: ByteArray?
+): Field<String?> {
+    val f = Armor1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.armor</code> as a field.
+ */
+fun armor1(
+      __1: Field<ByteArray?>
+): Field<String?> {
+    val f = Armor1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.armor</code>
+ */
+fun armor2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: Array<String?>?
+    , __3: Array<String?>?
+): String? {
+    val f = Armor2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.armor</code> as a field.
+ */
+fun armor2(
+      __1: ByteArray?
+    , __2: Array<String?>?
+    , __3: Array<String?>?
+): Field<String?> {
+    val f = Armor2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.armor</code> as a field.
+ */
+fun armor2(
+      __1: Field<ByteArray?>
+    , __2: Field<Array<String?>?>
+    , __3: Field<Array<String?>?>
+): Field<String?> {
+    val f = Armor2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext</code>
+ */
+fun citext1(
+      configuration: Configuration
+    , __1: String?
+): String? {
+    val f = Citext1()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext1(
+      __1: String?
+): Field<String?> {
+    val f = Citext1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext1(
+      __1: Field<String?>
+): Field<String?> {
+    val f = Citext1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext</code>
+ */
+fun citext2(
+      configuration: Configuration
+    , __1: Boolean?
+): String? {
+    val f = Citext2()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext2(
+      __1: Boolean?
+): Field<String?> {
+    val f = Citext2()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext2(
+      __1: Field<Boolean?>
+): Field<String?> {
+    val f = Citext2()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext</code>
+ */
+fun citext3(
+      configuration: Configuration
+    , __1: Inet?
+): String? {
+    val f = Citext3()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext3(
+      __1: Inet?
+): Field<String?> {
+    val f = Citext3()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext</code> as a field.
+ */
+fun citext3(
+      __1: Field<Inet?>
+): Field<String?> {
+    val f = Citext3()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_cmp</code>
+ */
+fun citextCmp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Int? {
+    val f = CitextCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_cmp</code> as a field.
+ */
+fun citextCmp(
+      __1: String?
+    , __2: String?
+): Field<Int?> {
+    val f = CitextCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_cmp</code> as a field.
+ */
+fun citextCmp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Int?> {
+    val f = CitextCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_eq</code>
+ */
+fun citextEq(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextEq()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_eq</code> as a field.
+ */
+fun citextEq(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextEq()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_eq</code> as a field.
+ */
+fun citextEq(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextEq()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_ge</code>
+ */
+fun citextGe(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_ge</code> as a field.
+ */
+fun citextGe(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_ge</code> as a field.
+ */
+fun citextGe(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_gt</code>
+ */
+fun citextGt(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_gt</code> as a field.
+ */
+fun citextGt(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_gt</code> as a field.
+ */
+fun citextGt(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_hash</code>
+ */
+fun citextHash(
+      configuration: Configuration
+    , __1: String?
+): Int? {
+    val f = CitextHash()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_hash</code> as a field.
+ */
+fun citextHash(
+      __1: String?
+): Field<Int?> {
+    val f = CitextHash()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_hash</code> as a field.
+ */
+fun citextHash(
+      __1: Field<String?>
+): Field<Int?> {
+    val f = CitextHash()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_hash_extended</code>
+ */
+fun citextHashExtended(
+      configuration: Configuration
+    , __1: String?
+    , __2: Long?
+): Long? {
+    val f = CitextHashExtended()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_hash_extended</code> as a field.
+ */
+fun citextHashExtended(
+      __1: String?
+    , __2: Long?
+): Field<Long?> {
+    val f = CitextHashExtended()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_hash_extended</code> as a field.
+ */
+fun citextHashExtended(
+      __1: Field<String?>
+    , __2: Field<Long?>
+): Field<Long?> {
+    val f = CitextHashExtended()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_larger</code>
+ */
+fun citextLarger(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): String? {
+    val f = CitextLarger()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_larger</code> as a field.
+ */
+fun citextLarger(
+      __1: String?
+    , __2: String?
+): Field<String?> {
+    val f = CitextLarger()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_larger</code> as a field.
+ */
+fun citextLarger(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<String?> {
+    val f = CitextLarger()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_le</code>
+ */
+fun citextLe(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_le</code> as a field.
+ */
+fun citextLe(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_le</code> as a field.
+ */
+fun citextLe(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_lt</code>
+ */
+fun citextLt(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_lt</code> as a field.
+ */
+fun citextLt(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_lt</code> as a field.
+ */
+fun citextLt(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_ne</code>
+ */
+fun citextNe(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextNe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_ne</code> as a field.
+ */
+fun citextNe(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextNe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_ne</code> as a field.
+ */
+fun citextNe(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextNe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_pattern_cmp</code>
+ */
+fun citextPatternCmp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Int? {
+    val f = CitextPatternCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_pattern_cmp</code> as a field.
+ */
+fun citextPatternCmp(
+      __1: String?
+    , __2: String?
+): Field<Int?> {
+    val f = CitextPatternCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_pattern_cmp</code> as a field.
+ */
+fun citextPatternCmp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Int?> {
+    val f = CitextPatternCmp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_pattern_ge</code>
+ */
+fun citextPatternGe(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextPatternGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_pattern_ge</code> as a field.
+ */
+fun citextPatternGe(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextPatternGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_pattern_ge</code> as a field.
+ */
+fun citextPatternGe(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextPatternGe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_pattern_gt</code>
+ */
+fun citextPatternGt(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextPatternGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_pattern_gt</code> as a field.
+ */
+fun citextPatternGt(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextPatternGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_pattern_gt</code> as a field.
+ */
+fun citextPatternGt(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextPatternGt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_pattern_le</code>
+ */
+fun citextPatternLe(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextPatternLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_pattern_le</code> as a field.
+ */
+fun citextPatternLe(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextPatternLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_pattern_le</code> as a field.
+ */
+fun citextPatternLe(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextPatternLe()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_pattern_lt</code>
+ */
+fun citextPatternLt(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = CitextPatternLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_pattern_lt</code> as a field.
+ */
+fun citextPatternLt(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = CitextPatternLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_pattern_lt</code> as a field.
+ */
+fun citextPatternLt(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = CitextPatternLt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citext_smaller</code>
+ */
+fun citextSmaller(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): String? {
+    val f = CitextSmaller()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citext_smaller</code> as a field.
+ */
+fun citextSmaller(
+      __1: String?
+    , __2: String?
+): Field<String?> {
+    val f = CitextSmaller()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citext_smaller</code> as a field.
+ */
+fun citextSmaller(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<String?> {
+    val f = CitextSmaller()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextin(
+      configuration: Configuration
+    , __1: Any?
+): String? {
+    val f = Citextin()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextin(
+      __1: Any?
+): Field<String?> {
+    val f = Citextin()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextin(
+      __1: Field<Any?>
+): Field<String?> {
+    val f = Citextin()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextout(
+      configuration: Configuration
+    , __1: String?
+): Any? {
+    val f = Citextout()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextout(
+      __1: String?
+): Field<Any?> {
+    val f = Citextout()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextout(
+      __1: Field<String?>
+): Field<Any?> {
+    val f = Citextout()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextrecv(
+      configuration: Configuration
+    , __1: Any?
+): String? {
+    val f = Citextrecv()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextrecv(
+      __1: Any?
+): Field<String?> {
+    val f = Citextrecv()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun citextrecv(
+      __1: Field<Any?>
+): Field<String?> {
+    val f = Citextrecv()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.citextsend</code>
+ */
+fun citextsend(
+      configuration: Configuration
+    , __1: String?
+): ByteArray? {
+    val f = Citextsend()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.citextsend</code> as a field.
+ */
+fun citextsend(
+      __1: String?
+): Field<ByteArray?> {
+    val f = Citextsend()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.citextsend</code> as a field.
+ */
+fun citextsend(
+      __1: Field<String?>
+): Field<ByteArray?> {
+    val f = Citextsend()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.crypt</code>
+ */
+fun crypt(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): String? {
+    val f = Crypt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.crypt</code> as a field.
+ */
+fun crypt(
+      __1: String?
+    , __2: String?
+): Field<String?> {
+    val f = Crypt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.crypt</code> as a field.
+ */
+fun crypt(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<String?> {
+    val f = Crypt()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.dearmor</code>
+ */
+fun dearmor(
+      configuration: Configuration
+    , __1: String?
+): ByteArray? {
+    val f = Dearmor()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.dearmor</code> as a field.
+ */
+fun dearmor(
+      __1: String?
+): Field<ByteArray?> {
+    val f = Dearmor()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.dearmor</code> as a field.
+ */
+fun dearmor(
+      __1: Field<String?>
+): Field<ByteArray?> {
+    val f = Dearmor()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.decrypt</code>
+ */
+fun decrypt(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = Decrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.decrypt</code> as a field.
+ */
+fun decrypt(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = Decrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.decrypt</code> as a field.
+ */
+fun decrypt(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = Decrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.decrypt_iv</code>
+ */
+fun decryptIv(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: ByteArray?
+    , __4: String?
+): ByteArray? {
+    val f = DecryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.decrypt_iv</code> as a field.
+ */
+fun decryptIv(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: ByteArray?
+    , __4: String?
+): Field<ByteArray?> {
+    val f = DecryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.decrypt_iv</code> as a field.
+ */
+fun decryptIv(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<ByteArray?>
+    , __4: Field<String?>
+): Field<ByteArray?> {
+    val f = DecryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.digest</code>
+ */
+fun digest1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): ByteArray? {
+    val f = Digest1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.digest</code> as a field.
+ */
+fun digest1(
+      __1: String?
+    , __2: String?
+): Field<ByteArray?> {
+    val f = Digest1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.digest</code> as a field.
+ */
+fun digest1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<ByteArray?> {
+    val f = Digest1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.digest</code>
+ */
+fun digest2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+): ByteArray? {
+    val f = Digest2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.digest</code> as a field.
+ */
+fun digest2(
+      __1: ByteArray?
+    , __2: String?
+): Field<ByteArray?> {
+    val f = Digest2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.digest</code> as a field.
+ */
+fun digest2(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+): Field<ByteArray?> {
+    val f = Digest2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.encrypt</code>
+ */
+fun encrypt(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = Encrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.encrypt</code> as a field.
+ */
+fun encrypt(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = Encrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.encrypt</code> as a field.
+ */
+fun encrypt(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = Encrypt()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.encrypt_iv</code>
+ */
+fun encryptIv(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: ByteArray?
+    , __4: String?
+): ByteArray? {
+    val f = EncryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.encrypt_iv</code> as a field.
+ */
+fun encryptIv(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: ByteArray?
+    , __4: String?
+): Field<ByteArray?> {
+    val f = EncryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.encrypt_iv</code> as a field.
+ */
+fun encryptIv(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<ByteArray?>
+    , __4: Field<String?>
+): Field<ByteArray?> {
+    val f = EncryptIv()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.galley_current_user_id</code>
+ */
+fun galleyCurrentUserId(
+      configuration: Configuration
+): UUID? {
+    val f = GalleyCurrentUserId()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.galley_current_user_id</code> as a field.
+ */
+fun galleyCurrentUserId(): Field<UUID?> {
+    val f = GalleyCurrentUserId()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.galley_has_charter_access</code>
+ */
+fun galleyHasCharterAccess(
+      configuration: Configuration
+    , _CharterId: UUID?
+): Boolean? {
+    val f = GalleyHasCharterAccess()
+    f.set_CharterId(_CharterId)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.galley_has_charter_access</code> as a field.
+ */
+fun galleyHasCharterAccess(
+      _CharterId: UUID?
+): Field<Boolean?> {
+    val f = GalleyHasCharterAccess()
+    f.set_CharterId(_CharterId)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.galley_has_charter_access</code> as a field.
+ */
+fun galleyHasCharterAccess(
+      _CharterId: Field<UUID?>
+): Field<Boolean?> {
+    val f = GalleyHasCharterAccess()
+    f.set_CharterId(_CharterId)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.galley_has_project_access</code>
+ */
+fun galleyHasProjectAccess(
+      configuration: Configuration
+    , _ProjectId: UUID?
+): Boolean? {
+    val f = GalleyHasProjectAccess()
+    f.set_ProjectId(_ProjectId)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.galley_has_project_access</code> as a field.
+ */
+fun galleyHasProjectAccess(
+      _ProjectId: UUID?
+): Field<Boolean?> {
+    val f = GalleyHasProjectAccess()
+    f.set_ProjectId(_ProjectId)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.galley_has_project_access</code> as a field.
+ */
+fun galleyHasProjectAccess(
+      _ProjectId: Field<UUID?>
+): Field<Boolean?> {
+    val f = GalleyHasProjectAccess()
+    f.set_ProjectId(_ProjectId)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.galley_has_vessel_access</code>
+ */
+fun galleyHasVesselAccess(
+      configuration: Configuration
+    , _VesselId: UUID?
+): Boolean? {
+    val f = GalleyHasVesselAccess()
+    f.set_VesselId(_VesselId)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.galley_has_vessel_access</code> as a field.
+ */
+fun galleyHasVesselAccess(
+      _VesselId: UUID?
+): Field<Boolean?> {
+    val f = GalleyHasVesselAccess()
+    f.set_VesselId(_VesselId)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.galley_has_vessel_access</code> as a field.
+ */
+fun galleyHasVesselAccess(
+      _VesselId: Field<UUID?>
+): Field<Boolean?> {
+    val f = GalleyHasVesselAccess()
+    f.set_VesselId(_VesselId)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.galley_outbox_enqueue</code>
+ */
+fun galleyOutboxEnqueue(
+      configuration: Configuration
+    , _AggregateTable: String?
+    , _AggregateId: UUID?
+    , _EventType: String?
+    , _Payload: ClusterSerializable?
+    , _VesselId: UUID?
+    , _CharterId: UUID?
+    , _ProjectId: UUID?
+    , _EventKey: String?
+): Unit {
+    val p = GalleyOutboxEnqueue()
+    p.set_AggregateTable(_AggregateTable)
+    p.set_AggregateId(_AggregateId)
+    p.set_EventType(_EventType)
+    p.set_Payload(_Payload)
+    p.set_VesselId(_VesselId)
+    p.set_CharterId(_CharterId)
+    p.set_ProjectId(_ProjectId)
+    p.set_EventKey(_EventKey)
+
+    p.execute(configuration)
+}
+
+/**
+ * Call <code>public.galley_refresh_mv_outbox_ready</code>
+ */
+fun galleyRefreshMvOutboxReady(
+      configuration: Configuration
+): Unit {
+    val p = GalleyRefreshMvOutboxReady()
+
+    p.execute(configuration)
+}
+
+/**
+ * Call <code>public.galley_set_auth_context</code>
+ */
+fun galleySetAuthContext(
+      configuration: Configuration
+    , _UserId: UUID?
+): Unit {
+    val p = GalleySetAuthContext()
+    p.set_UserId(_UserId)
+
+    p.execute(configuration)
+}
+
+/**
+ * Call <code>public.galley_set_request_context</code>
+ */
+fun galleySetRequestContext(
+      configuration: Configuration
+    , actorId: UUID?
+    , ip: String?
+    , userAgent: String?
+    , correlationId: String?
+): Unit {
+    val p = GalleySetRequestContext()
+    p.setActorId(actorId)
+    p.setIp(ip)
+    p.setUserAgent(userAgent)
+    p.setCorrelationId(correlationId)
+
+    p.execute(configuration)
+}
+
+/**
+ * Call <code>public.gen_random_bytes</code>
+ */
+fun genRandomBytes(
+      configuration: Configuration
+    , __1: Int?
+): ByteArray? {
+    val f = GenRandomBytes()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.gen_random_bytes</code> as a field.
+ */
+fun genRandomBytes(
+      __1: Int?
+): Field<ByteArray?> {
+    val f = GenRandomBytes()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.gen_random_bytes</code> as a field.
+ */
+fun genRandomBytes(
+      __1: Field<Int?>
+): Field<ByteArray?> {
+    val f = GenRandomBytes()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.gen_random_uuid</code>
+ */
+fun genRandomUuid(
+      configuration: Configuration
+): UUID? {
+    val f = GenRandomUuid()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.gen_random_uuid</code> as a field.
+ */
+fun genRandomUuid(): Field<UUID?> {
+    val f = GenRandomUuid()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.gen_salt</code>
+ */
+fun genSalt1(
+      configuration: Configuration
+    , __1: String?
+): String? {
+    val f = GenSalt1()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.gen_salt</code> as a field.
+ */
+fun genSalt1(
+      __1: String?
+): Field<String?> {
+    val f = GenSalt1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.gen_salt</code> as a field.
+ */
+fun genSalt1(
+      __1: Field<String?>
+): Field<String?> {
+    val f = GenSalt1()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.gen_salt</code>
+ */
+fun genSalt2(
+      configuration: Configuration
+    , __1: String?
+    , __2: Int?
+): String? {
+    val f = GenSalt2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.gen_salt</code> as a field.
+ */
+fun genSalt2(
+      __1: String?
+    , __2: Int?
+): Field<String?> {
+    val f = GenSalt2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.gen_salt</code> as a field.
+ */
+fun genSalt2(
+      __1: Field<String?>
+    , __2: Field<Int?>
+): Field<String?> {
+    val f = GenSalt2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractQueryTrgm(
+      configuration: Configuration
+    , __1: String?
+    , __2: Any?
+    , __3: Short?
+    , __4: Any?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+): Any? {
+    val f = GinExtractQueryTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractQueryTrgm(
+      __1: String?
+    , __2: Any?
+    , __3: Short?
+    , __4: Any?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+): Field<Any?> {
+    val f = GinExtractQueryTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractQueryTrgm(
+      __1: Field<String?>
+    , __2: Field<Any?>
+    , __3: Field<Short?>
+    , __4: Field<Any?>
+    , __5: Field<Any?>
+    , __6: Field<Any?>
+    , __7: Field<Any?>
+): Field<Any?> {
+    val f = GinExtractQueryTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractValueTrgm(
+      configuration: Configuration
+    , __1: String?
+    , __2: Any?
+): Any? {
+    val f = GinExtractValueTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractValueTrgm(
+      __1: String?
+    , __2: Any?
+): Field<Any?> {
+    val f = GinExtractValueTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginExtractValueTrgm(
+      __1: Field<String?>
+    , __2: Field<Any?>
+): Field<Any?> {
+    val f = GinExtractValueTrgm()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmConsistent(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Short?
+    , __3: String?
+    , __4: Int?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+    , __8: Any?
+): Boolean? {
+    val f = GinTrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+    f.set__8(__8)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmConsistent(
+      __1: Any?
+    , __2: Short?
+    , __3: String?
+    , __4: Int?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+    , __8: Any?
+): Field<Boolean?> {
+    val f = GinTrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+    f.set__8(__8)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmConsistent(
+      __1: Field<Any?>
+    , __2: Field<Short?>
+    , __3: Field<String?>
+    , __4: Field<Int?>
+    , __5: Field<Any?>
+    , __6: Field<Any?>
+    , __7: Field<Any?>
+    , __8: Field<Any?>
+): Field<Boolean?> {
+    val f = GinTrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+    f.set__8(__8)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmTriconsistent(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Short?
+    , __3: String?
+    , __4: Int?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+): String? {
+    val f = GinTrgmTriconsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmTriconsistent(
+      __1: Any?
+    , __2: Short?
+    , __3: String?
+    , __4: Int?
+    , __5: Any?
+    , __6: Any?
+    , __7: Any?
+): Field<String?> {
+    val f = GinTrgmTriconsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun ginTrgmTriconsistent(
+      __1: Field<Any?>
+    , __2: Field<Short?>
+    , __3: Field<String?>
+    , __4: Field<Int?>
+    , __5: Field<Any?>
+    , __6: Field<Any?>
+    , __7: Field<Any?>
+): Field<String?> {
+    val f = GinTrgmTriconsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+    f.set__6(__6)
+    f.set__7(__7)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmCompress(
+      configuration: Configuration
+    , __1: Any?
+): Any? {
+    val f = GtrgmCompress()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmCompress(
+      __1: Any?
+): Field<Any?> {
+    val f = GtrgmCompress()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmCompress(
+      __1: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmCompress()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmConsistent(
+      configuration: Configuration
+    , __1: Any?
+    , __2: String?
+    , __3: Short?
+    , __4: Long?
+    , __5: Any?
+): Boolean? {
+    val f = GtrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmConsistent(
+      __1: Any?
+    , __2: String?
+    , __3: Short?
+    , __4: Long?
+    , __5: Any?
+): Field<Boolean?> {
+    val f = GtrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmConsistent(
+      __1: Field<Any?>
+    , __2: Field<String?>
+    , __3: Field<Short?>
+    , __4: Field<Long?>
+    , __5: Field<Any?>
+): Field<Boolean?> {
+    val f = GtrgmConsistent()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDecompress(
+      configuration: Configuration
+    , __1: Any?
+): Any? {
+    val f = GtrgmDecompress()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDecompress(
+      __1: Any?
+): Field<Any?> {
+    val f = GtrgmDecompress()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDecompress(
+      __1: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmDecompress()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDistance(
+      configuration: Configuration
+    , __1: Any?
+    , __2: String?
+    , __3: Short?
+    , __4: Long?
+    , __5: Any?
+): Double? {
+    val f = GtrgmDistance()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDistance(
+      __1: Any?
+    , __2: String?
+    , __3: Short?
+    , __4: Long?
+    , __5: Any?
+): Field<Double?> {
+    val f = GtrgmDistance()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmDistance(
+      __1: Field<Any?>
+    , __2: Field<String?>
+    , __3: Field<Short?>
+    , __4: Field<Long?>
+    , __5: Field<Any?>
+): Field<Double?> {
+    val f = GtrgmDistance()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+    f.set__5(__5)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmIn(
+      configuration: Configuration
+    , __1: Any?
+): Any? {
+    val f = GtrgmIn()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmIn(
+      __1: Any?
+): Field<Any?> {
+    val f = GtrgmIn()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmIn(
+      __1: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmIn()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. Parameter type or return type is unknown. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmOptions(
+      configuration: Configuration
+    , __1: Any?
+): Unit {
+    val p = GtrgmOptions()
+    p.set__1(__1)
+
+    p.execute(configuration)
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmOut(
+      configuration: Configuration
+    , __1: Any?
+): Any? {
+    val f = GtrgmOut()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmOut(
+      __1: Any?
+): Field<Any?> {
+    val f = GtrgmOut()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmOut(
+      __1: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmOut()
+    f.set__1(__1)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPenalty(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Any?
+    , __3: Any?
+): Any? {
+    val f = GtrgmPenalty()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPenalty(
+      __1: Any?
+    , __2: Any?
+    , __3: Any?
+): Field<Any?> {
+    val f = GtrgmPenalty()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPenalty(
+      __1: Field<Any?>
+    , __2: Field<Any?>
+    , __3: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmPenalty()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPicksplit(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Any?
+): Any? {
+    val f = GtrgmPicksplit()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPicksplit(
+      __1: Any?
+    , __2: Any?
+): Field<Any?> {
+    val f = GtrgmPicksplit()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmPicksplit(
+      __1: Field<Any?>
+    , __2: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmPicksplit()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmSame(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Any?
+    , __3: Any?
+): Any? {
+    val f = GtrgmSame()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmSame(
+      __1: Any?
+    , __2: Any?
+    , __3: Any?
+): Field<Any?> {
+    val f = GtrgmSame()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmSame(
+      __1: Field<Any?>
+    , __2: Field<Any?>
+    , __3: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmSame()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmUnion(
+      configuration: Configuration
+    , __1: Any?
+    , __2: Any?
+): Any? {
+    val f = GtrgmUnion()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmUnion(
+      __1: Any?
+    , __2: Any?
+): Field<Any?> {
+    val f = GtrgmUnion()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+@Deprecated(message = "Unknown data type. If this is a qualified, user-defined type, it may have been excluded from code generation. If this is a built-in type, you can define an explicit org.jooq.Binding to specify how this type should be handled. Deprecation can be turned off using <deprecationOnUnknownTypes/> in your code generator configuration.")
+fun gtrgmUnion(
+      __1: Field<Any?>
+    , __2: Field<Any?>
+): Field<Any?> {
+    val f = GtrgmUnion()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.hmac</code>
+ */
+fun hmac1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): ByteArray? {
+    val f = Hmac1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.hmac</code> as a field.
+ */
+fun hmac1(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = Hmac1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.hmac</code> as a field.
+ */
+fun hmac1(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = Hmac1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.hmac</code>
+ */
+fun hmac2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = Hmac2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.hmac</code> as a field.
+ */
+fun hmac2(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = Hmac2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.hmac</code> as a field.
+ */
+fun hmac2(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = Hmac2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.max</code> as a field.
+ */
+fun max(
+      __1: String?
+): AggregateFunction<String?> {
+    val f = Max()
+    f.set__1(__1)
+
+    return f.asAggregateFunction()
+}
+
+/**
+ * Get <code>public.max</code> as a field.
+ */
+fun max(
+      __1: Field<String?>
+): AggregateFunction<String?> {
+    val f = Max()
+    f.set__1(__1)
+
+    return f.asAggregateFunction()
+}
+
+/**
+ * Get <code>public.min</code> as a field.
+ */
+fun min(
+      __1: String?
+): AggregateFunction<String?> {
+    val f = Min()
+    f.set__1(__1)
+
+    return f.asAggregateFunction()
+}
+
+/**
+ * Get <code>public.min</code> as a field.
+ */
+fun min(
+      __1: Field<String?>
+): AggregateFunction<String?> {
+    val f = Min()
+    f.set__1(__1)
+
+    return f.asAggregateFunction()
+}
+
+/**
+ * Call <code>public.pgp_key_id</code>
+ */
+fun pgpKeyId(
+      configuration: Configuration
+    , __1: ByteArray?
+): String? {
+    val f = PgpKeyId()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_key_id</code> as a field.
+ */
+fun pgpKeyId(
+      __1: ByteArray?
+): Field<String?> {
+    val f = PgpKeyId()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_key_id</code> as a field.
+ */
+fun pgpKeyId(
+      __1: Field<ByteArray?>
+): Field<String?> {
+    val f = PgpKeyId()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt</code>
+ */
+fun pgpPubDecrypt1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+): String? {
+    val f = PgpPubDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt1(
+      __1: ByteArray?
+    , __2: ByteArray?
+): Field<String?> {
+    val f = PgpPubDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt1(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+): Field<String?> {
+    val f = PgpPubDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt</code>
+ */
+fun pgpPubDecrypt2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): String? {
+    val f = PgpPubDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt2(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<String?> {
+    val f = PgpPubDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt2(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<String?> {
+    val f = PgpPubDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt</code>
+ */
+fun pgpPubDecrypt3(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+    , __4: String?
+): String? {
+    val f = PgpPubDecrypt3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt3(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+    , __4: String?
+): Field<String?> {
+    val f = PgpPubDecrypt3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt</code> as a field.
+ */
+fun pgpPubDecrypt3(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+    , __4: Field<String?>
+): Field<String?> {
+    val f = PgpPubDecrypt3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt_bytea</code>
+ */
+fun pgpPubDecryptBytea1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+): ByteArray? {
+    val f = PgpPubDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea1(
+      __1: ByteArray?
+    , __2: ByteArray?
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea1(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt_bytea</code>
+ */
+fun pgpPubDecryptBytea2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = PgpPubDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea2(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea2(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_decrypt_bytea</code>
+ */
+fun pgpPubDecryptBytea3(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+    , __4: String?
+): ByteArray? {
+    val f = PgpPubDecryptBytea3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea3(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+    , __4: String?
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_decrypt_bytea</code> as a field.
+ */
+fun pgpPubDecryptBytea3(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+    , __4: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpPubDecryptBytea3()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_encrypt</code>
+ */
+fun pgpPubEncrypt1(
+      configuration: Configuration
+    , __1: String?
+    , __2: ByteArray?
+): ByteArray? {
+    val f = PgpPubEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt</code> as a field.
+ */
+fun pgpPubEncrypt1(
+      __1: String?
+    , __2: ByteArray?
+): Field<ByteArray?> {
+    val f = PgpPubEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt</code> as a field.
+ */
+fun pgpPubEncrypt1(
+      __1: Field<String?>
+    , __2: Field<ByteArray?>
+): Field<ByteArray?> {
+    val f = PgpPubEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_encrypt</code>
+ */
+fun pgpPubEncrypt2(
+      configuration: Configuration
+    , __1: String?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = PgpPubEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt</code> as a field.
+ */
+fun pgpPubEncrypt2(
+      __1: String?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpPubEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt</code> as a field.
+ */
+fun pgpPubEncrypt2(
+      __1: Field<String?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpPubEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_encrypt_bytea</code>
+ */
+fun pgpPubEncryptBytea1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+): ByteArray? {
+    val f = PgpPubEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt_bytea</code> as a field.
+ */
+fun pgpPubEncryptBytea1(
+      __1: ByteArray?
+    , __2: ByteArray?
+): Field<ByteArray?> {
+    val f = PgpPubEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt_bytea</code> as a field.
+ */
+fun pgpPubEncryptBytea1(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+): Field<ByteArray?> {
+    val f = PgpPubEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_pub_encrypt_bytea</code>
+ */
+fun pgpPubEncryptBytea2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): ByteArray? {
+    val f = PgpPubEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt_bytea</code> as a field.
+ */
+fun pgpPubEncryptBytea2(
+      __1: ByteArray?
+    , __2: ByteArray?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpPubEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_pub_encrypt_bytea</code> as a field.
+ */
+fun pgpPubEncryptBytea2(
+      __1: Field<ByteArray?>
+    , __2: Field<ByteArray?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpPubEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_decrypt</code>
+ */
+fun pgpSymDecrypt1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+): String? {
+    val f = PgpSymDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt</code> as a field.
+ */
+fun pgpSymDecrypt1(
+      __1: ByteArray?
+    , __2: String?
+): Field<String?> {
+    val f = PgpSymDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt</code> as a field.
+ */
+fun pgpSymDecrypt1(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+): Field<String?> {
+    val f = PgpSymDecrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_decrypt</code>
+ */
+fun pgpSymDecrypt2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): String? {
+    val f = PgpSymDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt</code> as a field.
+ */
+fun pgpSymDecrypt2(
+      __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): Field<String?> {
+    val f = PgpSymDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt</code> as a field.
+ */
+fun pgpSymDecrypt2(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<String?> {
+    val f = PgpSymDecrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_decrypt_bytea</code>
+ */
+fun pgpSymDecryptBytea1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+): ByteArray? {
+    val f = PgpSymDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt_bytea</code> as a field.
+ */
+fun pgpSymDecryptBytea1(
+      __1: ByteArray?
+    , __2: String?
+): Field<ByteArray?> {
+    val f = PgpSymDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt_bytea</code> as a field.
+ */
+fun pgpSymDecryptBytea1(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymDecryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_decrypt_bytea</code>
+ */
+fun pgpSymDecryptBytea2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): ByteArray? {
+    val f = PgpSymDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt_bytea</code> as a field.
+ */
+fun pgpSymDecryptBytea2(
+      __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpSymDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_decrypt_bytea</code> as a field.
+ */
+fun pgpSymDecryptBytea2(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymDecryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_encrypt</code>
+ */
+fun pgpSymEncrypt1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): ByteArray? {
+    val f = PgpSymEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt</code> as a field.
+ */
+fun pgpSymEncrypt1(
+      __1: String?
+    , __2: String?
+): Field<ByteArray?> {
+    val f = PgpSymEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt</code> as a field.
+ */
+fun pgpSymEncrypt1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymEncrypt1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_encrypt</code>
+ */
+fun pgpSymEncrypt2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): ByteArray? {
+    val f = PgpSymEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt</code> as a field.
+ */
+fun pgpSymEncrypt2(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpSymEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt</code> as a field.
+ */
+fun pgpSymEncrypt2(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymEncrypt2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_encrypt_bytea</code>
+ */
+fun pgpSymEncryptBytea1(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+): ByteArray? {
+    val f = PgpSymEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt_bytea</code> as a field.
+ */
+fun pgpSymEncryptBytea1(
+      __1: ByteArray?
+    , __2: String?
+): Field<ByteArray?> {
+    val f = PgpSymEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt_bytea</code> as a field.
+ */
+fun pgpSymEncryptBytea1(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymEncryptBytea1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.pgp_sym_encrypt_bytea</code>
+ */
+fun pgpSymEncryptBytea2(
+      configuration: Configuration
+    , __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): ByteArray? {
+    val f = PgpSymEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt_bytea</code> as a field.
+ */
+fun pgpSymEncryptBytea2(
+      __1: ByteArray?
+    , __2: String?
+    , __3: String?
+): Field<ByteArray?> {
+    val f = PgpSymEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.pgp_sym_encrypt_bytea</code> as a field.
+ */
+fun pgpSymEncryptBytea2(
+      __1: Field<ByteArray?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<ByteArray?> {
+    val f = PgpSymEncryptBytea2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_match</code>
+ */
+fun regexpMatch1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Array<String?>? {
+    val f = RegexpMatch1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_match</code> as a field.
+ */
+fun regexpMatch1(
+      __1: String?
+    , __2: String?
+): Field<Array<String?>?> {
+    val f = RegexpMatch1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_match</code> as a field.
+ */
+fun regexpMatch1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Array<String?>?> {
+    val f = RegexpMatch1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_match</code>
+ */
+fun regexpMatch2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): Array<String?>? {
+    val f = RegexpMatch2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_match</code> as a field.
+ */
+fun regexpMatch2(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<Array<String?>?> {
+    val f = RegexpMatch2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_match</code> as a field.
+ */
+fun regexpMatch2(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<Array<String?>?> {
+    val f = RegexpMatch2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_replace</code>
+ */
+fun regexpReplace1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): String? {
+    val f = RegexpReplace1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_replace</code> as a field.
+ */
+fun regexpReplace1(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<String?> {
+    val f = RegexpReplace1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_replace</code> as a field.
+ */
+fun regexpReplace1(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<String?> {
+    val f = RegexpReplace1()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_replace</code>
+ */
+fun regexpReplace2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+    , __4: String?
+): String? {
+    val f = RegexpReplace2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_replace</code> as a field.
+ */
+fun regexpReplace2(
+      __1: String?
+    , __2: String?
+    , __3: String?
+    , __4: String?
+): Field<String?> {
+    val f = RegexpReplace2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_replace</code> as a field.
+ */
+fun regexpReplace2(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+    , __4: Field<String?>
+): Field<String?> {
+    val f = RegexpReplace2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+    f.set__4(__4)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_split_to_array</code>
+ */
+fun regexpSplitToArray1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Array<String?>? {
+    val f = RegexpSplitToArray1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_split_to_array</code> as a field.
+ */
+fun regexpSplitToArray1(
+      __1: String?
+    , __2: String?
+): Field<Array<String?>?> {
+    val f = RegexpSplitToArray1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_split_to_array</code> as a field.
+ */
+fun regexpSplitToArray1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Array<String?>?> {
+    val f = RegexpSplitToArray1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.regexp_split_to_array</code>
+ */
+fun regexpSplitToArray2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): Array<String?>? {
+    val f = RegexpSplitToArray2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.regexp_split_to_array</code> as a field.
+ */
+fun regexpSplitToArray2(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<Array<String?>?> {
+    val f = RegexpSplitToArray2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.regexp_split_to_array</code> as a field.
+ */
+fun regexpSplitToArray2(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<Array<String?>?> {
+    val f = RegexpSplitToArray2()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.replace</code>
+ */
+fun replace(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): String? {
+    val f = Replace()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.replace</code> as a field.
+ */
+fun replace(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<String?> {
+    val f = Replace()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.replace</code> as a field.
+ */
+fun replace(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<String?> {
+    val f = Replace()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.set_limit</code>
+ */
+fun setLimit(
+      configuration: Configuration
+    , __1: Float?
+): Float? {
+    val f = SetLimit()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.set_limit</code> as a field.
+ */
+fun setLimit(
+      __1: Float?
+): Field<Float?> {
+    val f = SetLimit()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.set_limit</code> as a field.
+ */
+fun setLimit(
+      __1: Field<Float?>
+): Field<Float?> {
+    val f = SetLimit()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.show_limit</code>
+ */
+fun showLimit(
+      configuration: Configuration
+): Float? {
+    val f = ShowLimit()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.show_limit</code> as a field.
+ */
+fun showLimit(): Field<Float?> {
+    val f = ShowLimit()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.show_trgm</code>
+ */
+fun showTrgm(
+      configuration: Configuration
+    , __1: String?
+): Array<String?>? {
+    val f = ShowTrgm()
+    f.set__1(__1)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.show_trgm</code> as a field.
+ */
+fun showTrgm(
+      __1: String?
+): Field<Array<String?>?> {
+    val f = ShowTrgm()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.show_trgm</code> as a field.
+ */
+fun showTrgm(
+      __1: Field<String?>
+): Field<Array<String?>?> {
+    val f = ShowTrgm()
+    f.set__1(__1)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.similarity</code>
+ */
+fun similarity(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = Similarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.similarity</code> as a field.
+ */
+fun similarity(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = Similarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.similarity</code> as a field.
+ */
+fun similarity(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = Similarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.similarity_dist</code>
+ */
+fun similarityDist(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = SimilarityDist()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.similarity_dist</code> as a field.
+ */
+fun similarityDist(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = SimilarityDist()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.similarity_dist</code> as a field.
+ */
+fun similarityDist(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = SimilarityDist()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.similarity_op</code>
+ */
+fun similarityOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = SimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.similarity_op</code> as a field.
+ */
+fun similarityOp(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = SimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.similarity_op</code> as a field.
+ */
+fun similarityOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = SimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.split_part</code>
+ */
+fun splitPart(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: Int?
+): String? {
+    val f = SplitPart()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.split_part</code> as a field.
+ */
+fun splitPart(
+      __1: String?
+    , __2: String?
+    , __3: Int?
+): Field<String?> {
+    val f = SplitPart()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.split_part</code> as a field.
+ */
+fun splitPart(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<Int?>
+): Field<String?> {
+    val f = SplitPart()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strict_word_similarity</code>
+ */
+fun strictWordSimilarity(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = StrictWordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strict_word_similarity</code> as a field.
+ */
+fun strictWordSimilarity(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = StrictWordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strict_word_similarity</code> as a field.
+ */
+fun strictWordSimilarity(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = StrictWordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strict_word_similarity_commutator_op</code>
+ */
+fun strictWordSimilarityCommutatorOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = StrictWordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strict_word_similarity_commutator_op</code> as a field.
+ */
+fun strictWordSimilarityCommutatorOp(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = StrictWordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strict_word_similarity_commutator_op</code> as a field.
+ */
+fun strictWordSimilarityCommutatorOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = StrictWordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strict_word_similarity_dist_commutator_op</code>
+ */
+fun strictWordSimilarityDistCommutatorOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = StrictWordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strict_word_similarity_dist_commutator_op</code> as a field.
+ */
+fun strictWordSimilarityDistCommutatorOp(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = StrictWordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strict_word_similarity_dist_commutator_op</code> as a field.
+ */
+fun strictWordSimilarityDistCommutatorOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = StrictWordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strict_word_similarity_dist_op</code>
+ */
+fun strictWordSimilarityDistOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = StrictWordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strict_word_similarity_dist_op</code> as a field.
+ */
+fun strictWordSimilarityDistOp(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = StrictWordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strict_word_similarity_dist_op</code> as a field.
+ */
+fun strictWordSimilarityDistOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = StrictWordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strict_word_similarity_op</code>
+ */
+fun strictWordSimilarityOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = StrictWordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strict_word_similarity_op</code> as a field.
+ */
+fun strictWordSimilarityOp(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = StrictWordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strict_word_similarity_op</code> as a field.
+ */
+fun strictWordSimilarityOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = StrictWordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.strpos</code>
+ */
+fun strpos(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Int? {
+    val f = Strpos()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.strpos</code> as a field.
+ */
+fun strpos(
+      __1: String?
+    , __2: String?
+): Field<Int?> {
+    val f = Strpos()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.strpos</code> as a field.
+ */
+fun strpos(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Int?> {
+    val f = Strpos()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticlike</code>
+ */
+fun texticlike1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticlike</code> as a field.
+ */
+fun texticlike1(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticlike</code> as a field.
+ */
+fun texticlike1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticlike</code>
+ */
+fun texticlike2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticlike</code> as a field.
+ */
+fun texticlike2(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticlike</code> as a field.
+ */
+fun texticlike2(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticnlike</code>
+ */
+fun texticnlike1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticnlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticnlike</code> as a field.
+ */
+fun texticnlike1(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticnlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticnlike</code> as a field.
+ */
+fun texticnlike1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticnlike1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticnlike</code>
+ */
+fun texticnlike2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticnlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticnlike</code> as a field.
+ */
+fun texticnlike2(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticnlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticnlike</code> as a field.
+ */
+fun texticnlike2(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticnlike2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticregexeq</code>
+ */
+fun texticregexeq1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticregexeq1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticregexeq</code> as a field.
+ */
+fun texticregexeq1(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticregexeq1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticregexeq</code> as a field.
+ */
+fun texticregexeq1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticregexeq1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticregexeq</code>
+ */
+fun texticregexeq2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticregexeq2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticregexeq</code> as a field.
+ */
+fun texticregexeq2(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticregexeq2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticregexeq</code> as a field.
+ */
+fun texticregexeq2(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticregexeq2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticregexne</code>
+ */
+fun texticregexne1(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticregexne1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticregexne</code> as a field.
+ */
+fun texticregexne1(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticregexne1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticregexne</code> as a field.
+ */
+fun texticregexne1(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticregexne1()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.texticregexne</code>
+ */
+fun texticregexne2(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = Texticregexne2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.texticregexne</code> as a field.
+ */
+fun texticregexne2(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = Texticregexne2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.texticregexne</code> as a field.
+ */
+fun texticregexne2(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = Texticregexne2()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.translate</code>
+ */
+fun translate(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+    , __3: String?
+): String? {
+    val f = Translate()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.translate</code> as a field.
+ */
+fun translate(
+      __1: String?
+    , __2: String?
+    , __3: String?
+): Field<String?> {
+    val f = Translate()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.translate</code> as a field.
+ */
+fun translate(
+      __1: Field<String?>
+    , __2: Field<String?>
+    , __3: Field<String?>
+): Field<String?> {
+    val f = Translate()
+    f.set__1(__1)
+    f.set__2(__2)
+    f.set__3(__3)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_generate_v1</code>
+ */
+fun uuidGenerateV1(
+      configuration: Configuration
+): UUID? {
+    val f = UuidGenerateV1()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_generate_v1</code> as a field.
+ */
+fun uuidGenerateV1(): Field<UUID?> {
+    val f = UuidGenerateV1()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_generate_v1mc</code>
+ */
+fun uuidGenerateV1mc(
+      configuration: Configuration
+): UUID? {
+    val f = UuidGenerateV1mc()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_generate_v1mc</code> as a field.
+ */
+fun uuidGenerateV1mc(): Field<UUID?> {
+    val f = UuidGenerateV1mc()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_generate_v3</code>
+ */
+fun uuidGenerateV3(
+      configuration: Configuration
+    , namespace: UUID?
+    , name: String?
+): UUID? {
+    val f = UuidGenerateV3()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_generate_v3</code> as a field.
+ */
+fun uuidGenerateV3(
+      namespace: UUID?
+    , name: String?
+): Field<UUID?> {
+    val f = UuidGenerateV3()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.uuid_generate_v3</code> as a field.
+ */
+fun uuidGenerateV3(
+      namespace: Field<UUID?>
+    , name: Field<String?>
+): Field<UUID?> {
+    val f = UuidGenerateV3()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_generate_v4</code>
+ */
+fun uuidGenerateV4(
+      configuration: Configuration
+): UUID? {
+    val f = UuidGenerateV4()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_generate_v4</code> as a field.
+ */
+fun uuidGenerateV4(): Field<UUID?> {
+    val f = UuidGenerateV4()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_generate_v5</code>
+ */
+fun uuidGenerateV5(
+      configuration: Configuration
+    , namespace: UUID?
+    , name: String?
+): UUID? {
+    val f = UuidGenerateV5()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_generate_v5</code> as a field.
+ */
+fun uuidGenerateV5(
+      namespace: UUID?
+    , name: String?
+): Field<UUID?> {
+    val f = UuidGenerateV5()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.uuid_generate_v5</code> as a field.
+ */
+fun uuidGenerateV5(
+      namespace: Field<UUID?>
+    , name: Field<String?>
+): Field<UUID?> {
+    val f = UuidGenerateV5()
+    f.setNamespace(namespace)
+    f.setName_(name)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_nil</code>
+ */
+fun uuidNil(
+      configuration: Configuration
+): UUID? {
+    val f = UuidNil()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_nil</code> as a field.
+ */
+fun uuidNil(): Field<UUID?> {
+    val f = UuidNil()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_ns_dns</code>
+ */
+fun uuidNsDns(
+      configuration: Configuration
+): UUID? {
+    val f = UuidNsDns()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_ns_dns</code> as a field.
+ */
+fun uuidNsDns(): Field<UUID?> {
+    val f = UuidNsDns()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_ns_oid</code>
+ */
+fun uuidNsOid(
+      configuration: Configuration
+): UUID? {
+    val f = UuidNsOid()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_ns_oid</code> as a field.
+ */
+fun uuidNsOid(): Field<UUID?> {
+    val f = UuidNsOid()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_ns_url</code>
+ */
+fun uuidNsUrl(
+      configuration: Configuration
+): UUID? {
+    val f = UuidNsUrl()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_ns_url</code> as a field.
+ */
+fun uuidNsUrl(): Field<UUID?> {
+    val f = UuidNsUrl()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.uuid_ns_x500</code>
+ */
+fun uuidNsX500(
+      configuration: Configuration
+): UUID? {
+    val f = UuidNsX500()
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.uuid_ns_x500</code> as a field.
+ */
+fun uuidNsX500(): Field<UUID?> {
+    val f = UuidNsX500()
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.word_similarity</code>
+ */
+fun wordSimilarity(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = WordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.word_similarity</code> as a field.
+ */
+fun wordSimilarity(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = WordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.word_similarity</code> as a field.
+ */
+fun wordSimilarity(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = WordSimilarity()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.word_similarity_commutator_op</code>
+ */
+fun wordSimilarityCommutatorOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = WordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.word_similarity_commutator_op</code> as a field.
+ */
+fun wordSimilarityCommutatorOp(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = WordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.word_similarity_commutator_op</code> as a field.
+ */
+fun wordSimilarityCommutatorOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = WordSimilarityCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.word_similarity_dist_commutator_op</code>
+ */
+fun wordSimilarityDistCommutatorOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = WordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.word_similarity_dist_commutator_op</code> as a field.
+ */
+fun wordSimilarityDistCommutatorOp(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = WordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.word_similarity_dist_commutator_op</code> as a field.
+ */
+fun wordSimilarityDistCommutatorOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = WordSimilarityDistCommutatorOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.word_similarity_dist_op</code>
+ */
+fun wordSimilarityDistOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Float? {
+    val f = WordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.word_similarity_dist_op</code> as a field.
+ */
+fun wordSimilarityDistOp(
+      __1: String?
+    , __2: String?
+): Field<Float?> {
+    val f = WordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.word_similarity_dist_op</code> as a field.
+ */
+fun wordSimilarityDistOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Float?> {
+    val f = WordSimilarityDistOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Call <code>public.word_similarity_op</code>
+ */
+fun wordSimilarityOp(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Boolean? {
+    val f = WordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    f.execute(configuration)
+    return f.returnValue
+}
+
+/**
+ * Get <code>public.word_similarity_op</code> as a field.
+ */
+fun wordSimilarityOp(
+      __1: String?
+    , __2: String?
+): Field<Boolean?> {
+    val f = WordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
+
+/**
+ * Get <code>public.word_similarity_op</code> as a field.
+ */
+fun wordSimilarityOp(
+      __1: Field<String?>
+    , __2: Field<String?>
+): Field<Boolean?> {
+    val f = WordSimilarityOp()
+    f.set__1(__1)
+    f.set__2(__2)
+
+    return f.asField()
+}
 
 /**
  * Call <code>public.pgp_armor_headers</code>.
@@ -40,4 +5365,72 @@ fun pgpArmorHeaders(
       __1: Field<String?>
 ): PgpArmorHeaders = generated.jooq.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
     __1
+)
+
+/**
+ * Call <code>public.regexp_matches</code>.
+ */
+fun regexpMatches(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Result<RegexpMatchesRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+      __1
+    , __2
+)).fetch()
+
+/**
+ * Get <code>public.regexp_matches</code> as a table.
+ */
+fun regexpMatches(
+      __1: String?
+    , __2: String?
+): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+    __1,
+    __2
+)
+
+/**
+ * Get <code>public.regexp_matches</code> as a table.
+ */
+fun regexpMatches(
+      __1: Field<String?>
+    , __2: Field<String?>
+): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+    __1,
+    __2
+)
+
+/**
+ * Call <code>public.regexp_split_to_table</code>.
+ */
+fun regexpSplitToTable(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Result<RegexpSplitToTableRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+      __1
+    , __2
+)).fetch()
+
+/**
+ * Get <code>public.regexp_split_to_table</code> as a table.
+ */
+fun regexpSplitToTable(
+      __1: String?
+    , __2: String?
+): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+    __1,
+    __2
+)
+
+/**
+ * Get <code>public.regexp_split_to_table</code> as a table.
+ */
+fun regexpSplitToTable(
+      __1: Field<String?>
+    , __2: Field<String?>
+): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+    __1,
+    __2
 )

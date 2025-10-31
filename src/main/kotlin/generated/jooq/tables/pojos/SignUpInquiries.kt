@@ -7,11 +7,11 @@ package generated.jooq.tables.pojos
 import generated.jooq.enums.SignUpIntent
 import generated.jooq.enums.TechnicalExperience
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -26,7 +26,7 @@ data class SignUpInquiries(
     var userId: UUID? = null,
     var intent: SignUpIntent? = null,
     var technicalExperience: TechnicalExperience? = null,
-    var questions: JSONB? = null,
+    var questions: ClusterSerializable? = null,
     var createdAt: OffsetDateTime? = null
 ): BaseModel, Serializable {
 

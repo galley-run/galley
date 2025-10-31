@@ -12,7 +12,6 @@ import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
 import generated.jooq.tables.CrewCharterMember
 import generated.jooq.tables.EmailLoginTokens
-import generated.jooq.tables.FlywaySchemaHistory
 import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.MvLogbookRecent
@@ -45,7 +44,6 @@ import org.jooq.impl.Internal
 // INDEX definitions
 // -------------------------------------------------------------------------
 
-val FLYWAY_SCHEMA_HISTORY_S_IDX: Index = Internal.createIndex(DSL.name("flyway_schema_history_s_idx"), FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.SUCCESS), false)
 val IDX_API_GW_CONFIGURATION_GIN: Index = Internal.createIndex(DSL.name("idx_api_gw_configuration_gin"), ProjectApiGateway.PROJECT_API_GATEWAY, arrayOf(ProjectApiGateway.PROJECT_API_GATEWAY.CONFIGURATION), false)
 val IDX_API_GW_UPDATED: Index = Internal.createIndex(DSL.name("idx_api_gw_updated"), ProjectApiGateway.PROJECT_API_GATEWAY, arrayOf(ProjectApiGateway.PROJECT_API_GATEWAY.UPDATED_AT), false)
 val IDX_API_KEYS_LAST_USED: Index = Internal.createIndex(DSL.name("idx_api_keys_last_used"), ApiKeys.API_KEYS, arrayOf(ApiKeys.API_KEYS.LAST_USED_AT), false)

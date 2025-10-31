@@ -8,10 +8,11 @@ import generated.jooq.enums.SignUpIntent
 import generated.jooq.enums.TechnicalExperience
 import generated.jooq.tables.SignUpInquiries
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -42,9 +43,9 @@ open class SignUpInquiriesRecord() : UpdatableRecordImpl<SignUpInquiriesRecord>(
         set(value): Unit = set(4, value)
         get(): TechnicalExperience? = get(4) as TechnicalExperience?
 
-    open var questions: JSONB?
+    open var questions: ClusterSerializable?
         set(value): Unit = set(5, value)
-        get(): JSONB? = get(5) as JSONB?
+        get(): ClusterSerializable? = get(5) as ClusterSerializable?
 
     open var createdAt: OffsetDateTime?
         set(value): Unit = set(6, value)
@@ -59,7 +60,7 @@ open class SignUpInquiriesRecord() : UpdatableRecordImpl<SignUpInquiriesRecord>(
     /**
      * Create a detached, initialised SignUpInquiriesRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, userId: UUID? = null, intent: SignUpIntent? = null, technicalExperience: TechnicalExperience? = null, questions: JSONB? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, userId: UUID? = null, intent: SignUpIntent? = null, technicalExperience: TechnicalExperience? = null, questions: ClusterSerializable? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.userId = userId

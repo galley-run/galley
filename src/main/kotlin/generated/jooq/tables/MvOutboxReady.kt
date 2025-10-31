@@ -9,18 +9,21 @@ import generated.jooq.enums.OutboxStatus
 import generated.jooq.indexes.IDX_MV_OUTBOX_READY_NEXT
 import generated.jooq.tables.records.MvOutboxReadyRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Index
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
@@ -122,12 +125,12 @@ open class MvOutboxReady(
     /**
      * The column <code>public.mv_outbox_ready.payload</code>.
      */
-    val PAYLOAD: TableField<MvOutboxReadyRecord, JSONB?> = createField(DSL.name("payload"), SQLDataType.JSONB, this, "")
+    val PAYLOAD: TableField<MvOutboxReadyRecord, ClusterSerializable?> = createField(DSL.name("payload"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.mv_outbox_ready.metadata</code>.
      */
-    val METADATA: TableField<MvOutboxReadyRecord, JSONB?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "")
+    val METADATA: TableField<MvOutboxReadyRecord, ClusterSerializable?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.mv_outbox_ready.status</code>.

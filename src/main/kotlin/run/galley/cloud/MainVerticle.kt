@@ -48,6 +48,7 @@ import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.ProjectDataVerticle
 import run.galley.cloud.data.UserDataVerticle
+import run.galley.cloud.data.VesselDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
@@ -77,7 +78,17 @@ class MainVerticle : CoroutineVerticle() {
     )
     vertx.eventBus().registerDefaultCodec(ApiStatusReplyException::class.java, ApiStatusReplyExceptionMessageCodec())
 
-    val mainRouter = Router.router(vertx)
+    val mainRouter =
+      Router
+        .router(vertx)
+    mainRouter.run {
+      setupCorsHandler(JsonArray().add("*"))
+      setupDefaultOptionsHandler()
+//      post().handler(BodyHandler.create())
+//      patch().handler(BodyHandler.create())
+//      put().handler(BodyHandler.create())
+//      setupDefaultResponse()
+    }
 
     val openApiBridge = OpenApiBridge(vertx, config).initialize()
     val openApiRouter = openApiBridge.buildRouter().createRouter()
@@ -117,12 +128,11 @@ class MainVerticle : CoroutineVerticle() {
           ctx.fail(HttpException(404, "Not Found"))
         }
       }
-
-//      post().handler(BodyHandler.create())
-//      patch().handler(BodyHandler.create())
-//      put().handler(BodyHandler.create())
     }
-    mainRouter.route().virtualHost(config.getJsonObject("webapp", JsonObject()).getString("host", "localhost")).subRouter(webAppRouter)
+    mainRouter
+      .route()
+      .virtualHost(config.getJsonObject("webapp", JsonObject()).getString("host", "localhost"))
+      .subRouter(webAppRouter)
 
     // Deploy verticles
     val deploymentOptions =
@@ -144,6 +154,7 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CrewCharterMemberDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()

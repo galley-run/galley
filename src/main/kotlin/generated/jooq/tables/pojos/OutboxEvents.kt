@@ -6,11 +6,11 @@ package generated.jooq.tables.pojos
 
 import generated.jooq.enums.OutboxStatus
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -29,8 +29,8 @@ data class OutboxEvents(
     var eventType: String? = null,
     var eventKey: String? = null,
     var eventVersion: Int? = null,
-    var payload: JSONB? = null,
-    var metadata: JSONB? = null,
+    var payload: ClusterSerializable? = null,
+    var metadata: ClusterSerializable? = null,
     var status: OutboxStatus? = null,
     var attempts: Int? = null,
     var nextAttemptAt: OffsetDateTime? = null,

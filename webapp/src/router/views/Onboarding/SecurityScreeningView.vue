@@ -11,61 +11,74 @@
 
     <div class="grid xl:grid-cols-2 gap-8">
       <UIFormField>
-        <UILabel required for="find">How did you find Galley?</UILabel>
+        <UILabel required for="reference">How did you find Galley?</UILabel>
         <UIDropDown
-          id="find"
-          v-model="questionnaire.find"
+          id="reference"
+          required
+          v-model="inquiry.reference"
           :items="[
-            { value: 'searchengine', label: 'Via Search Engine (e.g. DuckDuckGo, Google, Bing)' },
-            { value: 'socialmedia', label: 'Via Social Media' },
+            { value: 'search_engine', label: 'Via Search Engine (e.g. DuckDuckGo, Google, Bing)' },
+            { value: 'social_media', label: 'Via Social Media' },
+            { value: 'word_of_mouth', label: 'Word of Mouth' },
+            { value: 'online_community', label: 'Online Community' },
+            { value: 'conference_event', label: 'Conference / Event' },
+            { value: 'advertisement', label: 'Advertisement' },
+            { value: 'partner_referral', label: 'Partner / Referral' },
+            { value: 'blog_article', label: 'Blog / Article' },
             { value: 'other', label: 'Other' },
           ]"
         />
       </UIFormField>
       <UIFormField>
-        <UILabel required for="role">What is your role in your organisation?</UILabel>
+        <UILabel required for="orgRole">What is your role in your organisation?</UILabel>
         <UIDropDown
-          id="role"
-          v-model="questionnaire.role"
+          id="orgRole"
+          required
+          placeholder="Select your role..."
+          v-model="inquiry.orgRole"
           :items="[
-            { value: 'cto', label: 'CTO / Tech Lead' },
-            { value: 'cxo', label: 'Non-technical CXO' },
+            { value: 'tech_leadership', label: 'CTO / Tech Lead' },
+            { value: 'operations', label: 'PO / CPO / CXO / Operations Manager' },
             { value: 'developer', label: 'Software Developer' },
-            { value: 'devops', label: 'DevOps Developer' },
-            { value: 'qa', label: 'QA / Test Engineer' },
+            { value: 'sales', label: 'Sales' },
+            { value: 'marketing', label: 'Marketing' },
             { value: 'other', label: 'Other' },
           ]"
         />
       </UIFormField>
       <UIFormField>
-        <UILabel required for="industry">What industry do you work in?</UILabel>
+        <UILabel required for="orgIndustry">What industry do you work in?</UILabel>
         <UIDropDown
-          id="industry"
-          v-model="questionnaire.industry"
+          id="orgIndustry"
+          v-model="inquiry.orgIndustry"
+          required
           placeholder="Select an industry..."
           :items="[
-            { value: 'saas', label: 'SaaS' },
-            { value: 'edtech', label: 'EdTech' },
-            { value: 'nonprofit', label: 'Non-profit' },
-            { value: 'consulting', label: 'Consulting' },
+            { value: 'technology', label: 'IT / Software' },
+            { value: 'finance', label: 'Finance' },
+            { value: 'healthcare', label: 'Healthcare' },
+            { value: 'insurance', label: 'Insurance' },
+            { value: 'manufacturing', label: 'Manufacturing' },
+            { value: 'retail', label: 'Retail' },
             { value: 'other', label: 'Other' },
           ]"
         />
       </UIFormField>
       <UIFormField>
-        <UILabel required for="users">How many people do you expect will use Galley?</UILabel>
+        <UILabel required for="orgTeamSize">How many people do you expect will use Galley?</UILabel>
         <UIDropDown
-          id="users"
-          v-model="questionnaire.users"
+          id="orgTeamSize"
+          required
+          v-model="inquiry.orgTeamSize"
           :items="[
             { value: '1', label: 'Solo developer' },
-            { value: '1-5', label: '1 - 5 users' },
+            { value: '2-5', label: '1 - 5 users' },
             { value: '5-10', label: '5 - 10 users' },
             { value: '10-50', label: '10 - 50 users' },
             { value: '50+', label: 'Many, many people' },
           ]"
         />
-        <label for="users">
+        <label for="orgTeamSize">
           Based on your users level the app can give you guidance that matches your skills.
         </label>
       </UIFormField>
@@ -91,7 +104,7 @@ const formRef = ref<HTMLFormElement | null>(null)
 
 const onboardingStore = useOnboardingStore()
 
-const { questionnaire } = storeToRefs(onboardingStore)
+const { inquiry } = storeToRefs(onboardingStore)
 
 function onSubmit() {
   const form = formRef.value!
@@ -103,7 +116,10 @@ function onSubmit() {
   }
 
   onboardingStore.$patch({
-    questionnaire: questionnaire.value,
+    inquiry: inquiry.value,
+    completed: {
+      securityScreening: true,
+    },
   })
 
   router.push('/onboarding/naming-ceremony')

@@ -18,12 +18,18 @@
           v-model="charter.name"
         />
         <label for="charterName" class="form-field__error-message"> This field is required. </label>
-        <label for="charterName"> We've already named your namespace after your company. </label>
+        <label for="charterName"> We've already named your first namespace after your company. </label>
       </UIFormField>
       <UIFormField>
         <UILabel for="charterDescription">Description</UILabel>
-        <UITextInput id="charterDescription" v-model="charter.description" placeholder="e.g. The company's blog" />
-        <label for="charterDescription">Helpful for teams or differentiating between namespaces with similar names.</label>
+        <UITextInput
+          id="charterDescription"
+          v-model="charter.description"
+          placeholder="e.g. The company's blog"
+        />
+        <label for="charterDescription"
+          >Helpful for teams or differentiating between namespaces with similar names.</label
+        >
       </UIFormField>
     </div>
     <SlashesDivider class="opacity-30" />
@@ -48,7 +54,9 @@
             { value: 'development', label: 'Development' },
           ]"
         />
-        <label for="projectEnvironment" class="form-field__error-message"> This field is required. </label>
+        <label for="projectEnvironment" class="form-field__error-message">
+          This field is required.
+        </label>
       </UIFormField>
       <UIFormField>
         <UILabel required for="projectName">Project name</UILabel>
@@ -59,7 +67,9 @@
           v-model="projectName"
         />
         <label for="projectName" class="form-field__error-message"> This field is required. </label>
-        <label for="projectName">We recommend using the domain name where you will deploy to as Project name.</label>
+        <label for="projectName"
+          >We recommend using the domain name where you will deploy to as Project name.</label
+        >
       </UIFormField>
       <UIFormField class="col-span-2">
         <UILabel required for="projectPurpose">Tell us what it’s for</UILabel>
@@ -75,7 +85,9 @@
             { value: 'demo', label: 'Just trying out Galley' },
           ]"
         />
-        <label for="projectPurpose" class="form-field__error-message"> This field is required. </label>
+        <label for="projectPurpose" class="form-field__error-message">
+          This field is required.
+        </label>
       </UIFormField>
     </div>
     <div class="form-footer">
@@ -141,6 +153,9 @@ function onSubmit() {
   onboardingStore.$patch({
     charter: charter.value,
     project: project.value,
+    completed: {
+      firstCharter: true,
+    },
   })
 
   router.push('/onboarding/boarding')

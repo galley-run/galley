@@ -8,16 +8,19 @@ import generated.jooq.Public
 import generated.jooq.enums.OutboxStatus
 import generated.jooq.tables.records.VOutboxAuditRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.PlainSQL
 import org.jooq.QueryPart
@@ -133,12 +136,12 @@ open class VOutboxAudit(
     /**
      * The column <code>public.v_outbox_audit.payload</code>.
      */
-    val PAYLOAD: TableField<VOutboxAuditRecord, JSONB?> = createField(DSL.name("payload"), SQLDataType.JSONB, this, "")
+    val PAYLOAD: TableField<VOutboxAuditRecord, ClusterSerializable?> = createField(DSL.name("payload"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.v_outbox_audit.metadata</code>.
      */
-    val METADATA: TableField<VOutboxAuditRecord, JSONB?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "")
+    val METADATA: TableField<VOutboxAuditRecord, ClusterSerializable?> = createField(DSL.name("metadata"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.v_outbox_audit.vessel_name</code>.

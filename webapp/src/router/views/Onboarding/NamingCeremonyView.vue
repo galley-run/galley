@@ -2,7 +2,7 @@
   <form @submit.prevent="onSubmit" ref="formRef" class="space-y-8 max-w-4xl" novalidate>
     <div class="space-y-2">
       <h1>Naming Ceremony</h1>
-      <p class="text-tides-900" v-if="setupMode === 'setup'">
+      <p class="text-tides-900" v-if="intent === 'business'">
         Here you can provide your company details for billing and client invoicing. Your first
         vessel (cluster) will be named after your business.
       </p>
@@ -11,14 +11,16 @@
       </p>
     </div>
 
-    <div class="grid xl:grid-cols-6 gap-8" v-if="setupMode === 'setup'">
+    <div class="grid xl:grid-cols-6 gap-8" v-if="intent === 'business'">
       <UIFormField class="col-span-3">
-        <UILabel :required="!billing.name" for="billingCompanyName">Company name</UILabel>
+        <UILabel :required="!vesselBillingProfile.name" for="billingCompanyName"
+          >Company name</UILabel
+        >
         <UITextInput
-          :required="!billing.name"
+          :required="!vesselBillingProfile.name"
           id="billingCompanyName"
           placeholder="e.g. The Yacht Club"
-          v-model="billing.companyName"
+          v-model="vesselBillingProfile.companyName"
         />
         <label for="billingCompanyName" class="form-field__error-message">
           This field is required when <em>Billed to</em> is not given.
@@ -26,18 +28,23 @@
       </UIFormField>
       <UIFormField class="col-span-3">
         <UILabel required for="billingCountry">Country of origin</UILabel>
-        <UIDropDown required id="billingCountry" v-model="billing.country" :items="countries" />
+        <UIDropDown
+          required
+          id="billingCountry"
+          v-model="vesselBillingProfile.country"
+          :items="countries"
+        />
         <label for="billingCountry" class="form-field__error-message">
           This field is required.
         </label>
       </UIFormField>
       <UIFormField class="col-span-6">
-        <UILabel :required="!billing.companyName" for="billingName">Billed to</UILabel>
+        <UILabel :required="!vesselBillingProfile.companyName" for="billingName">Billed to</UILabel>
         <UITextInput
-          :required="!billing.companyName"
+          :required="!vesselBillingProfile.companyName"
           id="billingName"
           placeholder="e.g. Jack Sparrow"
-          v-model="billing.name"
+          v-model="vesselBillingProfile.name"
         />
         <label for="billingName" class="form-field__error-message">
           This field is required when <em>Company name</em> is not given.
@@ -49,7 +56,7 @@
           required
           id="billingAddress1"
           placeholder="e.g. 1 Waterway"
-          v-model="billing.address1"
+          v-model="vesselBillingProfile.address1"
         />
         <label for="billingAddress1" class="form-field__error-message">
           This field is required.
@@ -57,7 +64,11 @@
       </UIFormField>
       <UIFormField class="col-span-3">
         <UILabel for="billingAddress2">Billing Address line 2</UILabel>
-        <UITextInput id="billingAddress2" placeholder="e.g. Cabin 4C" v-model="billing.address2" />
+        <UITextInput
+          id="billingAddress2"
+          placeholder="e.g. Cabin 4C"
+          v-model="vesselBillingProfile.address2"
+        />
       </UIFormField>
       <UIFormField :class="showState ? 'col-span-2' : 'col-span-3'">
         <UILabel required for="billingPostalCode">Postal Code</UILabel>
@@ -65,7 +76,7 @@
           required
           id="billingPostalCode"
           placeholder="e.g. 13245"
-          v-model="billing.postalCode"
+          v-model="vesselBillingProfile.postalCode"
         />
         <label for="billingPostalCode" class="form-field__error-message">
           This field is required.
@@ -77,7 +88,7 @@
           required
           id="billingCity"
           placeholder="e.g. Port of Amsterdam"
-          v-model="billing.city"
+          v-model="vesselBillingProfile.city"
         />
         <label for="billingCity" class="form-field__error-message"> This field is required. </label>
       </UIFormField>
@@ -87,7 +98,7 @@
           required
           id="billingState"
           placeholder="e.g. California"
-          v-model="billing.state"
+          v-model="vesselBillingProfile.state"
         />
         <label for="billingState" class="form-field__error-message">
           This field is required.
@@ -98,12 +109,16 @@
         <UITextInput
           id="billingEmail"
           placeholder="e.g. captain@yacht.co"
-          v-model="billing.email"
+          v-model="vesselBillingProfile.email"
         />
       </UIFormField>
       <UIFormField class="col-span-3">
         <UILabel for="billingVAT">VAT number</UILabel>
-        <UITextInput id="billingVAT" placeholder="e.g. NL1234156789B01" v-model="billing.vat" />
+        <UITextInput
+          id="billingVAT"
+          placeholder="e.g. NL1234156789B01"
+          v-model="vesselBillingProfile.vat"
+        />
       </UIFormField>
     </div>
     <div v-else>
@@ -136,7 +151,7 @@ const countries = Object.entries(countriesObj).map(([countryCode, label]) => {
 })
 
 const showState = computed(() => {
-  const code = (billing.value.country ?? '').toString().toLowerCase()
+  const code = (vesselBillingProfile.value.country ?? '').toString().toLowerCase()
   return ['us', 'ca', 'au', 'br', 'mx', 'in', 'cn', 'jp', 'es', 'it', 'gb', 'ie'].includes(code)
 })
 
@@ -144,7 +159,7 @@ const formRef = ref<HTMLFormElement | null>(null)
 
 const onboardingStore = useOnboardingStore()
 
-const { billing, vessel, setupMode } = storeToRefs(onboardingStore)
+const { vesselBillingProfile, vessel, intent } = storeToRefs(onboardingStore)
 
 function onSubmit() {
   const form = formRef.value!
@@ -156,12 +171,23 @@ function onSubmit() {
   }
 
   onboardingStore.$patch({
-    billing: billing.value,
+    vesselBillingProfile: vesselBillingProfile.value,
     vessel: {
-      name: vessel.value.name ?? billing.value.companyName ?? billing.value.name ?? 'Vessel Inc.',
+      name:
+        vessel.value.name ??
+        vesselBillingProfile.value.companyName ??
+        vesselBillingProfile.value.name ??
+        'Vessel Inc.',
     },
     charter: {
-      name: billing.value.companyName ?? 'Charter Inc.',
+      name:
+        vessel.value.name ??
+        vesselBillingProfile.value.companyName ??
+        vesselBillingProfile.value.name ??
+        'Charter Inc.',
+    },
+    completed: {
+      namingCeremony: true,
     },
   })
 

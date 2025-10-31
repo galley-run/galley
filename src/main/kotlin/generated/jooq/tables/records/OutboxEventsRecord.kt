@@ -7,10 +7,11 @@ package generated.jooq.tables.records
 import generated.jooq.enums.OutboxStatus
 import generated.jooq.tables.OutboxEvents
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -57,13 +58,13 @@ open class OutboxEventsRecord() : UpdatableRecordImpl<OutboxEventsRecord>(Outbox
         set(value): Unit = set(8, value)
         get(): Int? = get(8) as Int?
 
-    open var payload: JSONB?
+    open var payload: ClusterSerializable?
         set(value): Unit = set(9, value)
-        get(): JSONB? = get(9) as JSONB?
+        get(): ClusterSerializable? = get(9) as ClusterSerializable?
 
-    open var metadata: JSONB?
+    open var metadata: ClusterSerializable?
         set(value): Unit = set(10, value)
-        get(): JSONB? = get(10) as JSONB?
+        get(): ClusterSerializable? = get(10) as ClusterSerializable?
 
     open var status: OutboxStatus?
         set(value): Unit = set(11, value)
@@ -98,7 +99,7 @@ open class OutboxEventsRecord() : UpdatableRecordImpl<OutboxEventsRecord>(Outbox
     /**
      * Create a detached, initialised OutboxEventsRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, aggregateTable: String? = null, aggregateId: UUID? = null, eventType: String? = null, eventKey: String? = null, eventVersion: Int? = null, payload: JSONB? = null, metadata: JSONB? = null, status: OutboxStatus? = null, attempts: Int? = null, nextAttemptAt: OffsetDateTime? = null, processedAt: OffsetDateTime? = null, error: String? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, aggregateTable: String? = null, aggregateId: UUID? = null, eventType: String? = null, eventKey: String? = null, eventVersion: Int? = null, payload: ClusterSerializable? = null, metadata: ClusterSerializable? = null, status: OutboxStatus? = null, attempts: Int? = null, nextAttemptAt: OffsetDateTime? = null, processedAt: OffsetDateTime? = null, error: String? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.charterId = charterId

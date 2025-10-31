@@ -36,3 +36,5 @@ coverage
 
 # Vitest
 __screenshots__/
+
+.env.local

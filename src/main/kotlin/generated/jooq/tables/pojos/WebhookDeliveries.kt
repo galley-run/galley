@@ -6,11 +6,11 @@ package generated.jooq.tables.pojos
 
 import generated.jooq.enums.DeliveryStatus
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -27,9 +27,9 @@ data class WebhookDeliveries(
     var httpStatus: Int? = null,
     var attemptNo: Int? = null,
     var durationMs: Int? = null,
-    var requestHeaders: JSONB? = null,
-    var requestBody: JSONB? = null,
-    var responseHeaders: JSONB? = null,
+    var requestHeaders: ClusterSerializable? = null,
+    var requestBody: ClusterSerializable? = null,
+    var responseHeaders: ClusterSerializable? = null,
     var responseBody: String? = null,
     var error: String? = null,
     var createdAt: OffsetDateTime? = null

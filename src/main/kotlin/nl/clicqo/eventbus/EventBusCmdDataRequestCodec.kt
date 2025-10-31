@@ -5,7 +5,6 @@ import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import nl.clicqo.ext.getUUID
-import run.galley.cloud.model.BaseModel
 
 class EventBusCmdDataRequestCodec : MessageCodec<EventBusCmdDataRequest, EventBusCmdDataRequest> {
   override fun encodeToWire(
@@ -29,7 +28,6 @@ class EventBusCmdDataRequestCodec : MessageCodec<EventBusCmdDataRequest, EventBu
     buffer.appendBuffer(bytes)
   }
 
-  @Suppress("UNCHECKED_CAST")
   override fun decodeFromWire(
     pos: Int,
     buffer: Buffer,

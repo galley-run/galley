@@ -37,4 +37,12 @@ object ApiStatus {
   val PROJECT_CREATE_FAILURE = ApiStatus(1700, "The project could not be created")
   val PROJECT_NOT_FOUND = ApiStatus(1701, "The project could not be found", HttpStatus.NotFound)
   val PROJECT_ID_INCORRECT = ApiStatus(1702, "The project id is incorrect")
+
+  val SIGN_UP_INTENT_MISSING = ApiStatus(1800, "The sign up intent is missing")
+  val SIGN_UP_USER_OBJ_MISSING = ApiStatus(1801, "The user object is missing")
+  val SIGN_UP_INQUIRY_OBJ_MISSING = ApiStatus(1802, "The inquiry object is missing")
+  val SIGN_UP_VESSEL_OBJ_MISSING = ApiStatus(1803, "The vessel object is missing")
+  val SIGN_UP_CHARTER_OBJ_MISSING = ApiStatus(1804, "The charter object is missing")
+  val SIGN_UP_PROJECT_OBJ_MISSING = ApiStatus(1805, "The project object is missing")
+  val SIGN_UP_INQUIRY_STORE_FAILED = ApiStatus(1806, "Storing the inquiry failed")
 }

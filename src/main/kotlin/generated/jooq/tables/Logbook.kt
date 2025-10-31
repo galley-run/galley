@@ -19,18 +19,21 @@ import generated.jooq.tables.Users.UsersPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.LogbookRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Index
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.Path
 import org.jooq.PlainSQL
@@ -125,7 +128,7 @@ open class Logbook(
     /**
      * The column <code>public.logbook.details</code>.
      */
-    val DETAILS: TableField<LogbookRecord, JSONB?> = createField(DSL.name("details"), SQLDataType.JSONB, this, "")
+    val DETAILS: TableField<LogbookRecord, ClusterSerializable?> = createField(DSL.name("details"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.logbook.created_at</code>.

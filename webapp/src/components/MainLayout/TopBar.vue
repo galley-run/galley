@@ -1,6 +1,6 @@
 <template>
   <header
-    class="flex w-full border-b border-b-tides-200 py-5 px-6 justify-between gap-4 items-center"
+    class="bg-white flex w-full border-b border-b-tides-200 py-5 px-6 justify-between gap-4 items-center"
   >
     <div class="flex gap-12 items-center">
       <GalleyLogo />

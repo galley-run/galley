@@ -4,8 +4,8 @@
       <li
         v-for="step in steps"
         :key="step.title"
-        class="flex flex-col group text-white dark:text-navy-600"
-        :class="$route.fullPath != step.page && 'opacity-50'"
+        class="flex flex-col group text-white dark:text-navy-600 relative transition-all"
+        :class="$route.fullPath != step.page && 'opacity-50 hover:opacity-100'"
       >
         <div class="relative not-group-last:mr-8 xl:not-group-last:mb-8 xl:mr-0">
           <span
@@ -22,6 +22,7 @@
           </div>
           <div class="ml-10 hidden xl:block">{{ step.description }}</div>
         </div>
+        <RouterLink :to="step.page" class="absolute inset-0" />
       </li>
     </ul>
   </aside>

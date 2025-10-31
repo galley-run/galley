@@ -12,18 +12,18 @@
         <UIRadioCard
           title="Set up for my business"
           description="You’re ready to board your company. Choose this option and we guide you through all the necessary steps to set up Galley so you can get up and running in no time."
-          name="setupMode"
+          name="intent"
           required
-          value="setup"
-          v-model="setupMode"
+          value="business"
+          v-model="intent"
         />
         <UIRadioCard
           title="Just explore Galley"
           description="Start your maiden voyage here. We help you to set up  quickly so you can discover how deploying your applications on a Kubernetes* cluster with Galley will help you and your (future) business."
           required
-          name="setupMode"
-          value="explore"
-          v-model="setupMode"
+          name="intent"
+          value="exploring"
+          v-model="intent"
         />
       </div>
     </div>
@@ -66,22 +66,22 @@
         </label>
       </UIFormField>
       <UIFormField>
-        <UILabel required for="experience">My technical experience</UILabel>
+        <UILabel required for="technicalExperience">My technical experience</UILabel>
         <UIDropDown
-          id="experience"
-          v-model="user.experience"
+          id="technicalExperience"
+          v-model="inquiry.technicalExperience"
           required
           :items="[
-            { value: 'junior', label: '1 - 3 years' },
-            { value: 'medior', label: '3 - 10 years' },
-            { value: 'senior', label: '10+ years' },
-            { value: 'ancient', label: '20+ years' },
+            { value: 'non_tech', label: 'None - Barely' },
+            { value: 'junior_dev', label: '1 - 5 years' },
+            { value: 'experienced', label: '5+ years' },
+            { value: 'tech_leadership', label: 'Tech Lead / CTO' },
           ]"
         />
         <label for="email" class="form-field__error-message">
           Please select your technical experience level.
         </label>
-        <label for="experience">
+        <label for="technicalExperience">
           Based on your experience level the app can give you guidance that matches your skills.
         </label>
       </UIFormField>
@@ -109,7 +109,7 @@ const formRef = ref<HTMLFormElement | null>(null)
 
 const onboardingStore = useOnboardingStore()
 
-const { user, setupMode } = storeToRefs(onboardingStore)
+const { user, inquiry, intent } = storeToRefs(onboardingStore)
 
 function onSubmit() {
   const form = formRef.value!
@@ -121,8 +121,12 @@ function onSubmit() {
   }
 
   onboardingStore.$patch({
-    setupMode: setupMode.value,
+    intent: intent.value,
     user: user.value,
+    inquiry: { technicalExperience: inquiry.value.technicalExperience },
+    completed: {
+      checkIn: true
+    }
   })
 
   router.push('/onboarding/security-screening')

@@ -6,11 +6,11 @@ package generated.jooq.tables.pojos
 
 import generated.jooq.enums.ApiGatewayEngine
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -25,7 +25,7 @@ data class ProjectApiGateway(
     var charterId: UUID? = null,
     var projectId: UUID? = null,
     var engine: ApiGatewayEngine? = null,
-    var configuration: JSONB? = null,
+    var configuration: ClusterSerializable? = null,
     var createdAt: OffsetDateTime? = null,
     var updatedAt: OffsetDateTime? = null
 ): BaseModel, Serializable {

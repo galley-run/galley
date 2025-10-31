@@ -33,6 +33,12 @@ object ApiStatus {
   val CREW_NO_VESSEL_MEMBER = ApiStatus(1600, "The user is not a member of this Vessel crew", HttpStatus.Forbidden)
   val CREW_NO_VESSEL_CAPTAIN = ApiStatus(1601, "The user is not a captain of this Vessel", HttpStatus.Forbidden)
   val CREW_NO_CHARTER_MEMBER = ApiStatus(1602, "The user is not a member of this Charter crew", HttpStatus.Forbidden)
+  val CREW_EMBARKING_TOO_OLD =
+    ApiStatus(
+      1603,
+      "You have created your account more than 6 hours ago without accepting your invite by e-mail. Please sign in again.",
+      HttpStatus.Unauthorized,
+    )
 
   val PROJECT_CREATE_FAILURE = ApiStatus(1700, "The project could not be created")
   val PROJECT_NOT_FOUND = ApiStatus(1701, "The project could not be found", HttpStatus.NotFound)
@@ -45,4 +51,7 @@ object ApiStatus {
   val SIGN_UP_CHARTER_OBJ_MISSING = ApiStatus(1804, "The charter object is missing")
   val SIGN_UP_PROJECT_OBJ_MISSING = ApiStatus(1805, "The project object is missing")
   val SIGN_UP_INQUIRY_STORE_FAILED = ApiStatus(1806, "Storing the inquiry failed")
+
+  val VESSEL_BILLING_PROFILE_CREATE_FAILURE = ApiStatus(1900, "The vessel billing profile could not be created")
+  val VESSEL_BILLING_PROFILE_NOT_FOUND = ApiStatus(1901, "The vessel billing profile could not be found")
 }

@@ -128,7 +128,7 @@ class CharterControllerVerticle :
     val vesselId = apiRequest.vesselId
 
     val charter = apiRequest.body ?: throw ApiStatusReplyException(ApiStatus.REQUEST_BODY_MISSING)
-    charter.put(CHARTERS.VESSEL_ID.name, vesselId.toString())
+    charter.put(CHARTERS.VESSEL_ID.name, vesselId)
 
     val dataRequest =
       EventBusCmdDataRequest(

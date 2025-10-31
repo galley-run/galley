@@ -37,6 +37,8 @@ export type Charter = {
 
 export type Project = {
   name: string
+  purpose: string
+  environment: string
 }
 
 export type User = {
@@ -97,6 +99,8 @@ export const useOnboardingStore = defineStore('onboarding', {
     },
     project: {
       name: '',
+      purpose: 'webapp',
+      environment: 'production'
     },
     completed: {
       checkIn: false,

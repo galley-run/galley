@@ -1,5 +1,6 @@
 package run.galley.cloud.controller
 
+import generated.jooq.enums.MemberStatus
 import generated.jooq.enums.VesselRole
 import generated.jooq.tables.Crew.Companion.CREW
 import generated.jooq.tables.Users.Companion.USERS
@@ -36,6 +37,7 @@ import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
+import java.time.OffsetDateTime
 import java.util.UUID
 
 class AuthControllerVerticle :
@@ -91,6 +93,23 @@ class AuthControllerVerticle :
     val apiRequest = getApiRequest(message)
     val user = getUser(apiRequest)
 
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<Crew>>(
+        CrewDataVerticle.LIST_BY_ACTIVE_USER,
+        EventBusQueryDataRequest(
+          filters =
+            filters {
+              CREW.USER_ID eq (user.id ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND))
+            },
+        ),
+      ).coAwait()
+      ?.body()
+      ?.payload
+      ?.toMany()
+      ?.ifEmpty { throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER) }
+      ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
+
     val newToken =
       JWT.authProvider(vertx, config).issueRefreshToken(
         user.id!!,
@@ -125,10 +144,17 @@ class AuthControllerVerticle :
         ?.body()
         ?.payload
         ?.toMany()
+        ?.ifEmpty { throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER) }
         ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
     val crewMemberIds = mutableMapOf<UUID, UUID>()
     val crewAccess = mutableListOf<CrewAccess>()
+    val embarking = vesselCrewResponse.size == 1 && vesselCrewResponse.first().status == MemberStatus.invited
+
+    if (embarking && vesselCrewResponse.first().createdAt?.isBefore(OffsetDateTime.now().minusHours(6)) == true) {
+      throw ApiStatusReplyException(ApiStatus.CREW_EMBARKING_TOO_OLD)
+    }
+
     vesselCrewResponse
       .forEach {
         if (it.vesselRole == VesselRole.captain) {
@@ -177,6 +203,7 @@ class AuthControllerVerticle :
       JWT.authProvider(vertx, config).issueAccessToken(
         user.id!!,
         crewAccess,
+        JsonObject().put("embarking", embarking),
       )
 
     message.reply(
@@ -210,7 +237,7 @@ class AuthControllerVerticle :
       vertx
         .eventBus()
         .request<EventBusDataResponse<Crew>>(
-          CrewDataVerticle.LIST_BY_USER,
+          CrewDataVerticle.LIST_BY_ACTIVE_USER,
           EventBusQueryDataRequest(
             filters =
               filters {

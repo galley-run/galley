@@ -8,7 +8,7 @@
       </p>
     </div>
     <div>
-      <div class="grid xl:grid-cols-2 gap-8">
+      <div class="grid md:grid-cols-2 gap-8">
         <UIRadioCard
           title="Set up for my business"
           description="You’re ready to board your company. Choose this option and we guide you through all the necessary steps to set up Galley so you can get up and running in no time."

@@ -43,11 +43,13 @@ import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
 import run.galley.cloud.controller.ProjectControllerVerticle
+import run.galley.cloud.controller.VesselBillingProfileControllerVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.ProjectDataVerticle
 import run.galley.cloud.data.UserDataVerticle
+import run.galley.cloud.data.VesselBillingProfileDataVerticle
 import run.galley.cloud.data.VesselDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
@@ -155,11 +157,13 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselBillingProfileDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselBillingProfileControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort =
       config

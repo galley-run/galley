@@ -13,7 +13,6 @@ import nl.clicqo.ext.getUUID
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
-import org.jooq.Require
 import run.galley.cloud.ApiStatus
 
 object CrewSql {
@@ -24,6 +23,14 @@ object CrewSql {
       .applyConditions(*conditions)
       .and(CREW.STATUS.eq(MemberStatus.active))
       .andActivated(CREW.ACTIVATED_AT)
+      .andNotDeleted(CREW.DELETED_AT)
+  }
+
+  fun list(request: EventBusQueryDataRequest): Query {
+    val conditions = buildConditions(request.filters)
+    return Jooq.postgres
+      .selectFrom(CREW)
+      .applyConditions(*conditions)
       .andNotDeleted(CREW.DELETED_AT)
   }
 

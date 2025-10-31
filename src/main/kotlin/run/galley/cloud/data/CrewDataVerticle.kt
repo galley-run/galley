@@ -14,6 +14,7 @@ import run.galley.cloud.sql.CrewSql
 
 class CrewDataVerticle : PostgresDataVerticle() {
   companion object {
+    const val LIST_BY_ACTIVE_USER = "data.crew.query.list_by_active_user"
     const val LIST_BY_USER = "data.crew.query.list_by_user"
     const val CREATE = "data.crew.cmd.create"
   }
@@ -22,14 +23,30 @@ class CrewDataVerticle : PostgresDataVerticle() {
     super.start()
 
     coroutineEventBus {
+      vertx.eventBus().coConsumer(LIST_BY_ACTIVE_USER, handler = ::listByActiveUser)
       vertx.eventBus().coConsumer(LIST_BY_USER, handler = ::listByUser)
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
     }
   }
 
-  private suspend fun listByUser(message: Message<EventBusQueryDataRequest>) {
+  private suspend fun listByActiveUser(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
     val results = pool.execute(CrewSql.listActive(request))
+
+    val crew =
+      results
+        ?.map(CrewFactory::from)
+
+    message.reply(
+      EventBusDataResponse(
+        payload = DataPayload.many(crew),
+      ),
+    )
+  }
+
+  private suspend fun listByUser(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val results = pool.execute(CrewSql.list(request))
 
     val crew =
       results

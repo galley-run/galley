@@ -18,7 +18,9 @@
           v-model="charter.name"
         />
         <label for="charterName" class="form-field__error-message"> This field is required. </label>
-        <label for="charterName"> We've already named your first namespace after your company. </label>
+        <label for="charterName">
+          We've already named your first namespace after your company.
+        </label>
       </UIFormField>
       <UIFormField>
         <UILabel for="charterDescription">Description</UILabel>
@@ -40,13 +42,13 @@
         This way you can combine and separate concerns wherever you need.
       </p>
     </div>
-    <div class="grid xl:grid-cols-2 gap-8">
+    <div class="grid md:grid-cols-2 gap-8">
       <UIFormField>
         <UILabel required for="projectEnvironment">Environment type</UILabel>
         <UIDropDown
           required
           id="projectEnvironment"
-          v-model="projectEnvironment"
+          v-model="project.environment"
           :items="[
             { value: 'production', label: 'Production' },
             { value: 'staging', label: 'Staging' },
@@ -64,7 +66,7 @@
           required
           id="projectName"
           :placeholder="projectNamePlaceholder"
-          v-model="projectName"
+          v-model="project.name"
         />
         <label for="projectName" class="form-field__error-message"> This field is required. </label>
         <label for="projectName"
@@ -76,7 +78,7 @@
         <UIDropDown
           required
           id="projectPurpose"
-          v-model="projectPurpose"
+          v-model="project.purpose"
           :items="[
             { value: 'spa', label: 'Single-Page Application' },
             { value: 'webapp', label: 'Web Application' },
@@ -102,7 +104,7 @@
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import { SuitcaseTag } from '@solar-icons/vue'
-import { computed, reactive, ref, toRefs } from 'vue'
+import { computed, ref } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
@@ -111,19 +113,14 @@ import { useOnboardingStore } from '@/stores/onboarding.ts'
 import { storeToRefs } from 'pinia'
 import router from '@/router'
 
-const state = reactive({
-  charterName: '',
-  charterDescription: '',
-  projectName: '',
-  projectEnvironment: 'production',
-  projectPurpose: 'webapp',
-})
+const formRef = ref<HTMLFormElement | null>(null)
 
-const { charterName, charterDescription, projectName, projectEnvironment, projectPurpose } =
-  toRefs(state)
+const onboardingStore = useOnboardingStore()
+
+const { charter, project } = storeToRefs(onboardingStore)
 
 const projectNamePlaceholder = computed(() => {
-  switch (projectEnvironment.value) {
+  switch (project.value.environment) {
     case 'staging':
       return 'e.g. staging.galley.run'
     case 'test':
@@ -134,12 +131,6 @@ const projectNamePlaceholder = computed(() => {
       return 'e.g. galley.run'
   }
 })
-
-const formRef = ref<HTMLFormElement | null>(null)
-
-const onboardingStore = useOnboardingStore()
-
-const { charter, project } = storeToRefs(onboardingStore)
 
 function onSubmit() {
   const form = formRef.value!

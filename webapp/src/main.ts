@@ -8,6 +8,7 @@ import App from './App.vue'
 import router from './router'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import registerAxios from '@/utils/registerAxios.ts'
+import { initAuthStore } from '@/stores/auth.ts'
 
 document.documentElement.classList.toggle(
   'dark',
@@ -22,6 +23,7 @@ app.use(router)
 app.use(VueQueryPlugin)
 
 registerAxios()
+initAuthStore()
 
 app.use(SolarIconsPlugin, {
   weight: 'LineDuotone',

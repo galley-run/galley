@@ -55,6 +55,45 @@ tags:
   - description: The Chef AI Agent which can guide you through Galley and can give you recommendations specific to your needs on Vessel scope
     name: chef
 paths:
+  /vessels/{vesselId}/billing-profile:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+    post:
+      tags:
+        - vessel/billing-profile
+      summary: Create vessel billing profile
+      operationId: vessel.billingProfile.cmd.create
+      security:
+        - vesselCaptain: []
+      requestBody:
+        required: true
+        description: Billing profile information to create
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/BillingProfileCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BillingProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/charters:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -546,6 +585,68 @@ components:
         type: string
         format: uuid
   schemas:
+    BillingProfileCreate:
+      type: object
+      description: Request body for POST /billing-profiles.
+      properties:
+        companyName:
+          type: string
+          description: Company name
+          examples:
+            - Acme Corp
+        billingTo:
+          type: string
+          description: Billing recipient name
+          examples:
+            - John Doe
+        address1:
+          type: string
+          description: Address line 1
+          examples:
+            - 123 Main St
+        address2:
+          type: string
+          description: Address line 2
+          examples:
+            - Suite 100
+        postalCode:
+          type: string
+          description: Postal code
+          examples:
+            - '12345'
+        city:
+          type: string
+          description: City
+          examples:
+            - Amsterdam
+        state:
+          type: string
+          description: State/province
+          examples:
+            - North Holland
+        country:
+          type: string
+          description: Country code (ISO 3166-1 alpha-2)
+          pattern: ^[A-Z]{2}$
+          examples:
+            - NL
+        email:
+          type: string
+          format: email
+          description: Billing email
+          examples:
+            - billing@acme.com
+        phone:
+          type: string
+          description: Phone number
+          examples:
+            - '+31201234567'
+        vatNumber:
+          type: string
+          description: VAT number
+          examples:
+            - NL123456789B01
+      additionalProperties: false
     JSONAPIResource:
       type: object
       required:
@@ -562,6 +663,71 @@ components:
         attributes:
           type: object
           description: Resource attributes
+    BillingProfile:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A Generic Billing Profile
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - BillingProfile
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - companyName
+              properties:
+                companyName:
+                  type: string
+                  description: Captures the name of the organization
+                  example: Clicqo
+                billedTo:
+                  type: string
+                  description: Captures the name of the billing contact
+                  example: Jack Sparrow
+                address1:
+                  type: string
+                  description: Captures the first line of the billing address
+                  example: 123 Main Street
+                address2:
+                  type: string
+                  description: Captures the second line of the billing address
+                postalCode:
+                  type: string
+                  description: Captures the postal code of the billing address
+                  example: 1234 AB
+                city:
+                  type: string
+                  description: Captures the city of the billing address
+                  example: Weesp
+                state:
+                  type: string
+                  description: Captures the state of the billing address
+                country:
+                  type: string
+                  description: Captures the country of the billing address in ISO 3166 format
+                  example: nl
+                vatNumber:
+                  type: string
+                  description: Captures the VAT number of the organization
+                  example: NL123456789B01
+                email:
+                  type: string
+                  description: Captures the email address of the billing contact
+                  example: finance@galley.run
+                phone:
+                  type: string
+                  description: Captures the phone number of the billing contact
+                  example: +31 123 456 7890
     CharterSummary:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'
@@ -806,71 +972,6 @@ components:
         accessToken:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
-    BillingProfile:
-      allOf:
-        - $ref: '#/components/schemas/JSONAPIResource'
-        - type: object
-          description: A Generic Billing Profile
-          required:
-            - id
-            - type
-            - attributes
-          properties:
-            id:
-              type: string
-              format: uuid
-            type:
-              type: string
-              enum:
-                - BillingProfile
-              description: Resource type
-            attributes:
-              type: object
-              required:
-                - companyName
-              properties:
-                companyName:
-                  type: string
-                  description: Captures the name of the organization
-                  example: Clicqo
-                billedTo:
-                  type: string
-                  description: Captures the name of the billing contact
-                  example: Jack Sparrow
-                address1:
-                  type: string
-                  description: Captures the first line of the billing address
-                  example: 123 Main Street
-                address2:
-                  type: string
-                  description: Captures the second line of the billing address
-                postalCode:
-                  type: string
-                  description: Captures the postal code of the billing address
-                  example: 1234 AB
-                city:
-                  type: string
-                  description: Captures the city of the billing address
-                  example: Weesp
-                state:
-                  type: string
-                  description: Captures the state of the billing address
-                country:
-                  type: string
-                  description: Captures the country of the billing address in ISO 3166 format
-                  example: nl
-                vatNumber:
-                  type: string
-                  description: Captures the VAT number of the organization
-                  example: NL123456789B01
-                email:
-                  type: string
-                  description: Captures the email address of the billing contact
-                  example: finance@galley.run
-                phone:
-                  type: string
-                  description: Captures the phone number of the billing contact
-                  example: +31 123 456 7890
     VesselCreate:
       type: object
       required:
@@ -1040,29 +1141,6 @@ components:
                     title:
                       type: string
       description: The server understood the request, but refuses to authorize it. Ensure the client has appropriate permissions.
-    NotFound:
-      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
-    InternalServerError:
-      content:
-        application/vnd.galley.v1+json:
-          schema:
-            type: object
-            required:
-              - errors
-            properties:
-              errors:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - title
-                    - status
-                  properties:
-                    status:
-                      type: string
-                    title:
-                      type: string
-      description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
     Conflict:
       description: The request could not be completed due to a conflict with the current state of the resource.
       content:
@@ -1084,6 +1162,29 @@ components:
                       type: string
                     title:
                       type: string
+    InternalServerError:
+      content:
+        application/vnd.galley.v1+json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - title
+                    - status
+                  properties:
+                    status:
+                      type: string
+                    title:
+                      type: string
+      description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
+    NotFound:
+      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
     UnsupportedMediaType:
       description: The request could not be completed due to a conflict with the content type of the request body.
       content:

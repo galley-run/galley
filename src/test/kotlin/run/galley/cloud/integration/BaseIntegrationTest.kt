@@ -109,12 +109,12 @@ abstract class BaseIntegrationTest {
             JsonObject()
               .put("openApiFile", "openapi.yaml")
               .put("host", "localhost")
-              .put("cors", listOf(".*")),
+              .put("cors", listOf("*")),
           ).put(
             "webapp",
             JsonObject()
               .put("host", "localhost")
-              .put("cors", listOf(".*")),
+              .put("cors", listOf("*")),
           ).put(
             "db",
             JsonObject()

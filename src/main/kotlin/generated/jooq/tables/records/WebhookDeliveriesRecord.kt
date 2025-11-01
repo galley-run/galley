@@ -7,10 +7,11 @@ package generated.jooq.tables.records
 import generated.jooq.enums.DeliveryStatus
 import generated.jooq.tables.WebhookDeliveries
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -49,17 +50,17 @@ open class WebhookDeliveriesRecord() : UpdatableRecordImpl<WebhookDeliveriesReco
         set(value): Unit = set(6, value)
         get(): Int? = get(6) as Int?
 
-    open var requestHeaders: JSONB?
+    open var requestHeaders: ClusterSerializable?
         set(value): Unit = set(7, value)
-        get(): JSONB? = get(7) as JSONB?
+        get(): ClusterSerializable? = get(7) as ClusterSerializable?
 
-    open var requestBody: JSONB?
+    open var requestBody: ClusterSerializable?
         set(value): Unit = set(8, value)
-        get(): JSONB? = get(8) as JSONB?
+        get(): ClusterSerializable? = get(8) as ClusterSerializable?
 
-    open var responseHeaders: JSONB?
+    open var responseHeaders: ClusterSerializable?
         set(value): Unit = set(9, value)
-        get(): JSONB? = get(9) as JSONB?
+        get(): ClusterSerializable? = get(9) as ClusterSerializable?
 
     open var responseBody: String?
         set(value): Unit = set(10, value)
@@ -82,7 +83,7 @@ open class WebhookDeliveriesRecord() : UpdatableRecordImpl<WebhookDeliveriesReco
     /**
      * Create a detached, initialised WebhookDeliveriesRecord
      */
-    constructor(id: UUID? = null, subscriptionId: UUID? = null, outboxEventId: UUID? = null, status: DeliveryStatus? = null, httpStatus: Int? = null, attemptNo: Int? = null, durationMs: Int? = null, requestHeaders: JSONB? = null, requestBody: JSONB? = null, responseHeaders: JSONB? = null, responseBody: String? = null, error: String? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, subscriptionId: UUID? = null, outboxEventId: UUID? = null, status: DeliveryStatus? = null, httpStatus: Int? = null, attemptNo: Int? = null, durationMs: Int? = null, requestHeaders: ClusterSerializable? = null, requestBody: ClusterSerializable? = null, responseHeaders: ClusterSerializable? = null, responseBody: String? = null, error: String? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.subscriptionId = subscriptionId
         this.outboxEventId = outboxEventId

@@ -4,11 +4,11 @@
 package generated.jooq.tables.pojos
 
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -25,7 +25,7 @@ data class MvLogbookRecent(
     var action: String? = null,
     var objectType: String? = null,
     var objectId: UUID? = null,
-    var details: JSONB? = null,
+    var details: ClusterSerializable? = null,
     var createdAt: OffsetDateTime? = null
 ): BaseModel, Serializable {
 

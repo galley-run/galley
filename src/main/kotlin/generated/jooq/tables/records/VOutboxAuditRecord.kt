@@ -7,10 +7,11 @@ package generated.jooq.tables.records
 import generated.jooq.enums.OutboxStatus
 import generated.jooq.tables.VOutboxAudit
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.impl.TableRecordImpl
 
 
@@ -52,13 +53,13 @@ open class VOutboxAuditRecord() : TableRecordImpl<VOutboxAuditRecord>(VOutboxAud
         set(value): Unit = set(7, value)
         get(): Int? = get(7) as Int?
 
-    open var payload: JSONB?
+    open var payload: ClusterSerializable?
         set(value): Unit = set(8, value)
-        get(): JSONB? = get(8) as JSONB?
+        get(): ClusterSerializable? = get(8) as ClusterSerializable?
 
-    open var metadata: JSONB?
+    open var metadata: ClusterSerializable?
         set(value): Unit = set(9, value)
-        get(): JSONB? = get(9) as JSONB?
+        get(): ClusterSerializable? = get(9) as ClusterSerializable?
 
     open var vesselName: String?
         set(value): Unit = set(10, value)
@@ -79,7 +80,7 @@ open class VOutboxAuditRecord() : TableRecordImpl<VOutboxAuditRecord>(VOutboxAud
     /**
      * Create a detached, initialised VOutboxAuditRecord
      */
-    constructor(id: UUID? = null, createdAt: OffsetDateTime? = null, status: OutboxStatus? = null, eventType: String? = null, aggregateTable: String? = null, aggregateId: UUID? = null, eventKey: String? = null, eventVersion: Int? = null, payload: JSONB? = null, metadata: JSONB? = null, vesselName: String? = null, charterName: String? = null, projectName: String? = null, projectEnv: String? = null): this() {
+    constructor(id: UUID? = null, createdAt: OffsetDateTime? = null, status: OutboxStatus? = null, eventType: String? = null, aggregateTable: String? = null, aggregateId: UUID? = null, eventKey: String? = null, eventVersion: Int? = null, payload: ClusterSerializable? = null, metadata: ClusterSerializable? = null, vesselName: String? = null, charterName: String? = null, projectName: String? = null, projectEnv: String? = null): this() {
         this.id = id
         this.createdAt = createdAt
         this.status = status

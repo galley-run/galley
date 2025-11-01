@@ -12,7 +12,6 @@ import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
 import generated.jooq.tables.CrewCharterMember
 import generated.jooq.tables.EmailLoginTokens
-import generated.jooq.tables.FlywaySchemaHistory
 import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.MvLogbookRecent
@@ -24,6 +23,8 @@ import generated.jooq.tables.ProjectApplications
 import generated.jooq.tables.ProjectConfigs
 import generated.jooq.tables.ProjectDatabases
 import generated.jooq.tables.ProjectSecrets
+import generated.jooq.tables.RegexpMatches
+import generated.jooq.tables.RegexpSplitToTable
 import generated.jooq.tables.Sessions
 import generated.jooq.tables.SignUpInquiries
 import generated.jooq.tables.UserIdentities
@@ -39,6 +40,8 @@ import generated.jooq.tables.WebauthnCredentials
 import generated.jooq.tables.WebhookDeliveries
 import generated.jooq.tables.WebhookSubscriptions
 import generated.jooq.tables.records.PgpArmorHeadersRecord
+import generated.jooq.tables.records.RegexpMatchesRecord
+import generated.jooq.tables.records.RegexpSplitToTableRecord
 
 import org.jooq.Configuration
 import org.jooq.Field
@@ -80,11 +83,6 @@ val CREW_CHARTER_MEMBER: CrewCharterMember = CrewCharterMember.CREW_CHARTER_MEMB
  * The table <code>public.email_login_tokens</code>.
  */
 val EMAIL_LOGIN_TOKENS: EmailLoginTokens = EmailLoginTokens.EMAIL_LOGIN_TOKENS
-
-/**
- * The table <code>public.flyway_schema_history</code>.
- */
-val FLYWAY_SCHEMA_HISTORY: FlywaySchemaHistory = FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY
 
 /**
  * The table <code>public.locker</code>.
@@ -168,6 +166,84 @@ val PROJECT_DATABASES: ProjectDatabases = ProjectDatabases.PROJECT_DATABASES
  * The table <code>public.project_secrets</code>.
  */
 val PROJECT_SECRETS: ProjectSecrets = ProjectSecrets.PROJECT_SECRETS
+
+/**
+ * The table <code>public.regexp_matches</code>.
+ */
+val REGEXP_MATCHES: RegexpMatches = RegexpMatches.REGEXP_MATCHES
+
+/**
+ * Call <code>public.regexp_matches</code>.
+ */
+fun REGEXP_MATCHES(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Result<RegexpMatchesRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+      __1
+    , __2
+)).fetch()
+
+/**
+ * Get <code>public.regexp_matches</code> as a table.
+ */
+fun REGEXP_MATCHES(
+      __1: String?
+    , __2: String?
+): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+    __1,
+    __2
+)
+
+/**
+ * Get <code>public.regexp_matches</code> as a table.
+ */
+fun REGEXP_MATCHES(
+      __1: Field<String?>
+    , __2: Field<String?>
+): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
+    __1,
+    __2
+)
+
+/**
+ * The table <code>public.regexp_split_to_table</code>.
+ */
+val REGEXP_SPLIT_TO_TABLE: RegexpSplitToTable = RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE
+
+/**
+ * Call <code>public.regexp_split_to_table</code>.
+ */
+fun REGEXP_SPLIT_TO_TABLE(
+      configuration: Configuration
+    , __1: String?
+    , __2: String?
+): Result<RegexpSplitToTableRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+      __1
+    , __2
+)).fetch()
+
+/**
+ * Get <code>public.regexp_split_to_table</code> as a table.
+ */
+fun REGEXP_SPLIT_TO_TABLE(
+      __1: String?
+    , __2: String?
+): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+    __1,
+    __2
+)
+
+/**
+ * Get <code>public.regexp_split_to_table</code> as a table.
+ */
+fun REGEXP_SPLIT_TO_TABLE(
+      __1: Field<String?>
+    , __2: Field<String?>
+): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
+    __1,
+    __2
+)
 
 /**
  * The table <code>public.sessions</code>.

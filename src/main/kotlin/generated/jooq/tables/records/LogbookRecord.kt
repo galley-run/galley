@@ -6,10 +6,11 @@ package generated.jooq.tables.records
 
 import generated.jooq.tables.Logbook
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -48,9 +49,9 @@ open class LogbookRecord() : UpdatableRecordImpl<LogbookRecord>(Logbook.LOGBOOK)
         set(value): Unit = set(6, value)
         get(): UUID? = get(6) as UUID?
 
-    open var details: JSONB?
+    open var details: ClusterSerializable?
         set(value): Unit = set(7, value)
-        get(): JSONB? = get(7) as JSONB?
+        get(): ClusterSerializable? = get(7) as ClusterSerializable?
 
     open var createdAt: OffsetDateTime?
         set(value): Unit = set(8, value)
@@ -65,7 +66,7 @@ open class LogbookRecord() : UpdatableRecordImpl<LogbookRecord>(Logbook.LOGBOOK)
     /**
      * Create a detached, initialised LogbookRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, userId: UUID? = null, action: String? = null, objectType: String? = null, objectId: UUID? = null, details: JSONB? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, userId: UUID? = null, action: String? = null, objectType: String? = null, objectId: UUID? = null, details: ClusterSerializable? = null, createdAt: OffsetDateTime? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.charterId = charterId

@@ -4,11 +4,11 @@
 package generated.jooq.tables.pojos
 
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
-
-import org.jooq.JSONB
 
 import run.galley.cloud.model.BaseModel
 
@@ -23,7 +23,7 @@ data class UserIdentities(
     var provider: String? = null,
     var subject: String? = null,
     var email: String? = null,
-    var rawProfile: JSONB? = null,
+    var rawProfile: ClusterSerializable? = null,
     var createdAt: OffsetDateTime? = null
 ): BaseModel, Serializable {
 

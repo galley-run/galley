@@ -3,7 +3,6 @@ package nl.clicqo.ext
 import io.vertx.core.eventbus.ReplyException
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.json.JsonArray
-import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.handler.CorsHandler
 import io.vertx.ext.web.handler.HttpException
@@ -18,12 +17,13 @@ import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.ApiStatusReplyException
 import org.slf4j.LoggerFactory
 
-fun Router.setupCorsHandler(config: JsonObject): Router {
+fun Router.setupCorsHandler(corsConfig: JsonArray): Router {
   route()
     .handler(
       CorsHandler
         .create()
-        .addOriginsWithRegex(config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")).map { it.toString() })
+        .addOrigins(corsConfig.map { it as String })
+        .allowCredentials(true)
         .allowedMethod(HttpMethod.GET)
         .allowedMethod(HttpMethod.DELETE)
         .allowedMethod(HttpMethod.OPTIONS)
@@ -164,6 +164,7 @@ fun Router.setupDefaultResponse(): Router {
       .putHeader("X-XSS-Protection", "1; mode=block")
       // Deny frames
       .putHeader("X-FRAME-OPTIONS", "DENY")
+    ctx.next()
   }
   return this
 }

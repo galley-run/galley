@@ -17,18 +17,21 @@ import generated.jooq.tables.OutboxEvents.OutboxEventsPath
 import generated.jooq.tables.WebhookSubscriptions.WebhookSubscriptionsPath
 import generated.jooq.tables.records.WebhookDeliveriesRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Index
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.Path
 import org.jooq.PlainSQL
@@ -123,17 +126,17 @@ open class WebhookDeliveries(
     /**
      * The column <code>public.webhook_deliveries.request_headers</code>.
      */
-    val REQUEST_HEADERS: TableField<WebhookDeliveriesRecord, JSONB?> = createField(DSL.name("request_headers"), SQLDataType.JSONB, this, "")
+    val REQUEST_HEADERS: TableField<WebhookDeliveriesRecord, ClusterSerializable?> = createField(DSL.name("request_headers"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.webhook_deliveries.request_body</code>.
      */
-    val REQUEST_BODY: TableField<WebhookDeliveriesRecord, JSONB?> = createField(DSL.name("request_body"), SQLDataType.JSONB, this, "")
+    val REQUEST_BODY: TableField<WebhookDeliveriesRecord, ClusterSerializable?> = createField(DSL.name("request_body"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.webhook_deliveries.response_headers</code>.
      */
-    val RESPONSE_HEADERS: TableField<WebhookDeliveriesRecord, JSONB?> = createField(DSL.name("response_headers"), SQLDataType.JSONB, this, "")
+    val RESPONSE_HEADERS: TableField<WebhookDeliveriesRecord, ClusterSerializable?> = createField(DSL.name("response_headers"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.webhook_deliveries.response_body</code>.

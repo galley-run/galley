@@ -7,10 +7,11 @@ package generated.jooq.tables.records
 import generated.jooq.enums.ApiGatewayEngine
 import generated.jooq.tables.ProjectApiGateway
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
-import org.jooq.JSONB
 import org.jooq.Record1
 import org.jooq.impl.UpdatableRecordImpl
 
@@ -41,9 +42,9 @@ open class ProjectApiGatewayRecord() : UpdatableRecordImpl<ProjectApiGatewayReco
         set(value): Unit = set(4, value)
         get(): ApiGatewayEngine? = get(4) as ApiGatewayEngine?
 
-    open var configuration: JSONB?
+    open var configuration: ClusterSerializable?
         set(value): Unit = set(5, value)
-        get(): JSONB? = get(5) as JSONB?
+        get(): ClusterSerializable? = get(5) as ClusterSerializable?
 
     open var createdAt: OffsetDateTime?
         set(value): Unit = set(6, value)
@@ -62,7 +63,7 @@ open class ProjectApiGatewayRecord() : UpdatableRecordImpl<ProjectApiGatewayReco
     /**
      * Create a detached, initialised ProjectApiGatewayRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, engine: ApiGatewayEngine? = null, configuration: JSONB? = null, createdAt: OffsetDateTime? = null, updatedAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, engine: ApiGatewayEngine? = null, configuration: ClusterSerializable? = null, createdAt: OffsetDateTime? = null, updatedAt: OffsetDateTime? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.charterId = charterId

@@ -12,7 +12,6 @@ import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
 import generated.jooq.tables.CrewCharterMember
 import generated.jooq.tables.EmailLoginTokens
-import generated.jooq.tables.FlywaySchemaHistory
 import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.OutboxEvents
@@ -40,7 +39,6 @@ import generated.jooq.tables.records.ChartersRecord
 import generated.jooq.tables.records.CrewCharterMemberRecord
 import generated.jooq.tables.records.CrewRecord
 import generated.jooq.tables.records.EmailLoginTokensRecord
-import generated.jooq.tables.records.FlywaySchemaHistoryRecord
 import generated.jooq.tables.records.LockerRecord
 import generated.jooq.tables.records.LogbookRecord
 import generated.jooq.tables.records.OutboxEventsRecord
@@ -84,7 +82,6 @@ val CREW_PKEY: UniqueKey<CrewRecord> = Internal.createUniqueKey(Crew.CREW, DSL.n
 val CREW_CHARTER_MEMBER_PKEY: UniqueKey<CrewCharterMemberRecord> = Internal.createUniqueKey(CrewCharterMember.CREW_CHARTER_MEMBER, DSL.name("crew_charter_member_pkey"), arrayOf(CrewCharterMember.CREW_CHARTER_MEMBER.ID), true)
 val EMAIL_LOGIN_TOKENS_PKEY: UniqueKey<EmailLoginTokensRecord> = Internal.createUniqueKey(EmailLoginTokens.EMAIL_LOGIN_TOKENS, DSL.name("email_login_tokens_pkey"), arrayOf(EmailLoginTokens.EMAIL_LOGIN_TOKENS.ID), true)
 val EMAIL_LOGIN_TOKENS_TOKEN_HASH_KEY: UniqueKey<EmailLoginTokensRecord> = Internal.createUniqueKey(EmailLoginTokens.EMAIL_LOGIN_TOKENS, DSL.name("email_login_tokens_token_hash_key"), arrayOf(EmailLoginTokens.EMAIL_LOGIN_TOKENS.TOKEN_HASH), true)
-val FLYWAY_SCHEMA_HISTORY_PK: UniqueKey<FlywaySchemaHistoryRecord> = Internal.createUniqueKey(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY, DSL.name("flyway_schema_history_pk"), arrayOf(FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY.INSTALLED_RANK), true)
 val LOCKER_PKEY: UniqueKey<LockerRecord> = Internal.createUniqueKey(Locker.LOCKER, DSL.name("locker_pkey"), arrayOf(Locker.LOCKER.ID), true)
 val LOGBOOK_PKEY: UniqueKey<LogbookRecord> = Internal.createUniqueKey(Logbook.LOGBOOK, DSL.name("logbook_pkey"), arrayOf(Logbook.LOGBOOK.ID), true)
 val OUTBOX_EVENTS_PKEY: UniqueKey<OutboxEventsRecord> = Internal.createUniqueKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("outbox_events_pkey"), arrayOf(OutboxEvents.OUTBOX_EVENTS.ID), true)

@@ -186,3 +186,7 @@ nbdist/
 
 config.json
 keystore.p12
+*.pem
+
+/src/main/resources/webroot/*
+!/src/main/resources/webroot/.gitkeep

@@ -18,18 +18,21 @@ import generated.jooq.tables.Charters.ChartersPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.ProjectApiGatewayRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
 
+import nl.clicqo.data.JooqJsonbObjectBinding
+
 import org.jooq.Condition
 import org.jooq.Field
 import org.jooq.ForeignKey
 import org.jooq.Index
 import org.jooq.InverseForeignKey
-import org.jooq.JSONB
 import org.jooq.Name
 import org.jooq.Path
 import org.jooq.PlainSQL
@@ -114,7 +117,7 @@ open class ProjectApiGateway(
     /**
      * The column <code>public.project_api_gateway.configuration</code>.
      */
-    val CONFIGURATION: TableField<ProjectApiGatewayRecord, JSONB?> = createField(DSL.name("configuration"), SQLDataType.JSONB.nullable(false), this, "")
+    val CONFIGURATION: TableField<ProjectApiGatewayRecord, ClusterSerializable?> = createField(DSL.name("configuration"), SQLDataType.JSONB.nullable(false), this, "", JooqJsonbObjectBinding())
 
     /**
      * The column <code>public.project_api_gateway.created_at</code>.

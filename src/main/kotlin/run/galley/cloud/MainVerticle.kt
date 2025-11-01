@@ -131,9 +131,10 @@ class MainVerticle : CoroutineVerticle() {
         }
       }
     }
+    val webAppConfig = config.getJsonObject("webapp", JsonObject())
     mainRouter
       .route()
-      .virtualHost(config.getJsonObject("webapp", JsonObject()).getString("host", "localhost"))
+      .virtualHost(webAppConfig.getString("host", "localhost"))
       .subRouter(webAppRouter)
 
     // Deploy verticles

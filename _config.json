@@ -34,8 +34,8 @@
     "email": {
       "hostname": "127.0.0.1",
       "port": 25,
-      "username": "email@galley.run",
-      "password": "blank",
+      "username": "",
+      "password": "",
       "defaults": {
         "from": "Galley <welcome@galley.run>",
         "cc": ["Galley <cc@galley.run>"],

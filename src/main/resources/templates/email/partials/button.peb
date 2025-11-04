@@ -1,0 +1,10 @@
+{# Button partial for HTML emails #}
+{% set _primary = primary_color | default('#559f7e') %}
+{% set _accent  = accent_color | default('#4e74a2') %}
+{% set _bg = variant == 'secondary' ? _accent : _primary %}
+
+<a class="btn" href="{{ href }}" target="_blank"
+   style="display:inline-block;padding:12px 16px;border-radius:8px;background:{{ _bg }};
+          color:#ffffff;font-weight:700;">
+  {{ label }}
+</a>

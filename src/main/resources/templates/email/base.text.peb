@@ -1,0 +1,17 @@
+{# Plain text base for Galley.run emails #}
+
+{% set _brand = brand_name | default('Galley') %}
+
+{% block body %}
+{{ _brand }}
+------------
+Replace this body in your child template.
+{% endblock %}
+
+{% block footer %}
+------------
+You received this email because of an action in your Galley.run account.
+{% if unsubscribe_url is not empty %}
+Unsubscribe: {{ unsubscribe_url }}
+{% endif %}
+{% endblock %}

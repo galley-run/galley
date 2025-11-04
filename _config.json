@@ -1,16 +1,26 @@
 {
   "http": {
-    "port": 9233
+    "port": 443,
+    "certPath": "api.galley.dev.pem",
+    "keyPath": "api.galley.dev-key.pem"
   },
   "jwt": {
     "secret": "secret",
     "keystore": "keystore.p12",
     "type": "pkcs12",
-    "pepper": "long-and-random-string"
+    "pepper": "long-and-random-string",
+    "ttl": {
+      "access": 90
+    }
   },
   "api": {
     "openApiFile": "openapi.yaml",
-    "cors": [".*"]
+    "cors": [".*"],
+    "host": "api.galley.dev"
+  },
+  "webapp": {
+    "host": "cloud.galley.dev",
+    "cors": ["*"]
   },
   "db": {
     "port": 5432,
@@ -19,5 +29,19 @@
     "pool_size": 5,
     "username": "username",
     "password": "password"
+  },
+  "messaging": {
+    "email": {
+      "hostname": "127.0.0.1",
+      "port": 25,
+      "username": "email@galley.run",
+      "password": "blank",
+      "defaults": {
+        "from": "Galley <welcome@galley.run>",
+        "cc": ["Galley <cc@galley.run>"],
+        "bcc": ["Galley <bcc@galley.run>"],
+        "urlPrefix": "https://cloud.galley.dev"
+      }
+    }
   }
 }

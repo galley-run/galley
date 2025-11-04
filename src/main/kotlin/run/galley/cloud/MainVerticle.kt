@@ -39,6 +39,7 @@ import nl.clicqo.ext.setupCorsHandler
 import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
 import nl.clicqo.ext.setupFailureHandler
+import nl.clicqo.messaging.email.EmailMessagingVerticle
 import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
@@ -86,10 +87,6 @@ class MainVerticle : CoroutineVerticle() {
     mainRouter.run {
       setupCorsHandler(JsonArray().add("*"))
       setupDefaultOptionsHandler()
-//      post().handler(BodyHandler.create())
-//      patch().handler(BodyHandler.create())
-//      put().handler(BodyHandler.create())
-//      setupDefaultResponse()
     }
 
     val openApiBridge = OpenApiBridge(vertx, config).initialize()
@@ -107,11 +104,6 @@ class MainVerticle : CoroutineVerticle() {
 
     val webAppRouter = Router.router(vertx)
     webAppRouter.run {
-//      setupCorsHandler(config.getJsonObject("webapp").getJsonArray("cors", JsonArray().add(".*")))
-//      setupDefaultOptionsHandler()
-//      setupDefaultResponse()
-//      setupFailureHandler()
-
       route(
         "/*",
       ).handler(
@@ -150,6 +142,9 @@ class MainVerticle : CoroutineVerticle() {
         .coAwait()
     // Undeploy once the migration is done
     vertx.undeploy(flywayMigrationVerticleId).coAwait()
+
+    val emailConfig = config.getJsonObject("messaging", JsonObject()).getJsonObject("email", JsonObject())
+    vertx.deployVerticle(EmailMessagingVerticle(), deploymentOptionsOf(emailConfig)).coAwait()
 
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()

@@ -1,0 +1,148 @@
+{# Galley.run – Base HTML layout for transactional emails #}
+{# Variables:
+   - title:            String (HTML <title>)
+   - preheader:        String (hidden preview line)
+   - brand_name:       String (default: "Galley.run")
+   - brand_url:        String (default: "https://galley.run")
+   - primary_color:    String (default: "#0B3B5A" – deep navy)
+   - accent_color:     String (default: "#17A2B8" – seafoam)
+   - unsubscribe_url:  Optional link for unsubscribing
+#}
+
+{% set _title = title | default('Galley') %}
+{% set _brand = brand_name | default('Galley') %}
+{% set _brand_url = brand_url | default('https://galley.run') %}
+{% set _primary = primary_color | default('#4e74a2') %}
+{% set _accent  = accent_color | default('#559f7e') %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no">
+  <title>{{ _title }}</title>
+
+  <style>
+    html, body { margin:0; padding:0; height:100%; }
+    img { border:0; outline:none; text-decoration:none; -ms-interpolation-mode:bicubic; }
+    table { border-collapse:collapse; }
+    a { text-decoration:none; }
+
+    .wrapper { width:100%; background:#fafafa; }
+    .outer { width:100%; max-width:600px; margin:0 auto; background:#ffffff; border: 1px solid #fafafa; border-radius: 12px; }
+    .pad-24 { padding:24px; }
+    .muted { color:#b5bdc9; }
+    .small { font-size:12px; line-height:18px; }
+    .h1 { font-size:22px; line-height:28px; margin:0 0 12px; color:#324b67; font-weight:700; }
+    .p  { font-size:14px; line-height:20px; margin:0 0 12px; color:#0d141c; }
+    .sp-16 { height:16px; line-height:16px; }
+    .sp-24 { height:24px; line-height:24px; }
+
+    .brand { font-weight:800; letter-spacing:.2px; color:#0f172a; }
+    .tag   { color:#0f172a; background:#b5bdc9; border-radius:999px; padding:2px 8px; font-size:11px; }
+
+    .btn {
+      display:inline-block;
+      padding:12px 16px;
+      border-radius:8px;
+      background:{{ _primary }};
+      color:#ffffff !important;
+      font-weight:700;
+    }
+    .btn-secondary {
+      display:inline-block;
+      padding:12px 16px;
+      border-radius:8px;
+      background:{{ _accent }};
+      color:#559f7e !important;
+      font-weight:700;
+    }
+
+    .border-bottom {
+      border-bottom: 1px solid #ededed;
+    }
+
+    @media only screen and (max-width: 620px) {
+      .pad-24 { padding:16px !important; }
+      .h1 { font-size:20px !important; line-height:26px !important; }
+    }
+  </style>
+</head>
+
+<body style="margin:0; padding:0; background:#fafafa;">
+  {% if preheader is not empty %}
+    <div style="display:none !important; visibility:hidden; opacity:0; color:transparent; height:0; width:0; overflow:hidden; mso-hide:all;">
+      {{ preheader }}
+    </div>
+  {% endif %}
+
+  <table role="presentation" class="wrapper" width="100%" cellspacing="0" cellpadding="0" bgcolor="#fafafa">
+    <tr>
+      <td align="center" style="padding:24px 12px;">
+        <table role="presentation" class="outer" width="600" cellspacing="0" cellpadding="0" bgcolor="#ffffff">
+          <!-- Header -->
+          <tr>
+            <td class="pad-24 border-bottom" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+              {% block header %}
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td class="brand">
+                      <a href="{{ _brand_url }}" style="color:#0f172a;"><img src="https://galley.run/galley.png" width="100" alt="{{ _brand }}" /></a>
+                    </td>
+                  </tr>
+                </table>
+              {% endblock %}
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td class="pad-24" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+              {% block body %}
+                <h1 class="h1">Example title</h1>
+                <p class="p">Replace this section in your child template.</p>
+              {% endblock %}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="pad-24" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+              {% block footer %}
+                <table role="presentation" width="100%">
+                  <tr>
+                    <td class="small muted">
+                      You received this email because an action occurred in your Galley.run account.
+                      {% if unsubscribe_url is not empty %}
+                        <br>To stop receiving emails like this, <a style="color:{{ _primary }};" href="{{ unsubscribe_url }}" target="_blank">unsubscribe here</a>.
+                      {% endif %}
+                    </td>
+                  </tr>
+                </table>
+              {% endblock %}
+            </td>
+          </tr>
+        </table>
+
+        <!-- Secondary footer -->
+        {% block footer_secondary %}
+          <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px; margin:12px auto 0;">
+            <tr>
+              <td class="small muted" align="center" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                © {{ now | date("yyyy") }} Galley.run
+              </td>
+            </tr>
+            <tr>
+              <td class="small muted" align="center" style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+                Need some help? Hit reply to this email and our support team will get back to you.
+              </td>
+            </tr>
+          </table>
+        {% endblock %}
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

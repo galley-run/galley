@@ -1,6 +1,5 @@
 package run.galley.cloud.web
 
-import com.github.jknack.handlebars.internal.lang3.StringUtils.isNotBlank
 import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
@@ -132,7 +131,7 @@ class OpenApiBridge(
               .getHeader("Content-Type")
               ?.substringBefore(";")
               ?.trim()
-              ?.takeIf(::isNotBlank) ?: "*/*"
+              ?.takeIf(String::isNotEmpty) ?: "*/*"
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
           val acceptsJson =
             acceptHeader.split(",").find { header ->

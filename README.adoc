@@ -87,6 +87,13 @@ You can start the app with JVM System Property `-Dapp.env=dev` to enable a smoot
 
 The following customizations only work in if `app.env` is set to `dev`.
 
+==== To run Postgres and SMTP server during local development
+
+----
+docker compose up -d
+open http://127.0.0.1:5000 # Local SMTP Server
+----
+
 ==== Extend Access Token TTL
 
 Add JVM System Property `-Djwt.ttl.access=3600` to extend the TTL seconds of the AccessToken (default: 30s).

@@ -20,6 +20,7 @@ object ApiStatus {
   val REFRESH_TOKEN_INVALID =
     ApiStatus(1301, "The refresh token is invalid or expired", HttpStatus.Unauthorized)
   val REFRESH_TOKEN_MISSING = ApiStatus(1302, REFRESH_TOKEN_INVALID)
+  val ACCESS_TOKEN_MISSING = ApiStatus(1303, "The access token is invalid or expired", HttpStatus.Unauthorized)
 
   val CHARTER_NO_ACCESS = ApiStatus(1400, "You don't have access to this charter", HttpStatus.Forbidden)
   val CHARTER_NOT_FOUND = ApiStatus(1401, "The charter could not be found", HttpStatus.NotFound)
@@ -39,6 +40,7 @@ object ApiStatus {
       "You have created your account more than 6 hours ago without accepting your invite by e-mail. Please sign in again.",
       HttpStatus.Unauthorized,
     )
+  val CREW_NO_ACTIVATION_SALT = ApiStatus(1604, "You can't activate without an activation key", HttpStatus.NotFound)
 
   val PROJECT_CREATE_FAILURE = ApiStatus(1700, "The project could not be created")
   val PROJECT_NOT_FOUND = ApiStatus(1701, "The project could not be found", HttpStatus.NotFound)
@@ -54,4 +56,8 @@ object ApiStatus {
 
   val VESSEL_BILLING_PROFILE_CREATE_FAILURE = ApiStatus(1900, "The vessel billing profile could not be created")
   val VESSEL_BILLING_PROFILE_NOT_FOUND = ApiStatus(1901, "The vessel billing profile could not be found")
+
+  val SESSION_NOT_FOUND = ApiStatus(2000, "The session could not be found", HttpStatus.NotFound)
+
+  val JWT_PEPPER_MISSING = ApiStatus(2100, "The JWT Pepper is not set in the configuration", HttpStatus.ServiceUnavailable)
 }

@@ -134,6 +134,11 @@ open class Crew(
      */
     val DELETED_AT: TableField<CrewRecord, OffsetDateTime?> = createField(DSL.name("deleted_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "")
 
+    /**
+     * The column <code>public.crew.activation_salt</code>.
+     */
+    val ACTIVATION_SALT: TableField<CrewRecord, String?> = createField(DSL.name("activation_salt"), SQLDataType.VARCHAR(64).nullable(false).defaultValue(DSL.field(DSL.raw("\"substring\"(md5((random())::text), 1, 64)"), SQLDataType.VARCHAR)), this, "")
+
     private constructor(alias: Name, aliased: Table<CrewRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<CrewRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<CrewRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)

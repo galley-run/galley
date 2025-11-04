@@ -3,6 +3,7 @@ package nl.clicqo.ext
 import nl.clicqo.api.ApiStatus
 import java.time.LocalDate
 import java.util.UUID
+import kotlin.io.encoding.Base64
 
 fun String.camelCaseToSnakeCase(): String =
   mapIndexed { index, c ->
@@ -41,3 +42,7 @@ fun String.toSingular(): String =
         else -> this
       }
   }
+
+fun String.toBase64() = Base64.encode(this.encodeToByteArray())
+
+fun ByteArray.toBase64() = Base64.encode(this)

@@ -66,11 +66,13 @@ open class ApiStatus : Throwable {
     val FAILED_UPDATE = ApiStatus(113, "Updating the resource failed")
     val FAILED_DELETE = ApiStatus(114, "Deleting the resource failed")
     val FAILED_AUTHORIZATION = ApiStatus(115, "Authorization failed", HttpStatus.Unauthorized)
-    val PG_FAILED_CONSTRAINT_DUPLICATE = ApiStatus(120, "The request couldn't be processed", HttpStatus.Conflict)
+    val PG_FAILED_CONSTRAINT_DUPLICATE =
+      ApiStatus(120, "The request couldn't be processed, it seems it already exists", HttpStatus.Conflict)
     val REQUEST_BODY_NOT_ALLOWED = ApiStatus(130, "The request body should be a Json object", HttpStatus.BadRequest)
     val REQUEST_BODY_MISSING_REQUIRED_FIELDS = ApiStatus(131, "The request body is missing required fields", HttpStatus.BadRequest)
     val CONTENT_TYPE_NOT_DEFINED = ApiStatus(132, "The requested content type is not available", HttpStatus.UnsupportedMediaType)
     val RESPONSE_VALIDATION_FAILED = ApiStatus(140, "The response validation failed", HttpStatus.InternalServerError)
+    val MESSAGING_EMAIL_FAILED = ApiStatus(150, "The email couldn't be send")
 
     @Suppress("ktlint:standard:function-naming")
     fun JOOQ_MISSING_REQUIRED_FIELDS(message: String) = ApiStatus(130, "The following fields are missing in the condition: ($message)")

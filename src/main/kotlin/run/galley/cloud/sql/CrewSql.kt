@@ -10,6 +10,7 @@ import nl.clicqo.ext.andActivated
 import nl.clicqo.ext.andNotDeleted
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.getUUID
+import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
@@ -35,7 +36,7 @@ object CrewSql {
   }
 
   fun create(request: EventBusCmdDataRequest): Query {
-    val payload = request.payload ?: throw ApiStatus.REQUEST_BODY_MISSING
+    val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
     val userId = request.userId ?: throw ApiStatus.MISSING_USER_ID
 
     return Jooq.postgres
@@ -58,4 +59,14 @@ object CrewSql {
           else -> null
         }
       }.toTypedArray()
+
+  fun activate(request: EventBusQueryDataRequest): Query {
+    val conditions = buildConditions(request.filters)
+    return Jooq.postgres
+      .selectFrom(CREW)
+      .applyConditions(*conditions)
+      .and(CREW.STATUS.eq(MemberStatus.invited))
+      .and(CREW.ACTIVATED_AT.isNull)
+      .andNotDeleted(CREW.DELETED_AT)
+  }
 }

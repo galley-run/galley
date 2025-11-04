@@ -1,6 +1,6 @@
 {% extends "../base.html.peb" %}
-    {% set title = "Reset your password" %}
-    {% set preheader = "Reset your Galley.run password in a few clicks" %}
+{% set title = "Activate your account" %}
+{% set preheader = "Please activate your Galley account" %}
 
 {% block body %}
   <h1 class="h1">Activate your account</h1>
@@ -9,9 +9,9 @@
 
   <div class="sp-16">&nbsp;</div>
   {% include "../partials/button.peb" with {
-"href": activationUrl,
+"href": activation_url,
 "label": "Activate your account"
 } %}
   <div class="sp-24">&nbsp;</div>
-  <p class="small muted">If the button doesn’t work, copy and paste this URL into your browser:<br>{{ activationUrl }}</p>
+  <p class="small muted">If the button doesn’t work, copy and paste this URL into your browser:<br>{{ activation_url }}</p>
 {% endblock %}

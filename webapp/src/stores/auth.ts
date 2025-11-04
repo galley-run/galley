@@ -35,9 +35,13 @@ export const useAuthStore = defineStore('auth', {
       await this.refreshAccessToken()
     },
     async signOut() {
-      await axios.delete(`/auth/refresh-token/${this.refreshToken}`)
+      try {
+        await axios.delete(`/auth/sign-out`)
+      } catch {}
+
       this.$reset()
       this.stopAccessTokenTimer()
+
       try {
         localStorage.removeItem(STORAGE_KEY)
       } catch {}
@@ -45,10 +49,15 @@ export const useAuthStore = defineStore('auth', {
       await router.push('/login')
     },
     async refreshAccessToken() {
-      this.accessToken = (
-        await axios.post('/auth/access-token', { refreshToken: this.refreshToken })
-      ).data.data.accessToken
+      if (!this.refreshToken) return
 
+      try {
+        this.accessToken = (
+          await axios.post('/auth/access-token', { refreshToken: this.refreshToken })
+        ).data.data.accessToken
+      } catch (_) {
+        return this.signOut()
+      }
       const jwtBase64 = this.accessToken?.split('.')[1] ?? ''
       if (!this.accessToken || !jwtBase64) {
         return this.signOut()
@@ -67,6 +76,8 @@ export const useAuthStore = defineStore('auth', {
       ).data.data.refreshToken
     },
     async startRefreshTokenTimer() {
+      if (!this.refreshToken) return
+
       await this.refreshAccessToken()
       // parse json object from base64 encoded jwt token
       const jwtBase64 = this.refreshToken?.split('.')[1] ?? ''

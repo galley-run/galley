@@ -9,6 +9,8 @@ import io.vertx.ext.mail.MailMessage
 import io.vertx.ext.web.templ.pebble.PebbleTemplateEngine
 import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.api.ApiStatus
+import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import java.time.Instant
@@ -40,38 +42,40 @@ class EmailMessagingVerticle :
     }
   }
 
-  private suspend fun sendEmail(message: Message<JsonObject>) {
+  private suspend fun sendEmail(message: Message<EmailComposer>) {
     val body = message.body()
 
-    val to = body.getJsonArray("to").map { it.toString() }
+    val to = body.to
     val cc =
-      (
-        body.getJsonArray("cc").addAll(
-          config.getJsonObject("defaults", JsonObject()).getJsonArray(
+      body.cc.addAll(
+        config
+          .getJsonObject("defaults", JsonObject())
+          .getJsonArray(
             "cc",
             JsonArray(),
-          ),
-        ) ?: emptyList()
-      ).map { it.toString() }
+          ).list
+          .map { it.toString() },
+      )
     val bcc =
-      (
-        body.getJsonArray("bcc").addAll(
-          config.getJsonObject("defaults", JsonObject()).getJsonArray(
+      body.bcc.addAll(
+        config
+          .getJsonObject("defaults", JsonObject())
+          .getJsonArray(
             "bcc",
             JsonArray(),
-          ),
-        ) ?: emptyList()
-      ).map { it.toString() }
-    val subject = body.getString("subject")
-    val template = body.getString("template")
-    val from = body.getString("from", config.getJsonObject("defaults", JsonObject()).getString("from", "NO FROM SET"))
+          ).list
+          .map { it.toString() },
+      )
+    val subject = body.subject
+    val template = body.template
+    val from = body.from ?: config.getJsonObject("defaults", JsonObject()).getString("from", "NO FROM SET")
     val variables =
       JsonObject()
         .put("subject", subject)
         .put("now", Instant.now())
         .mergeIn(
           JsonObject.mapFrom(
-            body.getJsonObject("variables", JsonObject()).map.mapValues {
+            body.variables.map.mapValues {
               if (it.key.lowercase().endsWith("url") &&
                 !it.value.toString().startsWith("http")
               ) {
@@ -99,9 +103,9 @@ class EmailMessagingVerticle :
 
     val email =
       MailMessage()
-        .setTo(to)
-        .setCc(cc)
-        .setBcc(bcc)
+        .setTo(to.toList())
+        .setCc(cc.toList())
+        .setBcc(bcc.toList())
         .setSubject(subject)
         .setHtml(html.toString())
         .setText(plainText.toString())
@@ -111,9 +115,9 @@ class EmailMessagingVerticle :
       try {
         client.sendMail(email).coAwait()
       } catch (e: Exception) {
-        e.printStackTrace()
-        return
+        throw ApiStatusReplyException(ApiStatus.MESSAGING_EMAIL_FAILED, e.message.toString())
       }
+
     message.reply(result?.toJson())
   }
 

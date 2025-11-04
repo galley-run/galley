@@ -9,8 +9,11 @@ import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
 import nl.clicqo.ext.getUUID
 import nl.clicqo.system.Debug
+import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CrewAccess
 import java.util.UUID
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 object JWT {
   fun authConfig(config: JsonObject): JWTAuthOptions =
@@ -27,6 +30,16 @@ object JWT {
     vertx: Vertx,
     config: JsonObject,
   ): JWTAuth = JWTAuth.create(vertx, authConfig(config))
+
+  fun hashRefreshToken(
+    tokenRaw: String,
+    config: JsonObject,
+  ): ByteArray {
+    val pepper = config.getJsonObject("jwt")?.getString("pepper") ?: throw ApiStatus.JWT_PEPPER_MISSING
+    val mac = Mac.getInstance("HmacSHA256")
+    mac.init(SecretKeySpec(pepper.toByteArray(), "HmacSHA256"))
+    return mac.doFinal(tokenRaw.toByteArray())
+  }
 
   // Base JWT Options
   private val jwtOptions =

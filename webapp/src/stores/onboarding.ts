@@ -15,7 +15,7 @@ export type Inquiry = {
 
 export type VesselBillingProfile = {
   companyName: string
-  name: string
+  billingTo: string
   address1: string
   address2: string
   country: string
@@ -23,7 +23,7 @@ export type VesselBillingProfile = {
   city: string
   state: string
   email: string
-  vat: string
+  vatNumber: string
 }
 
 export type Vessel = {
@@ -80,14 +80,14 @@ export const useOnboardingStore = defineStore('onboarding', {
     },
     vesselBillingProfile: {
       companyName: '',
-      name: '',
+      billingTo: '',
       address1: '',
       address2: '',
       country: 'nl',
       postalCode: '',
       city: '',
       state: '',
-      vat: '',
+      vatNumber: '',
       email: '',
     },
     vessel: {

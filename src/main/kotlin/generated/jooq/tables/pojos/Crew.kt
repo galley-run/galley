@@ -26,7 +26,8 @@ data class Crew(
     var status: MemberStatus? = null,
     var createdAt: OffsetDateTime? = null,
     var activatedAt: OffsetDateTime? = null,
-    var deletedAt: OffsetDateTime? = null
+    var deletedAt: OffsetDateTime? = null,
+    var activationSalt: String? = null
 ): BaseModel, Serializable {
 
 
@@ -86,6 +87,12 @@ data class Crew(
         }
         else if (this.deletedAt != o.deletedAt)
             return false
+        if (this.activationSalt == null) {
+            if (o.activationSalt != null)
+                return false
+        }
+        else if (this.activationSalt != o.activationSalt)
+            return false
         return true
     }
 
@@ -100,6 +107,7 @@ data class Crew(
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.activatedAt == null) 0 else this.activatedAt.hashCode())
         result = prime * result + (if (this.deletedAt == null) 0 else this.deletedAt.hashCode())
+        result = prime * result + (if (this.activationSalt == null) 0 else this.activationSalt.hashCode())
         return result
     }
 
@@ -114,6 +122,7 @@ data class Crew(
         sb.append(", ").append(createdAt)
         sb.append(", ").append(activatedAt)
         sb.append(", ").append(deletedAt)
+        sb.append(", ").append(activationSalt)
 
         sb.append(")")
         return sb.toString()

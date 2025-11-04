@@ -39,6 +39,8 @@ import nl.clicqo.ext.setupCorsHandler
 import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
 import nl.clicqo.ext.setupFailureHandler
+import nl.clicqo.messaging.email.EmailComposer
+import nl.clicqo.messaging.email.EmailComposerCodec
 import nl.clicqo.messaging.email.EmailMessagingVerticle
 import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
@@ -49,6 +51,7 @@ import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
 import run.galley.cloud.data.ProjectDataVerticle
+import run.galley.cloud.data.SessionDataVerticle
 import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.data.VesselBillingProfileDataVerticle
 import run.galley.cloud.data.VesselDataVerticle
@@ -70,6 +73,7 @@ class MainVerticle : CoroutineVerticle() {
       )
     val config = configRetriever.config.coAwait().mergeIn(config)
 
+    vertx.eventBus().registerDefaultCodec(EmailComposer::class.java, EmailComposerCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
     vertx.eventBus().registerDefaultCodec(EventBusCmdDataRequest::class.java, EventBusCmdDataRequestCodec())
@@ -147,6 +151,7 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(EmailMessagingVerticle(), deploymentOptionsOf(emailConfig)).coAwait()
 
     // Setup Postgres DB Pool and deploy all data verticles
+    vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CrewDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CrewCharterMemberDataVerticle(), deploymentOptions).coAwait()

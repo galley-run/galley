@@ -13,11 +13,11 @@
 
     <div class="grid xl:grid-cols-6 gap-8" v-if="intent === 'business'">
       <UIFormField class="col-span-3">
-        <UILabel :required="!vesselBillingProfile.name" for="billingCompanyName"
+        <UILabel :required="!vesselBillingProfile.billingTo" for="billingCompanyName"
           >Company name</UILabel
         >
         <UITextInput
-          :required="!vesselBillingProfile.name"
+          :required="!vesselBillingProfile.billingTo"
           id="billingCompanyName"
           placeholder="e.g. The Yacht Club"
           v-model="vesselBillingProfile.companyName"
@@ -39,14 +39,14 @@
         </label>
       </UIFormField>
       <UIFormField class="col-span-6">
-        <UILabel :required="!vesselBillingProfile.companyName" for="billingName">Billed to</UILabel>
+        <UILabel :required="!vesselBillingProfile.companyName" for="billingTo">Billed to</UILabel>
         <UITextInput
           :required="!vesselBillingProfile.companyName"
-          id="billingName"
+          id="billingTo"
           placeholder="e.g. Jack Sparrow"
-          v-model="vesselBillingProfile.name"
+          v-model="vesselBillingProfile.billingTo"
         />
-        <label for="billingName" class="form-field__error-message">
+        <label for="billingTo" class="form-field__error-message">
           This field is required when <em>Company name</em> is not given.
         </label>
       </UIFormField>
@@ -117,7 +117,7 @@
         <UITextInput
           id="billingVAT"
           placeholder="e.g. NL1234156789B01"
-          v-model="vesselBillingProfile.vat"
+          v-model="vesselBillingProfile.vatNumber"
         />
       </UIFormField>
     </div>
@@ -174,16 +174,16 @@ function onSubmit() {
     vesselBillingProfile: vesselBillingProfile.value,
     vessel: {
       name:
-        vessel.value.name ??
         vesselBillingProfile.value.companyName ??
         vesselBillingProfile.value.name ??
+        vessel.value.name ??
         'Vessel Inc.',
     },
     charter: {
       name:
-        vessel.value.name ??
         vesselBillingProfile.value.companyName ??
         vesselBillingProfile.value.name ??
+        vessel.value.name ??
         'Charter Inc.',
     },
     completed: {

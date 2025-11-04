@@ -15,3 +15,9 @@ You received this email because of an action in your Galley.run account.
 Unsubscribe: {{ unsubscribe_url }}
 {% endif %}
 {% endblock %}
+
+{% block footer_secondary %}
+© {{ now | date("yyyy") }} Galley.run
+
+Need some help? Hit reply to this email and our support team will get back to you.
+{% endblock %}

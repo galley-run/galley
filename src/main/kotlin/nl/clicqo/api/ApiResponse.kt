@@ -139,9 +139,11 @@ class ApiResponse(
       try {
         responseValidator.validate(response, operationId).coAwait()
       } catch (e: JsonSchemaValidationException) {
+        logger.error("SCHEMA VALIDATION ERROR", e)
         logger.error(e.message)
         throw ApiStatus.RESPONSE_VALIDATION_FAILED
       } catch (e: ValidatorException) {
+        logger.error("VALIDATOR ERROR", e)
         logger.error(e.message)
         throw ApiStatus.RESPONSE_VALIDATION_FAILED
       }

@@ -13,15 +13,23 @@ import AccountActivationView from '@/router/views/Onboarding/AccountActivationVi
 import {useAuthStore} from '@/stores/auth.ts'
 import LoginLayout from '@/router/layouts/LoginLayout.vue'
 import LoginView from '@/router/views/Login/LoginView.vue'
+import LogoutView from '@/router/views/Login/LogoutView.vue'
 
 const routes = [
   {
-    path: '/login',
+    path: '/auth',
     component: LoginLayout,
     children: [
-      {path: '', component: LoginView, meta: { public: true } },
-    ]
+      { path: 'login', component: LoginView, meta: { public: true }, alias: "/login" },
+      { path: 'logout', component: LogoutView, meta: { public: true }, alias: "/logout" },
+      {
+        path: 'activate/:hash',
+        component: AccountActivationView,
+        meta: { public: true },
+      },
+    ],
   },
+
   {
     path: '/onboarding',
     component: OnboardingLayout,
@@ -31,11 +39,6 @@ const routes = [
       { path: 'naming-ceremony', component: NamingCeremonyView, meta: { public: true } },
       { path: 'first-charter', component: FirstCharterView, meta: { public: true } },
       { path: 'boarding', component: BoardingView, meta: { public: true } },
-      {
-        path: 'account/activation/:hash',
-        component: AccountActivationView,
-        meta: { public: true },
-      },
     ],
   },
   {
@@ -59,10 +62,7 @@ router.beforeEach(async (to) => {
   const authRequired = !to.meta.public
   const authStore = useAuthStore();
 
-  console.log(!to.meta.public)
-
   if (authRequired && !authStore.refreshToken) {
-    console.log(authRequired, !authStore.refreshToken)
     return {
       path: '/login',
       query: {returnUrl: to.fullPath}

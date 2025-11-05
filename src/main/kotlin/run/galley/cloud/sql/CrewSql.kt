@@ -15,6 +15,7 @@ import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
 import run.galley.cloud.ApiStatus
+import java.time.OffsetDateTime
 
 object CrewSql {
   fun listActive(request: EventBusQueryDataRequest): Query {
@@ -62,11 +63,19 @@ object CrewSql {
 
   fun activate(request: EventBusQueryDataRequest): Query {
     val conditions = buildConditions(request.filters)
+
     return Jooq.postgres
-      .selectFrom(CREW)
-      .applyConditions(*conditions)
+      .update(CREW)
+      .set(
+        mapOf(
+          CREW.ACTIVATED_AT to OffsetDateTime.now(),
+          CREW.ACTIVATION_SALT to "",
+          CREW.STATUS to MemberStatus.active,
+        ),
+      ).applyConditions(*conditions)
       .and(CREW.STATUS.eq(MemberStatus.invited))
       .and(CREW.ACTIVATED_AT.isNull)
       .andNotDeleted(CREW.DELETED_AT)
+      .returning()
   }
 }

@@ -391,7 +391,7 @@ class AuthControllerVerticle :
         variables =
           JsonObject().put(
             "activation_url",
-            "/onboarding/account/activation/${"${crew.id}.${vessel.id}.${user.id}.${crew.activationSalt}".toBase64()}",
+            "/auth/activate/${"${crew.id}.${vessel.id}.${user.id}.${crew.activationSalt}".toBase64()}",
           ),
       )
 

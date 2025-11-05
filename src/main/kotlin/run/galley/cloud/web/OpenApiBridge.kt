@@ -45,6 +45,8 @@ class OpenApiBridge(
       .httpHandler(scpAuthHandler)
       .security("vesselCaptain")
       .httpHandler(scpAuthHandler)
+      .security("any")
+      .httpHandler(scpAuthHandler)
 
     /**
      * Add eventbus handlers for each operation.

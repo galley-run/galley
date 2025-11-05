@@ -130,6 +130,11 @@ class JWTAuthHandlerScp :
       }
       val userRoles = jwt.getJsonObject("scp") ?: throw ApiStatus.USER_ROLE_FORBIDDEN
 
+      if (scopes.size == 1 && scopes[0].lowercase() == "any") {
+        ctx.next()
+        return
+      }
+
       val vesselRole =
         userRoles
           .takeIf {

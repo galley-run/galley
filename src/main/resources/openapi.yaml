@@ -275,12 +275,7 @@ paths:
       summary: List projects for charter
       operationId: project.query.list
       security:
-        - vesselCaptain: []
-        - charterCaptain: []
-        - charterBoatswain: []
-        - charterDeckhand: []
-        - charterSteward: []
-        - charterPurser: []
+        - any: []
       responses:
         '200':
           description: The request was successful, and the server has returned the requested resource in the response body.
@@ -498,7 +493,8 @@ paths:
         - auth
       summary: Activate Account after Sign up
       operationId: auth.account.cmd.grant
-      security: []
+      security:
+        - any: []
       requestBody:
         required: true
         content:
@@ -547,7 +543,8 @@ paths:
         - auth
       summary: Sign out
       operationId: auth.cmd.revoke
-      security: []
+      security:
+        - any: []
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
@@ -557,6 +554,12 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
+    any:
+      type: http
+      scheme: bearer
+      description: Any User Role is allowed
+      bearerFormat: JWT
+      x-vessel-role: member
     vesselCaptain:
       type: http
       scheme: bearer
@@ -668,7 +671,6 @@ components:
             - nl
         email:
           type: string
-          format: email
           description: Billing email
           examples:
             - billing@acme.com

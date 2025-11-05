@@ -23,6 +23,9 @@ export const useAuthStore = defineStore('auth', {
     accessTokenTimeout: null,
     _schemaVersion: 1,
   }),
+  getters: {
+    isAuthenticated: (state) => !!state.accessToken || !!state.refreshToken
+  },
   actions: {
     async signIn(email: string) {
       this.refreshToken = (await axios.post('/auth/sign-in', { email })).data.data.refreshToken

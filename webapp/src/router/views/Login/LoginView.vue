@@ -28,11 +28,12 @@
     </div>
   </form>
 
-  <!--  <div class="border-t border-tides-400 pt-4 mt-4 space-y-4">-->
-  <!--    <p class="text-tides-800">Or use social login:</p>-->
-  <!--    <UIButton ghost type="submit">Sign in with Github</UIButton>-->
+
+    <div class="border-t border-tides-400 pt-4 mt-4">
+<!--      <p class="text-tides-800">Sign up instead</p>-->
+      <UIButton ghost type="submit" to="/onboarding">Sign up instead</UIButton>
   <!--    <UIButton ghost type="submit">Sign in with Apple</UIButton>-->
-  <!--  </div>-->
+    </div>
 </template>
 <script setup lang="ts">
 import UIFormField from '@/components/FormField/UIFormField.vue'
@@ -45,10 +46,13 @@ import { useMutation } from '@tanstack/vue-query'
 import axios from 'axios'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 import { ApiError } from '@/utils/registerAxios.ts'
+import { useAuthStore } from '@/stores/auth.ts'
 
 const email = ref('')
 const suggestSignUp = ref(false)
 const formRef = ref<HTMLFormElement | null>(null)
+
+const authStore = useAuthStore()
 
 const { isPending, isError, error, isSuccess, mutateAsync } = useMutation({
   mutationFn: (email: string) => axios.post(`/auth/sign-in`, { email }),
@@ -65,8 +69,10 @@ async function onSubmit() {
   }
 
   try {
-    await mutateAsync(email.value)
+    const result = await mutateAsync(email.value)
+
     if (isSuccess.value) {
+      await authStore.setRefreshToken(result.data.data.refreshToken)
       await router.push('/')
     }
   } catch (error) {

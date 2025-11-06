@@ -10,7 +10,6 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.factory.VesselEngineFactory
-import run.galley.cloud.model.factory.VesselFactory
 import run.galley.cloud.sql.VesselEngineSql
 
 class VesselEngineDataVerticle : PostgresDataVerticle() {
@@ -42,7 +41,8 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
     val results = pool.execute(VesselEngineSql.create(request))
 
     val vesselEngine =
-      results?.firstOrNull()?.let(VesselFactory::from) ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+      results?.firstOrNull()?.let(VesselEngineFactory::from)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }

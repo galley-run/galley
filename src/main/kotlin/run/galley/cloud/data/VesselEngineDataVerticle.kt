@@ -9,13 +9,13 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.model.factory.VesselFactory
+import run.galley.cloud.model.factory.VesselEngineFactory
 import run.galley.cloud.sql.VesselEngineSql
 
 class VesselEngineDataVerticle : PostgresDataVerticle() {
   companion object {
     const val CREATE = "data.vessel.engine.cmd.create"
-    const val GET = "data.vessel.engine.query.get"
+    const val LIST_BY_VESSEL_ID = "data.vessel.engine.query.list_by_vessel_id"
   }
 
   override suspend fun start() {
@@ -23,18 +23,17 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
 
     coroutineEventBus {
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
-      vertx.eventBus().coConsumer(GET, handler = ::get)
+      vertx.eventBus().coConsumer(LIST_BY_VESSEL_ID, handler = ::listByVesselId)
     }
   }
 
-  private suspend fun get(message: Message<EventBusQueryDataRequest>) {
+  private suspend fun listByVesselId(message: Message<EventBusQueryDataRequest>) {
     val request = message.body()
-    val results = pool.execute(VesselEngineSql.get(request))
+    val results = pool.execute(VesselEngineSql.getByVesselId(request))
 
-    val vesselEngine =
-      results?.firstOrNull()?.let(VesselFactory::from) ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+    val vesselEngines = results?.map(VesselEngineFactory::from)
 
-    message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
+    message.reply(EventBusDataResponse(DataPayload.many(vesselEngines)))
   }
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {
@@ -42,7 +41,8 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
     val results = pool.execute(VesselEngineSql.create(request))
 
     val vesselEngine =
-      results?.firstOrNull()?.let(VesselFactory::from) ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+      results?.firstOrNull()?.let(VesselEngineFactory::from)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }

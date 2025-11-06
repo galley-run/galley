@@ -188,7 +188,7 @@ const {
 } = useMutation({
   mutationFn: (project: Projects) =>
     axios.post(
-      `/vessels/${activeVesselId?.value}/charters/${charterData.value?.data?.data?.id}/projects`,
+      `/vessels/${activeVesselId?.value}/charters/${charterData.value?.data?.id}/projects`,
       project,
     ),
 })
@@ -202,7 +202,7 @@ onMounted(async () => {
     inquiry: inquiry.value,
     vessel: vessel.value,
   })
-  await authStore.setRefreshToken(signUpData?.value?.data?.data?.refreshToken)
+  await authStore.setRefreshToken(signUpData?.value?.data?.refreshToken)
 
   if (intent.value === 'business') {
     await mutateVesselBillingProfile(vesselBillingProfile.value)

@@ -34,14 +34,15 @@ export default function registerAxios() {
   axios.defaults.headers.common['Content-Type'] = `application/vnd.galley.v1+json`
 
   axios.interceptors.response.use(
-    (res) => res,
+    (res) => {
+      if (res.status === 203) {
+        console.error('Response Validation Incorrect (for:)', res)
+      }
+      return res?.data
+    },
     (e: AxiosError<ApiErrorBody>) => {
       const body = e.response?.data
-      const msg =
-        body?.errors?.[0]?.title ||
-        body?.error ||
-        e.message ||
-        'Er ging iets mis'
+      const msg = body?.errors?.[0]?.title || body?.error || e.message || 'Er ging iets mis'
 
       return Promise.reject(
         new ApiError(

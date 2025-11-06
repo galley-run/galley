@@ -9,5 +9,6 @@ object VesselFactory {
     Vessels(
       id = row.getUUID(VESSELS.ID.name),
       name = row.getString(VESSELS.NAME.name),
+      createdAt = row.getOffsetDateTime(VESSELS.CREATED_AT.name),
     )
 }

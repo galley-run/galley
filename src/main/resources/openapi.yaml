@@ -55,6 +55,74 @@ tags:
   - description: The Chef AI Agent which can guide you through Galley and can give you recommendations specific to your needs on Vessel scope
     name: chef
 paths:
+  /vessels:
+    get:
+      tags:
+        - vessel
+      summary: List vessels
+      operationId: vessel.query.list
+      security:
+        - any: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListVessels
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VesselSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/engine:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+    get:
+      tags:
+        - vessel/engine
+      summary: Get vessel engine overview
+      operationId: vessel.engine.query.list
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/VesselEngine'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/billing-profile:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -601,29 +669,100 @@ components:
       bearerFormat: JWT
       x-vessel-role: member
       x-charter-role: steward
-  parameters:
-    vesselId:
-      name: vesselId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    charterId:
-      name: charterId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-    projectId:
-      name: projectId
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
   schemas:
+    JSONAPIResource:
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          description: Resource identifier
+        type:
+          type: string
+          description: Resource type
+        attributes:
+          type: object
+          description: Resource attributes
+    VesselSummary:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Vessel, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Vessel ID (UUID)
+            type:
+              type: string
+              enum:
+                - Vessel
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - createdAt
+              properties:
+                name:
+                  type: string
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Creation timestamp
+    VesselEngine:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: Full VesselEngine entity representation for Single Get.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Unique engine identifier
+              examples:
+                - 123e4567-e89b-12d3-a456-426614174000
+            type:
+              type: string
+              enum:
+                - VesselEngine
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - vesselId
+                - name
+                - mode
+              properties:
+                vesselId:
+                  type: string
+                  format: uuid
+                  description: Vessel this engine belongs to
+                name:
+                  type: string
+                  description: Engine name
+                  examples:
+                    - Production Cluster
+                mode:
+                  type: string
+                  enum:
+                    - managed_cloud
+                    - managed_engine
+                    - controlled_engine
+                  description: Engine operation mode
+                  examples:
+                    - managed_engine
     BillingProfileCreate:
       type: object
       description: Request body for POST /billing-profiles.
@@ -685,22 +824,6 @@ components:
           examples:
             - NL123456789B01
       additionalProperties: false
-    JSONAPIResource:
-      type: object
-      required:
-        - id
-        - type
-        - attributes
-      properties:
-        id:
-          type: string
-          description: Resource identifier
-        type:
-          type: string
-          description: Resource type
-        attributes:
-          type: object
-          description: Resource attributes
     BillingProfile:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'
@@ -1219,27 +1342,8 @@ components:
                     title:
                       type: string
       description: The server understood the request, but refuses to authorize it. Ensure the client has appropriate permissions.
-    Conflict:
-      description: The request could not be completed due to a conflict with the current state of the resource.
-      content:
-        application/vnd.galley.v1+json:
-          schema:
-            type: object
-            required:
-              - errors
-            properties:
-              errors:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - title
-                    - status
-                  properties:
-                    status:
-                      type: string
-                    title:
-                      type: string
+    NotFound:
+      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
     InternalServerError:
       content:
         application/vnd.galley.v1+json:
@@ -1261,8 +1365,27 @@ components:
                     title:
                       type: string
       description: The server encountered an unexpected condition that prevented it from fulfilling the request. Report the issue to the support team if it persists.
-    NotFound:
-      description: The server cannot find the requested resource. The endpoint may be invalid or the resource may no longer exist.
+    Conflict:
+      description: The request could not be completed due to a conflict with the current state of the resource.
+      content:
+        application/vnd.galley.v1+json:
+          schema:
+            type: object
+            required:
+              - errors
+            properties:
+              errors:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - title
+                    - status
+                  properties:
+                    status:
+                      type: string
+                    title:
+                      type: string
     UnsupportedMediaType:
       description: The request could not be completed due to a conflict with the content type of the request body.
       content:
@@ -1286,3 +1409,25 @@ components:
                       type: string
     NoContent:
       description: The server has successfully fulfilled the request and there is no additional content to send in the response payload body.
+  parameters:
+    vesselId:
+      name: vesselId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    charterId:
+      name: charterId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid

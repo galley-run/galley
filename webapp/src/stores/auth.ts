@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async signIn(email: string) {
-      this.refreshToken = (await axios.post('/auth/sign-in', { email })).data.data.refreshToken
+      this.refreshToken = (await axios.post('/auth/sign-in', { email }))?.data?.refreshToken
 
       await this.refreshAccessToken()
     },
@@ -78,7 +78,7 @@ export const useAuthStore = defineStore('auth', {
       try {
         this.accessToken = (
           await axios.post('/auth/access-token', { refreshToken: this.refreshToken })
-        ).data.data.accessToken
+        )?.data?.accessToken
 
         this.extractAccessToken()
       } catch {
@@ -99,7 +99,7 @@ export const useAuthStore = defineStore('auth', {
     async refreshRefreshToken() {
       this.refreshToken = (
         await axios.post('/auth/refresh-token', { refreshToken: this.refreshToken })
-      ).data.data.refreshToken
+      )?.data?.refreshToken
     },
     async startRefreshTokenTimer() {
       if (!this.refreshToken) return

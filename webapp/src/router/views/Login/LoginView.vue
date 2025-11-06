@@ -72,7 +72,7 @@ async function onSubmit() {
     const result = await mutateAsync(email.value)
 
     if (isSuccess.value) {
-      await authStore.setRefreshToken(result.data.data.refreshToken)
+      await authStore.setRefreshToken(result?.data?.refreshToken)
       await router.push('/')
     }
   } catch (error) {

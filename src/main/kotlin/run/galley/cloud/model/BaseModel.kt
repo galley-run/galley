@@ -4,6 +4,7 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Row
 import nl.clicqo.ext.toSingular
+import java.time.OffsetDateTime
 
 interface BaseModel {
   companion object {
@@ -29,7 +30,7 @@ interface BaseModel {
             .forEach { field ->
               field.isAccessible = true
               val value = field.get(this@BaseModel)
-              put(field.name, value)
+              put(field.name, if (value is OffsetDateTime) value.toString() else value)
             }
         }
     val id = attributes.getString("id")

@@ -11,7 +11,6 @@ import io.vertx.openapi.validation.ValidatableResponse
 import io.vertx.openapi.validation.ValidatorException
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.applyIf
-import nl.clicqo.system.Debug
 import nl.clicqo.web.HttpStatus
 import org.slf4j.LoggerFactory
 
@@ -140,23 +139,15 @@ class ApiResponse(
       val validatedResponse = responseValidator.validate(response, operationId).coAwait()
       validatedResponse.send(routingContext.response())
     } catch (e: JsonSchemaValidationException) {
-      logger.error("SCHEMA VALIDATION ERROR", e)
+      logger.error("203 - SCHEMA VALIDATION ERROR", e)
       logger.error(e.message)
-      if (!Debug.isDevMode()) {
-        throw ApiStatus.RESPONSE_VALIDATION_FAILED
-      } else {
-        routingContext.response().statusCode = HttpStatus.NonAuthoritativeInformation.code
-        routingContext.response().end()
-      }
+      routingContext.response().statusCode = HttpStatus.NonAuthoritativeInformation.code
+      routingContext.response().end(filteredBody?.toBuffer())
     } catch (e: ValidatorException) {
-      logger.error("VALIDATOR ERROR", e)
+      logger.error("203 - VALIDATOR ERROR", e)
       logger.error(e.message)
-      if (!Debug.isDevMode()) {
-        throw ApiStatus.RESPONSE_VALIDATION_FAILED
-      } else {
-        routingContext.response().statusCode = HttpStatus.NonAuthoritativeInformation.code
-        routingContext.response().end()
-      }
+      routingContext.response().statusCode = HttpStatus.NonAuthoritativeInformation.code
+      routingContext.response().end(filteredBody?.toBuffer())
     }
   }
 }

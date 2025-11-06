@@ -110,6 +110,7 @@ fabric.properties
 *.iml
 modules.xml
 .idea/misc.xml
+.idea/data_source_mapping.xml
 *.ipr
 
 ### macOS ###

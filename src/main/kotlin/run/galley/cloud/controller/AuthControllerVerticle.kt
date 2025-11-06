@@ -113,8 +113,7 @@ class AuthControllerVerticle :
       .put(
         SESSIONS.DEVICE_NAME.name,
         apiRequest.body?.getString("deviceName") ?: apiRequest.context.userAgent,
-      )
-      .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
+      ).put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
       .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
       .put(
         SESSIONS.EXPIRES_AT.name,

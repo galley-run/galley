@@ -52,15 +52,6 @@ object CrewSql {
       ).returning()
   }
 
-  private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> =
-    filters
-      .mapNotNull { (field, values) ->
-        when (field) {
-          CREW.USER_ID.name -> CREW.USER_ID.`in`(values.map { it.toUUID() })
-          else -> null
-        }
-      }.toTypedArray()
-
   fun activate(request: EventBusQueryDataRequest): Query {
     val conditions = buildConditions(request.filters)
 
@@ -78,4 +69,13 @@ object CrewSql {
       .andNotDeleted(CREW.DELETED_AT)
       .returning()
   }
+
+  private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> =
+    filters
+      .mapNotNull { (field, values) ->
+        when (field) {
+          CREW.USER_ID.name -> CREW.USER_ID.`in`(values.map { it.toUUID() })
+          else -> null
+        }
+      }.toTypedArray()
 }

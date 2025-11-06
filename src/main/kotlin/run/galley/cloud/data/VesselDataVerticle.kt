@@ -10,6 +10,7 @@ import nl.clicqo.data.DataPayload
 import nl.clicqo.data.execute
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
+import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.factory.VesselFactory
@@ -17,6 +18,7 @@ import run.galley.cloud.sql.VesselSql
 
 class VesselDataVerticle : PostgresDataVerticle() {
   companion object {
+    const val LIST = "data.vessel.query.list"
     const val CREATE = "data.vessel.cmd.create"
   }
 
@@ -24,8 +26,24 @@ class VesselDataVerticle : PostgresDataVerticle() {
     super.start()
 
     coroutineEventBus {
+      vertx.eventBus().coConsumer(LIST, handler = ::list)
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
     }
+  }
+
+  private suspend fun list(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val results = pool.execute(VesselSql.list(request))
+
+    val vessels =
+      results
+        ?.map(VesselFactory::from)
+
+    message.reply(
+      EventBusDataResponse(
+        payload = DataPayload.many(vessels),
+      ),
+    )
   }
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {

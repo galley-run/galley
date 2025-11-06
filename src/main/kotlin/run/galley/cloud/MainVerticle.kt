@@ -47,6 +47,8 @@ import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
 import run.galley.cloud.controller.ProjectControllerVerticle
 import run.galley.cloud.controller.VesselBillingProfileControllerVerticle
+import run.galley.cloud.controller.VesselControllerVerticle
+import run.galley.cloud.controller.VesselEngineControllerVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
@@ -166,7 +168,9 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselBillingProfileControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort =
       config

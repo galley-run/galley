@@ -99,7 +99,7 @@ open class Sessions(
     /**
      * The column <code>public.sessions.refresh_token_hash</code>.
      */
-    val REFRESH_TOKEN_HASH: TableField<SessionsRecord, ByteArray?> = createField(DSL.name("refresh_token_hash"), SQLDataType.BLOB.nullable(false), this, "")
+    val REFRESH_TOKEN_HASH: TableField<SessionsRecord, String?> = createField(DSL.name("refresh_token_hash"), SQLDataType.CLOB.nullable(false), this, "")
 
     /**
      * The column <code>public.sessions.device_name</code>.

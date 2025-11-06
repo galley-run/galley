@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center gap-2">
-    <UIDropDown v-model="charter" variant="inline" :items="charters" />
+    <UIDropDown v-model="selectedCharterId" variant="inline" :items="chartersForDropdown" />
     <SlashDivider />
-    <UIDropDown v-model="project" variant="inline" :items="projects" />
+    <UIDropDown v-model="selectedProjectId" variant="inline" :items="projectsForDropdown" />
     <SlashDivider />
     <UIButton :leading-addon="MenuDots" variant="neutral" ghost />
   </div>
@@ -11,16 +11,17 @@
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import SlashDivider from '@/assets/SlashDivider.vue'
 import { MenuDots } from '@solar-icons/vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import UIButton from '@/components/UIButton.vue'
+import { useProjectsStore } from '@/stores/projects.ts'
+import { useAuthStore } from '@/stores/auth.ts'
+import { storeToRefs } from 'pinia'
 
-const charters = [{ label: 'Clicqo', value: '2DAC9D56-1B2E-4364-9F01-1E457ACB26B4' }]
+const projectStore = useProjectsStore()
+const authStore = useAuthStore()
+const { chartersForDropdown, projectsForDropdown, selectedCharterId, selectedProjectId } = storeToRefs(projectStore)
 
-const projects = [
-  { label: 'clicqo.nl', value: 'B1292432-4E30-4141-A834-15D5D9182241' },
-  { label: 'staging.clicqo.nl', value: '3B27546C-8F25-4C45-BE9B-6E6340386162' },
-]
-
-const charter = ref<string | null>('2DAC9D56-1B2E-4364-9F01-1E457ACB26B4')
-const project = ref<string | null>('B1292432-4E30-4141-A834-15D5D9182241')
+onMounted(() => {
+  projectStore.fetchCharters(authStore.vesselIds)
+})
 </script>

@@ -11,6 +11,8 @@ import org.jooq.conf.BackslashEscaping
 import org.jooq.conf.ParamType
 import org.jooq.conf.Settings
 import org.jooq.impl.DSL
+import org.jooq.postgres.extensions.types.Inet
+import io.vertx.pgclient.data.Inet as PgInet
 
 object Jooq {
   val postgres by lazy {
@@ -23,19 +25,29 @@ object Jooq {
         .withRenderNamedParamPrefix("$"),
     )
   }
-
-  fun prepareBindValues(values: List<Any?>) =
-    values.map { v ->
-      if (v is Enum<*>) v.name else v
-    }
 }
 
 @Suppress("SqlSourceToSinkFlow")
 suspend fun Pool.execute(query: Query): RowSet<Row>? {
+  val rawParams: List<Any?> = query.bindValues
+
+  val mappedParams: List<Any?> =
+    rawParams.map { v ->
+      when (v) {
+        is Inet ->
+          PgInet()
+            .setAddress(v.address()) // java.net.InetAddress
+            .setNetmask(v.prefix()) // kan null zijn
+        else -> v
+      }
+    }
+
+  val tuple: Tuple = Tuple.from(mappedParams)
+
   val results =
     this
       .preparedQuery(query.sql)
-      .execute(Tuple.wrap(Jooq.prepareBindValues(query.bindValues)))
+      .execute(tuple)
       .coAwait()
 
   return results

@@ -61,7 +61,7 @@
         </label>
       </UIFormField>
       <UIFormField>
-        <UILabel required for="projectName">Project name</UILabel>
+        <UILabel required for="projectName">Projects name</UILabel>
         <UITextInput
           required
           id="projectName"
@@ -70,7 +70,7 @@
         />
         <label for="projectName" class="form-field__error-message"> This field is required. </label>
         <label for="projectName"
-          >We recommend using the domain name where you will deploy to as Project name.</label
+          >We recommend using the domain name where you will deploy to as Projects name.</label
         >
       </UIFormField>
       <UIFormField class="col-span-2">

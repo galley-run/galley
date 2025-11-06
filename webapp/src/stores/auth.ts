@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '@/router'
+import { useProjectsStore } from '@/stores/projects.ts'
+import { useOnboardingStore } from '@/stores/onboarding.ts'
 
 const STORAGE_KEY = 'auth'
 
@@ -11,7 +13,7 @@ export const useAuthStore = defineStore('auth', {
     scopes?: {
       [key: string]: string
     }
-    vesselIds?: string[]
+    vesselIds: string[]
     activeVesselId?: string
     accessTokenTimeout: number | null
     _schemaVersion: 1
@@ -19,12 +21,14 @@ export const useAuthStore = defineStore('auth', {
     accessToken: undefined,
     refreshToken: undefined,
     scopes: undefined,
+    vesselIds: [],
     activeVesselId: undefined,
     accessTokenTimeout: null,
     _schemaVersion: 1,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.accessToken || !!state.refreshToken
+    isAuthenticated: (state) => !!state.accessToken && !!state.refreshToken,
+    isAuthenticating: (state) => !state.accessToken && !!state.refreshToken,
   },
   actions: {
     async signIn(email: string) {
@@ -38,11 +42,16 @@ export const useAuthStore = defineStore('auth', {
       await this.refreshAccessToken()
     },
     async signOut() {
+      const projectsStore = useProjectsStore()
+      const onboardingStore = useOnboardingStore()
+
       try {
         await axios.delete(`/auth/sign-out`)
       } catch {}
 
       this.$reset()
+      projectsStore.$reset()
+      onboardingStore.$reset()
       this.stopAccessTokenTimer()
 
       try {
@@ -51,6 +60,18 @@ export const useAuthStore = defineStore('auth', {
 
       await router.push('/login')
     },
+    extractAccessToken() {
+      const jwtBase64 = this.accessToken?.split('.')[1] ?? ''
+      if (!this.refreshToken || !jwtBase64) {
+        return this.signOut()
+      }
+      const jwtToken = JSON.parse(atob(jwtBase64))
+
+      const scp = jwtToken?.scp
+      if (scp && Object.keys(scp).length > 0) {
+        this.vesselIds = [...new Set(Object.keys(scp).map((key) => key.split(':')[0] ?? ''))]
+      }
+    },
     async refreshAccessToken() {
       if (!this.refreshToken) return
 
@@ -58,7 +79,9 @@ export const useAuthStore = defineStore('auth', {
         this.accessToken = (
           await axios.post('/auth/access-token', { refreshToken: this.refreshToken })
         ).data.data.accessToken
-      } catch (_) {
+
+        this.extractAccessToken()
+      } catch {
         return this.signOut()
       }
       const jwtBase64 = this.accessToken?.split('.')[1] ?? ''

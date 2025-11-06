@@ -1,6 +1,5 @@
 package run.galley.cloud.controller
 
-import com.webauthn4j.verifier.AuthenticationDataVerifier
 import generated.jooq.enums.MemberStatus
 import generated.jooq.enums.VesselRole
 import generated.jooq.tables.Crew.Companion.CREW
@@ -26,12 +25,12 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
-import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toBase64
 import nl.clicqo.ext.toUUID
 import nl.clicqo.messaging.email.EmailComposer
 import nl.clicqo.messaging.email.EmailMessagingVerticle
 import nl.clicqo.messaging.email.Recipients
+import org.jooq.postgres.extensions.types.Inet
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CharterCrewAccess
 import run.galley.cloud.crew.CrewAccess
@@ -45,7 +44,10 @@ import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
+import java.net.InetAddress
+import java.time.Instant
 import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 
 class AuthControllerVerticle :
@@ -134,23 +136,27 @@ class AuthControllerVerticle :
     val oldTokenHash =
       JWT
         .hashRefreshToken(refreshToken, config)
-        .toBase64()
-        .toByteArray()
 
     val newTokenHash =
       JWT
         .hashRefreshToken(newToken, config)
-        .toBase64()
-        .toByteArray()
+
+    val jwtToken = JWT.authProvider(vertx, config).authenticate(TokenCredentials(newToken)).coAwait()
 
     vertx
       .eventBus()
       .request<EventBusDataResponse<Sessions>>(
-        SessionDataVerticle.CREATE,
+        SessionDataVerticle.UPDATE,
         EventBusCmdDataRequest(
           payload =
             JsonObject()
-              .put(SESSIONS.REFRESH_TOKEN_HASH.name, newTokenHash),
+              .put(SESSIONS.REFRESH_TOKEN_HASH.name, newTokenHash)
+              .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
+              .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
+              .put(
+                SESSIONS.EXPIRES_AT.name,
+                OffsetDateTime.ofInstant(Instant.ofEpochSecond(jwtToken.attributes().getLong("exp")), ZoneOffset.UTC).toString(),
+              ),
           userId = user.id,
           filters =
             filters {
@@ -304,9 +310,38 @@ class AuthControllerVerticle :
       else -> TODO("Currently not supported, need to get crew_charter_member info to get charter role")
     }
 
+    val refreshToken = JWT.authProvider(vertx, config).issueRefreshToken(user.id!!)
+
+    val newTokenHash =
+      JWT
+        .hashRefreshToken(refreshToken, config)
+
+    val jwtToken = JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
+
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<Sessions>>(
+        SessionDataVerticle.CREATE,
+        EventBusCmdDataRequest(
+          payload =
+            JsonObject()
+              .put(SESSIONS.REFRESH_TOKEN_HASH.name, newTokenHash)
+              .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
+              .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
+              .put(
+                SESSIONS.EXPIRES_AT.name,
+                OffsetDateTime.ofInstant(Instant.ofEpochSecond(jwtToken.attributes().getLong("exp")), ZoneOffset.UTC).toString(),
+              ),
+          userId = user.id,
+        ),
+      ).coAwait()
+      .body()
+      ?.payload
+      ?.toOne()
+
     message.reply(
       EventBusApiResponse(
-        JsonObject().put("refreshToken", JWT.authProvider(vertx, config).issueRefreshToken(user.id!!)),
+        JsonObject().put("refreshToken", refreshToken),
       ),
     )
   }

@@ -12,6 +12,7 @@ import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiRequestContext
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
@@ -209,6 +210,16 @@ class OpenApiBridge(
                   query = query,
                   format = requestedFormat,
                   version = requestedVersion,
+                  context =
+                    EventBusApiRequestContext(
+                      userAgent = routingContext.request().getHeader("User-Agent"),
+                      remoteIp =
+                        routingContext
+                          .request()
+                          .connection()
+                          .remoteAddress()
+                          .hostAddress(),
+                    ),
                 ),
               ).coAwait()
               .body()

@@ -33,9 +33,9 @@
       (!ghost || $slots.default) && !large && !small && 'py-2.5 gap-1.5 px-4.25',
       (!ghost || $slots.default) && large && 'text-lg py-3.25 gap-2.5 px-5',
       (!ghost || $slots.default) && small && 'text-sm py-1.75 gap-1.5 px-3.5',
-      ghost && !$slots.default && !large && !small && 'hover:ring-10 active:ring-10 focus:ring-10 size-6 px-1.75',
-      ghost && !$slots.default && large && 'hover:ring-10 active:ring-10 focus:ring-10 size-6 px-1.75',
-      ghost && !$slots.default && small && 'hover:ring-6 active:ring-6 focus:ring-6 size-6 px-2.5',
+      ghost && !$slots.default && !large && !small && 'hover:ring-10 active:ring-10 focus:ring-10 size-6 px-1.75 outline-offset-10',
+      ghost && !$slots.default && large && 'hover:ring-10 active:ring-10 focus:ring-10 size-6 px-1.75 outline-offset-10',
+      ghost && !$slots.default && small && 'hover:ring-6 active:ring-6 focus:ring-6 size-6 px-2.5 outline-offset-10',
     ]"
     :to="to"
     :href="href"

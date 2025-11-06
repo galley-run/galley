@@ -9,6 +9,7 @@ class EventBusApiRequest(
   // Headers
   val format: String = "v1",
   val version: String = "v1",
+  val context: EventBusApiRequestContext = EventBusApiRequestContext(),
   val crewRole: CrewRole? = null,
   // Request Payload
   val pathParams: MutableMap<String, RequestParameter>? = null,

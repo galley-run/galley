@@ -1,6 +1,10 @@
 package run.galley.cloud.data
 
+import generated.jooq.tables.pojos.VesselEngines
+import generated.jooq.tables.references.VESSEL_ENGINES
 import io.vertx.core.eventbus.Message
+import io.vertx.core.json.JsonObject
+import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.execute
@@ -30,6 +34,17 @@ class VesselDataVerticle : PostgresDataVerticle() {
 
     val vessel =
       results?.firstOrNull()?.let(VesselFactory::from) ?: throw ApiStatusReplyException(ApiStatus.VESSEL_NOT_FOUND)
+
+    val vesselEngineRequest =
+      EventBusCmdDataRequest(
+        JsonObject()
+          .put(VESSEL_ENGINES.NAME.name, "default")
+          .put(VESSEL_ENGINES.VESSEL_ID.name, vessel.id),
+      )
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<VesselEngines>>(VesselEngineDataVerticle.CREATE, vesselEngineRequest)
+      .coAwait()
 
     message.reply(EventBusDataResponse(DataPayload.one(vessel)))
   }

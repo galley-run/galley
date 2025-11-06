@@ -87,12 +87,12 @@
       <CheckCircle v-if="isCharterCreateSuccess && isProjectCreateSuccess" />
       <DangerCircle v-if="isCharterCreateError || isProjectCreateError" />
       <div>
-        <h4 class="text-navy-700">Embark with your first Charter and Project</h4>
+        <h4 class="text-navy-700">Embark with your first Charter and Projects</h4>
         <p
           class="text-tides-900"
           v-if="!projectCreateError?.message && !charterCreateError?.message"
         >
-          We’ll add your first customer environment (Charter) and website (Project) to set sail with
+          We’ll add your first customer environment (Charter) and website (Projects) to set sail with
           Galley.
         </p>
         <p v-else-if="projectCreateError" class="text-coral-500">
@@ -127,7 +127,7 @@ import {
   type Charter,
   type Inquiry,
   type Intent,
-  type Project,
+  type Projects,
   useOnboardingStore,
   type User,
   type Vessel,
@@ -186,7 +186,7 @@ const {
   isSuccess: isProjectCreateSuccess,
   mutateAsync: mutateProjectCreate,
 } = useMutation({
-  mutationFn: (project: Project) =>
+  mutationFn: (project: Projects) =>
     axios.post(
       `/vessels/${activeVesselId?.value}/charters/${charterData.value?.data?.data?.id}/projects`,
       project,

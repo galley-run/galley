@@ -20,11 +20,13 @@ import { Logout, MinimalisticMagnifer, Moon, Sun2, SunFog } from '@solar-icons/v
 import UIButton from '@/components/UIButton.vue'
 import { ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth.ts'
+import { storeToRefs } from 'pinia'
 
 const darkMode = ref(localStorage.theme ?? 'auto')
 const darkModeIcon = ref(SunFog)
 
-const { isAuthenticated } = useAuthStore()
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
 
 watch(
   darkMode,

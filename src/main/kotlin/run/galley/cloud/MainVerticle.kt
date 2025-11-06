@@ -55,6 +55,7 @@ import run.galley.cloud.data.SessionDataVerticle
 import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.data.VesselBillingProfileDataVerticle
 import run.galley.cloud.data.VesselDataVerticle
+import run.galley.cloud.data.VesselEngineDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
@@ -158,6 +159,7 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselBillingProfileDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles

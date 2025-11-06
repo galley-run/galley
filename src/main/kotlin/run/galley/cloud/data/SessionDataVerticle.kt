@@ -20,6 +20,7 @@ class SessionDataVerticle : PostgresDataVerticle() {
     const val CREATE = "data.session.cmd.create"
     const val REVOKE = "data.session.cmd.revoke"
     const val UPDATE = "data.session.cmd.update"
+    const val PATCH = "data.session.cmd.patch"
   }
 
   override suspend fun start() {
@@ -29,10 +30,11 @@ class SessionDataVerticle : PostgresDataVerticle() {
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
       vertx.eventBus().coConsumer(REVOKE, handler = ::revoke)
       vertx.eventBus().coConsumer(UPDATE, handler = ::update)
+      vertx.eventBus().coConsumer(PATCH, handler = ::patch)
     }
   }
 
-  private suspend fun create(message: Message<EventBusCmdDataRequest>) {
+  private suspend fun update(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
 
     val replacingSessionResults = pool.execute(SessionSql.get(request))
@@ -42,7 +44,10 @@ class SessionDataVerticle : PostgresDataVerticle() {
 
     val results = pool.execute(SessionSql.create(request))
     val newSession =
-      results?.firstOrNull()?.let(SessionFactory::from) ?: throw ApiStatusReplyException(ApiStatus.SESSION_NOT_FOUND)
+      results
+        ?.firstOrNull()
+        ?.let(SessionFactory::from)
+        ?: throw ApiStatusReplyException(ApiStatus.SESSION_NOT_FOUND)
 
     val revokeRequest =
       EventBusCmdDataRequest(
@@ -53,12 +58,10 @@ class SessionDataVerticle : PostgresDataVerticle() {
         userId = currentSession.userId,
       )
 
-    vertx.eventBus().request<EventBusDataResponse<Sessions>>(UPDATE, revokeRequest).coAwait()
+    vertx.eventBus().request<EventBusDataResponse<Sessions>>(PATCH, revokeRequest).coAwait()
 
     message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.one(newSession),
-      ),
+      EventBusDataResponse(DataPayload.one(newSession)),
     )
   }
 
@@ -72,17 +75,27 @@ class SessionDataVerticle : PostgresDataVerticle() {
     )
   }
 
-  private suspend fun update(message: Message<EventBusCmdDataRequest>) {
+  private suspend fun create(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
-    val results = pool.execute(SessionSql.update(request))
 
+    val results = pool.execute(SessionSql.create(request))
+    val newSession =
+      results?.firstOrNull()?.let(SessionFactory::from) ?: throw ApiStatusReplyException(ApiStatus.SESSION_NOT_FOUND)
+
+    message.reply(
+      EventBusDataResponse(DataPayload.one(newSession)),
+    )
+  }
+
+  private suspend fun patch(message: Message<EventBusCmdDataRequest>) {
+    val request = message.body()
+
+    val results = pool.execute(SessionSql.update(request))
     val session =
       results?.firstOrNull()?.let(SessionFactory::from) ?: throw ApiStatusReplyException(ApiStatus.SESSION_NOT_FOUND)
 
     message.reply(
-      EventBusDataResponse(
-        payload = DataPayload.one(session),
-      ),
+      EventBusDataResponse(DataPayload.one(session)),
     )
   }
 }

@@ -9,13 +9,17 @@ import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
+import org.jooq.postgres.extensions.types.Inet
 import run.galley.cloud.ApiStatus
+import java.net.InetAddress
 import java.time.OffsetDateTime
 
 object SessionSql {
   fun create(request: EventBusCmdDataRequest): Query {
     val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
     val userId = request.userId ?: throw ApiStatus.MISSING_USER_ID
+
+    val ip = payload.getString(SESSIONS.IP_ADDRESS.name)
 
     return Jooq.postgres
       .insertInto(SESSIONS)
@@ -25,7 +29,7 @@ object SessionSql {
           SESSIONS.REFRESH_TOKEN_HASH to payload.getString(SESSIONS.REFRESH_TOKEN_HASH.name),
           SESSIONS.DEVICE_NAME to payload.getString(SESSIONS.DEVICE_NAME.name),
           SESSIONS.USER_AGENT to payload.getString(SESSIONS.USER_AGENT.name),
-          SESSIONS.IP_ADDRESS to payload.getString(SESSIONS.IP_ADDRESS.name),
+          SESSIONS.IP_ADDRESS to Inet.inet(InetAddress.getByName(ip)),
           SESSIONS.EXPIRES_AT to OffsetDateTime.parse(payload.getString(SESSIONS.EXPIRES_AT.name)),
         ),
       ).returning()
@@ -82,7 +86,7 @@ object SessionSql {
     filters
       .mapNotNull { (field, values) ->
         when (field) {
-          SESSIONS.REFRESH_TOKEN_HASH.name -> SESSIONS.REFRESH_TOKEN_HASH.`in`(values.map { it.toByteArray() })
+          SESSIONS.REFRESH_TOKEN_HASH.name -> SESSIONS.REFRESH_TOKEN_HASH.`in`(values.map { it.toByteArray(Charsets.UTF_8) })
           SESSIONS.USER_ID.name -> SESSIONS.USER_ID.`in`(values.map { it.toUUID() })
           else -> null
         }

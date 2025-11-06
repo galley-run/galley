@@ -60,4 +60,7 @@ object ApiStatus {
   val SESSION_NOT_FOUND = ApiStatus(2000, "The session could not be found", HttpStatus.NotFound)
 
   val JWT_PEPPER_MISSING = ApiStatus(2100, "The JWT Pepper is not set in the configuration", HttpStatus.ServiceUnavailable)
+
+  val VESSEL_ENGINE_ID_INCORRECT = ApiStatus(2200, "The Vessel engine id is incorrect")
+  val VESSEL_ENGINE_NOT_FOUND = ApiStatus(2201, "The Vessel engine not found", HttpStatus.NotFound)
 }

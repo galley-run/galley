@@ -28,9 +28,9 @@ open class SessionsRecord() : UpdatableRecordImpl<SessionsRecord>(Sessions.SESSI
         set(value): Unit = set(1, value)
         get(): UUID? = get(1) as UUID?
 
-    open var refreshTokenHash: ByteArray?
+    open var refreshTokenHash: String?
         set(value): Unit = set(2, value)
-        get(): ByteArray? = get(2) as ByteArray?
+        get(): String? = get(2) as String?
 
     open var deviceName: String?
         set(value): Unit = set(3, value)
@@ -73,7 +73,7 @@ open class SessionsRecord() : UpdatableRecordImpl<SessionsRecord>(Sessions.SESSI
     /**
      * Create a detached, initialised SessionsRecord
      */
-    constructor(id: UUID? = null, userId: UUID? = null, refreshTokenHash: ByteArray? = null, deviceName: String? = null, userAgent: String? = null, ipAddress: Inet? = null, issuedAt: OffsetDateTime? = null, lastUsedAt: OffsetDateTime? = null, expiresAt: OffsetDateTime? = null, revokedAt: OffsetDateTime? = null, replacedById: UUID? = null): this() {
+    constructor(id: UUID? = null, userId: UUID? = null, refreshTokenHash: String? = null, deviceName: String? = null, userAgent: String? = null, ipAddress: Inet? = null, issuedAt: OffsetDateTime? = null, lastUsedAt: OffsetDateTime? = null, expiresAt: OffsetDateTime? = null, revokedAt: OffsetDateTime? = null, replacedById: UUID? = null): this() {
         this.id = id
         this.userId = userId
         this.refreshTokenHash = refreshTokenHash

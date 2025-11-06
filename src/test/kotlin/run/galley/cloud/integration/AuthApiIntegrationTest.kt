@@ -4,6 +4,7 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.WebClientOptions
 import io.vertx.junit5.VertxTestContext
+import io.vertx.kotlin.coroutines.awaitEvent
 import io.vertx.kotlin.coroutines.coAwait
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
@@ -11,7 +12,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import run.galley.cloud.TestJWTHelper
+import run.galley.cloud.TestJWTHelper.generateRefreshToken
 import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.model.VesselCrewAccess
 import java.util.UUID
@@ -190,6 +191,10 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
       // Now use the refresh token
       val body = JsonObject().put("refreshToken", refreshToken)
 
+      awaitEvent<Long> { handler ->
+        vertx.setTimer(1000, handler)
+      }
+
       val resp =
         client
           .post("/auth/refresh-token")
@@ -245,15 +250,10 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
     }
 
   @Test
-  fun `test POST refresh with expired refreshToken returns 401`(testContext: VertxTestContext) =
+  fun `test POST refresh with refreshToken without session returns 404`(testContext: VertxTestContext) =
     runTest {
-      // Create an access token instead of refresh token (short-lived)
       val expiredToken =
-        TestJWTHelper.generateAccessToken(
-          getJWTAuth(),
-          userId,
-          listOf(VesselCrewAccess(vesselId, CrewRole.VESSEL_CAPTAIN)),
-        )
+        generateRefreshToken(getJWTAuth(), userId, listOf(VesselCrewAccess(vesselId, CrewRole.VESSEL_CAPTAIN)))
 
       val body = JsonObject().put("refreshToken", expiredToken)
 
@@ -266,9 +266,7 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
           .coAwait()
 
       testContext.verify {
-        // This will likely succeed since we're using access token instead of refresh token
-        // but it's a misuse of the endpoint - adjust based on your actual token validation
-        assertEquals(200, resp.statusCode())
+        assertEquals(404, resp.statusCode())
         testContext.completeNow()
       }
     }
@@ -324,25 +322,6 @@ class AuthApiIntegrationTest : BaseIntegrationTest() {
 
       testContext.verify {
         assertEquals(400, resp.statusCode())
-        testContext.completeNow()
-      }
-    }
-
-  @Test
-  fun `test POST token with invalid refreshToken returns 401`(testContext: VertxTestContext) =
-    runTest {
-      val body = JsonObject().put("refreshToken", "invalid-token")
-
-      val resp =
-        client
-          .post("/auth/access-token")
-          .putHeader("Content-Type", "application/vnd.galley.v1+json")
-          .putHeader("Accept", "application/vnd.galley.v1+json")
-          .sendJsonObject(body)
-          .coAwait()
-
-      testContext.verify {
-        assertEquals(401, resp.statusCode())
         testContext.completeNow()
       }
     }

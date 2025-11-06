@@ -103,6 +103,24 @@ class AuthControllerVerticle :
       ?: throw ApiStatusReplyException(ApiStatus.USER_NOT_FOUND)
   }
 
+  private fun sessionPayload(
+    apiRequest: EventBusApiRequest,
+    refreshTokenHash: String,
+    expirationEpochSeconds: Long,
+  ): JsonObject =
+    JsonObject()
+      .put(SESSIONS.REFRESH_TOKEN_HASH.name, refreshTokenHash)
+      .put(
+        SESSIONS.DEVICE_NAME.name,
+        apiRequest.body?.getString("deviceName") ?: apiRequest.context.userAgent,
+      )
+      .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
+      .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
+      .put(
+        SESSIONS.EXPIRES_AT.name,
+        OffsetDateTime.ofInstant(Instant.ofEpochSecond(expirationEpochSeconds), ZoneOffset.UTC).toString(),
+      )
+
   private suspend fun issueRefreshToken(message: Message<EventBusApiRequest>) {
     val apiRequest = getApiRequest(message)
     val user = getUser(apiRequest)
@@ -142,21 +160,19 @@ class AuthControllerVerticle :
         .hashRefreshToken(newToken, config)
 
     val jwtToken = JWT.authProvider(vertx, config).authenticate(TokenCredentials(newToken)).coAwait()
+    val sessionPayload =
+      sessionPayload(
+        apiRequest,
+        newTokenHash,
+        jwtToken.attributes().getLong("exp"),
+      )
 
     vertx
       .eventBus()
       .request<EventBusDataResponse<Sessions>>(
         SessionDataVerticle.UPDATE,
         EventBusCmdDataRequest(
-          payload =
-            JsonObject()
-              .put(SESSIONS.REFRESH_TOKEN_HASH.name, newTokenHash)
-              .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
-              .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
-              .put(
-                SESSIONS.EXPIRES_AT.name,
-                OffsetDateTime.ofInstant(Instant.ofEpochSecond(jwtToken.attributes().getLong("exp")), ZoneOffset.UTC).toString(),
-              ),
+          payload = sessionPayload,
           userId = user.id,
           filters =
             filters {
@@ -317,21 +333,19 @@ class AuthControllerVerticle :
         .hashRefreshToken(refreshToken, config)
 
     val jwtToken = JWT.authProvider(vertx, config).authenticate(TokenCredentials(refreshToken)).coAwait()
+    val sessionPayload =
+      sessionPayload(
+        apiRequest,
+        newTokenHash,
+        jwtToken.attributes().getLong("exp"),
+      )
 
     vertx
       .eventBus()
       .request<EventBusDataResponse<Sessions>>(
         SessionDataVerticle.CREATE,
         EventBusCmdDataRequest(
-          payload =
-            JsonObject()
-              .put(SESSIONS.REFRESH_TOKEN_HASH.name, newTokenHash)
-              .put(SESSIONS.USER_AGENT.name, apiRequest.context.userAgent)
-              .put(SESSIONS.IP_ADDRESS.name, apiRequest.context.remoteIp)
-              .put(
-                SESSIONS.EXPIRES_AT.name,
-                OffsetDateTime.ofInstant(Instant.ofEpochSecond(jwtToken.attributes().getLong("exp")), ZoneOffset.UTC).toString(),
-              ),
+          payload = sessionPayload,
           userId = user.id,
         ),
       ).coAwait()

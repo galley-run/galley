@@ -53,6 +53,10 @@ open class CrewRecord() : UpdatableRecordImpl<CrewRecord>(Crew.CREW) {
         set(value): Unit = set(7, value)
         get(): OffsetDateTime? = get(7) as OffsetDateTime?
 
+    open var activationSalt: String?
+        set(value): Unit = set(8, value)
+        get(): String? = get(8) as String?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -62,7 +66,7 @@ open class CrewRecord() : UpdatableRecordImpl<CrewRecord>(Crew.CREW) {
     /**
      * Create a detached, initialised CrewRecord
      */
-    constructor(id: UUID? = null, userId: UUID? = null, vesselId: UUID? = null, vesselRole: VesselRole? = null, status: MemberStatus? = null, createdAt: OffsetDateTime? = null, activatedAt: OffsetDateTime? = null, deletedAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, userId: UUID? = null, vesselId: UUID? = null, vesselRole: VesselRole? = null, status: MemberStatus? = null, createdAt: OffsetDateTime? = null, activatedAt: OffsetDateTime? = null, deletedAt: OffsetDateTime? = null, activationSalt: String? = null): this() {
         this.id = id
         this.userId = userId
         this.vesselId = vesselId
@@ -71,6 +75,7 @@ open class CrewRecord() : UpdatableRecordImpl<CrewRecord>(Crew.CREW) {
         this.createdAt = createdAt
         this.activatedAt = activatedAt
         this.deletedAt = deletedAt
+        this.activationSalt = activationSalt
         resetTouchedOnNotNull()
     }
 
@@ -87,6 +92,7 @@ open class CrewRecord() : UpdatableRecordImpl<CrewRecord>(Crew.CREW) {
             this.createdAt = value.createdAt
             this.activatedAt = value.activatedAt
             this.deletedAt = value.deletedAt
+            this.activationSalt = value.activationSalt
             resetTouchedOnNotNull()
         }
     }

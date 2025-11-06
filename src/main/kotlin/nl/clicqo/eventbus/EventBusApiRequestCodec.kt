@@ -31,6 +31,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
         .put("version", s.version)
         .put("format", s.format)
         .put("crewRole", s.crewRole?.name)
+        .put("context", s.context.toJsonObject())
 
     val bytes = jsonObject.toBuffer()
     buffer.appendInt(bytes.length())
@@ -61,6 +62,7 @@ class EventBusApiRequestCodec : MessageCodec<EventBusApiRequest, EventBusApiRequ
       version = json.getString("version", "v1"),
       format = json.getString("format", "json"),
       crewRole = json.getString("crewRole")?.let(CrewRole::valueOf),
+      context = EventBusApiRequestContext.fromJsonObject(json.getJsonObject("context")),
     )
   }
 

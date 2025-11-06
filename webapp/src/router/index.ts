@@ -9,27 +9,45 @@ import SecurityScreeningView from '@/router/views/Onboarding/SecurityScreeningVi
 import NamingCeremonyView from '@/router/views/Onboarding/NamingCeremonyView.vue'
 import FirstCharterView from '@/router/views/Onboarding/FirstCharterView.vue'
 import BoardingView from '@/router/views/Onboarding/BoardingView.vue'
+import AccountActivationView from '@/router/views/Onboarding/AccountActivationView.vue'
 import {useAuthStore} from '@/stores/auth.ts'
+import LoginLayout from '@/router/layouts/LoginLayout.vue'
+import LoginView from '@/router/views/Login/LoginView.vue'
+import LogoutView from '@/router/views/Login/LogoutView.vue'
 
 const routes = [
+  {
+    path: '/auth',
+    component: LoginLayout,
+    children: [
+      { path: 'login', component: LoginView, meta: { public: true }, alias: "/login" },
+      { path: 'logout', component: LogoutView, meta: { public: true }, alias: "/logout" },
+      {
+        path: 'activate/:hash',
+        component: AccountActivationView,
+        meta: { public: true },
+      },
+    ],
+  },
+
   {
     path: '/onboarding',
     component: OnboardingLayout,
     children: [
-      {path: '', component: RegistrationView, meta: {public: true}},
-      {path: 'security-screening', component: SecurityScreeningView, meta: {public: true}},
-      {path: 'naming-ceremony', component: NamingCeremonyView, meta: {public: true}},
-      {path: 'first-charter', component: FirstCharterView, meta: {public: true}},
-      {path: 'boarding', component: BoardingView, meta: {public: true}},
+      { path: '', component: RegistrationView, meta: { public: true } },
+      { path: 'security-screening', component: SecurityScreeningView, meta: { public: true } },
+      { path: 'naming-ceremony', component: NamingCeremonyView, meta: { public: true } },
+      { path: 'first-charter', component: FirstCharterView, meta: { public: true } },
+      { path: 'boarding', component: BoardingView, meta: { public: true } },
     ],
   },
   {
     path: '/',
     component: MainLayout,
     children: [
-      {path: '', component: DashboardView},
-      {path: '/charter/compute-plans', component: ComputePlansView},
-      {path: '/vessel/engine', component: EngineView},
+      { path: '', component: DashboardView },
+      { path: '/charter/compute-plans', component: ComputePlansView },
+      { path: '/vessel/engine', component: EngineView },
     ],
   },
 ]
@@ -46,7 +64,7 @@ router.beforeEach(async (to) => {
 
   if (authRequired && !authStore.refreshToken) {
     return {
-      path: '/onboarding', // TODO: Change to login
+      path: '/login',
       query: {returnUrl: to.fullPath}
     };
   }

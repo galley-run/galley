@@ -11,10 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    ports:
+      - '127.0.0.1:5000:80'    # Localhost only
+      - '127.0.0.1:25:25'      # Localhost only
+      - '127.0.0.1:143:143'    # Localhost only
+      - '127.0.0.1:110:110'    # POP3 plain (localhost only)
 
 volumes:
   postgres_data:

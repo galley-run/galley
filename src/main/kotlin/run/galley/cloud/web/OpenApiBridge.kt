@@ -1,6 +1,5 @@
 package run.galley.cloud.web
 
-import com.github.jknack.handlebars.internal.lang3.StringUtils.isNotBlank
 import io.vertx.core.Vertx
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
@@ -13,6 +12,7 @@ import nl.clicqo.api.ApiResponse
 import nl.clicqo.api.ApiResponseOptions
 import nl.clicqo.api.OpenAPIBridgeRouter
 import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiRequestContext
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.ext.addCoroutineHandler
 import nl.clicqo.ext.toUUID
@@ -45,6 +45,8 @@ class OpenApiBridge(
       .security("charterCaptain")
       .httpHandler(scpAuthHandler)
       .security("vesselCaptain")
+      .httpHandler(scpAuthHandler)
+      .security("any")
       .httpHandler(scpAuthHandler)
 
     /**
@@ -132,7 +134,7 @@ class OpenApiBridge(
               .getHeader("Content-Type")
               ?.substringBefore(";")
               ?.trim()
-              ?.takeIf(::isNotBlank) ?: "*/*"
+              ?.takeIf(String::isNotEmpty) ?: "*/*"
           val acceptHeader = routingContext.request().getHeader("Accept") ?: "*/*"
           val acceptsJson =
             acceptHeader.split(",").find { header ->
@@ -208,6 +210,16 @@ class OpenApiBridge(
                   query = query,
                   format = requestedFormat,
                   version = requestedVersion,
+                  context =
+                    EventBusApiRequestContext(
+                      userAgent = routingContext.request().getHeader("User-Agent"),
+                      remoteIp =
+                        routingContext
+                          .request()
+                          .connection()
+                          .remoteAddress()
+                          .hostAddress(),
+                    ),
                 ),
               ).coAwait()
               .body()

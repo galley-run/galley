@@ -179,9 +179,11 @@ fun REGEXP_MATCHES(
       configuration: Configuration
     , __1: String?
     , __2: String?
+    , __3: String?
 ): Result<RegexpMatchesRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
       __1
     , __2
+    , __3
 )).fetch()
 
 /**
@@ -190,9 +192,11 @@ fun REGEXP_MATCHES(
 fun REGEXP_MATCHES(
       __1: String?
     , __2: String?
+    , __3: String?
 ): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
     __1,
-    __2
+    __2,
+    __3
 )
 
 /**
@@ -201,9 +205,11 @@ fun REGEXP_MATCHES(
 fun REGEXP_MATCHES(
       __1: Field<String?>
     , __2: Field<String?>
+    , __3: Field<String?>
 ): RegexpMatches = generated.jooq.tables.RegexpMatches.REGEXP_MATCHES.call(
     __1,
-    __2
+    __2,
+    __3
 )
 
 /**

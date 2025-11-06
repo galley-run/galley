@@ -1,0 +1,129 @@
+package nl.clicqo.messaging.email
+
+import io.vertx.core.eventbus.Message
+import io.vertx.core.json.JsonArray
+import io.vertx.core.json.JsonObject
+import io.vertx.ext.mail.MailClient
+import io.vertx.ext.mail.MailConfig
+import io.vertx.ext.mail.MailMessage
+import io.vertx.ext.web.templ.pebble.PebbleTemplateEngine
+import io.vertx.kotlin.coroutines.CoroutineVerticle
+import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.api.ApiStatus
+import nl.clicqo.api.ApiStatusReplyException
+import nl.clicqo.ext.CoroutineEventBusSupport
+import nl.clicqo.ext.coroutineEventBus
+import java.time.Instant
+
+class EmailMessagingVerticle :
+  CoroutineVerticle(),
+  CoroutineEventBusSupport {
+  companion object Companion {
+    const val SEND = "messaging.email.send"
+
+    const val DEFAULT_POOL_NAME = "messaging.email.default-pool"
+  }
+
+  private lateinit var client: MailClient
+  private var mailConfig: MailConfig? = null
+
+  override suspend fun start() {
+    super.start()
+
+    mailConfig =
+      MailConfig(config)
+
+    client =
+      MailClient
+        .createShared(vertx, mailConfig, DEFAULT_POOL_NAME)
+
+    coroutineEventBus {
+      vertx.eventBus().coConsumer(SEND, handler = ::sendEmail)
+    }
+  }
+
+  private suspend fun sendEmail(message: Message<EmailComposer>) {
+    val body = message.body()
+
+    val to = body.to
+    val cc =
+      body.cc.addAll(
+        config
+          .getJsonObject("defaults", JsonObject())
+          .getJsonArray(
+            "cc",
+            JsonArray(),
+          ).list
+          .map { it.toString() },
+      )
+    val bcc =
+      body.bcc.addAll(
+        config
+          .getJsonObject("defaults", JsonObject())
+          .getJsonArray(
+            "bcc",
+            JsonArray(),
+          ).list
+          .map { it.toString() },
+      )
+    val subject = body.subject
+    val template = body.template
+    val from = body.from ?: config.getJsonObject("defaults", JsonObject()).getString("from", "NO FROM SET")
+    val variables =
+      JsonObject()
+        .put("subject", subject)
+        .put("now", Instant.now())
+        .mergeIn(
+          JsonObject.mapFrom(
+            body.variables.map.mapValues {
+              if (it.key.lowercase().endsWith("url") &&
+                !it.value.toString().startsWith("http")
+              ) {
+                return@mapValues "${
+                  config.getJsonObject("defaults", JsonObject()).getString("urlPrefix", "")
+                }${it.value}"
+              }
+            },
+          ),
+        )
+
+    val engine = PebbleTemplateEngine.create(vertx)
+    val html =
+      try {
+        engine.render(variables, "templates/email/$template.html").coAwait()
+      } catch (e: Exception) {
+        println(e.message)
+      }
+    val plainText =
+      try {
+        engine.render(variables, "templates/email/$template.text").coAwait()
+      } catch (e: Exception) {
+        println(e.message)
+      }
+
+    val email =
+      MailMessage()
+        .setTo(to.toList())
+        .setCc(cc.toList())
+        .setBcc(bcc.toList())
+        .setSubject(subject)
+        .setHtml(html.toString())
+        .setText(plainText.toString())
+        .setFrom(from)
+
+    val result =
+      try {
+        client.sendMail(email).coAwait()
+      } catch (e: Exception) {
+        throw ApiStatusReplyException(ApiStatus.MESSAGING_EMAIL_FAILED, e.message.toString())
+      }
+
+    message.reply(result?.toJson())
+  }
+
+  override suspend fun stop() {
+    super.stop()
+
+    client.close()
+  }
+}

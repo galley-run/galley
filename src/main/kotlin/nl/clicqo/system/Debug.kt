@@ -5,4 +5,6 @@ object Debug {
     System
       .getProperty(key)
       .takeIf { System.getProperty("app.env")?.equals("dev") == true }
+
+  fun isDevMode(): Boolean = System.getProperty("app.env")?.equals("dev") == true
 }

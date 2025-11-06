@@ -14,6 +14,7 @@ object CrewFactory {
       vesselId = row.getUUID(CREW.VESSEL_ID.name),
       vesselRole = VesselRole.valueOf(row.getString(CREW.VESSEL_ROLE.name)),
       status = MemberStatus.valueOf(row.getString(CREW.STATUS.name)),
+      activationSalt = row.getString(CREW.ACTIVATION_SALT.name),
       activatedAt = row.getOffsetDateTime(CREW.ACTIVATED_AT.name),
     )
 }

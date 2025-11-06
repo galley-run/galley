@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.ApiStatusReplyException
 import org.postgresql.util.PSQLState
+import org.slf4j.LoggerFactory
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -66,14 +67,22 @@ interface CoroutineEventBusSupport : CoroutineScope {
     handler: suspend (Message<T>) -> Unit,
   ): MessageConsumer<T> =
     handler {
+      val logger = LoggerFactory.getLogger(this::class.java)
+
       launch((ContextInternal.current()?.dispatcher() ?: EmptyCoroutineContext) + context) {
         try {
           handler(it)
         } catch (e: PgException) {
           it.reply(
             when (e.sqlState) {
-              PSQLState.UNIQUE_VIOLATION.state -> ApiStatusReplyException(ApiStatus.PG_FAILED_CONSTRAINT_DUPLICATE)
-              else -> ApiStatusReplyException(ApiStatus.FAILED)
+              PSQLState.UNIQUE_VIOLATION.state -> {
+                logger.error(e.sqlState, e)
+                ApiStatusReplyException(ApiStatus.PG_FAILED_CONSTRAINT_DUPLICATE)
+              }
+              else -> {
+                logger.error(e.sqlState, e)
+                ApiStatusReplyException(ApiStatus.FAILED)
+              }
             },
           )
         } catch (e: ApiStatus) {

@@ -4,12 +4,12 @@
   >
     <div class="flex gap-12 items-center">
       <GalleyLogo />
-      <ProjectSwitcher />
+      <ProjectSwitcher v-if="isAuthenticated" />
     </div>
     <div class="flex gap-2">
       <UIButton :leading-addon="darkModeIcon" variant="neutral" @click="toggleDarkMode" ghost />
-      <UIButton :leading-addon="MinimalisticMagnifer" variant="neutral" ghost />
-      <UIButton :leading-addon="Logout" variant="neutral" ghost />
+      <UIButton :leading-addon="MinimalisticMagnifer" v-if="isAuthenticated" variant="neutral" ghost />
+      <UIButton :leading-addon="Logout" to="/logout" v-if="isAuthenticated" variant="neutral" ghost />
     </div>
   </header>
 </template>
@@ -19,9 +19,14 @@ import ProjectSwitcher from '@/components/MainLayout/ProjectSwitcher.vue'
 import { Logout, MinimalisticMagnifer, Moon, Sun2, SunFog } from '@solar-icons/vue'
 import UIButton from '@/components/UIButton.vue'
 import { ref, watch } from 'vue'
+import { useAuthStore } from '@/stores/auth.ts'
+import { storeToRefs } from 'pinia'
 
 const darkMode = ref(localStorage.theme ?? 'auto')
 const darkModeIcon = ref(SunFog)
+
+const authStore = useAuthStore()
+const { isAuthenticated } = storeToRefs(authStore)
 
 watch(
   darkMode,

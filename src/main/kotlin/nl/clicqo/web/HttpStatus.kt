@@ -7,6 +7,7 @@ enum class HttpStatus(
   Ok(200, "OK"),
   Created(201, "Created"),
   Accepted(202, "Accepted"),
+  NonAuthoritativeInformation(203, "Non Authoritative Information"),
   NoContent(204, "No Content"),
   NeedsRefresh(210, "Needs Refresh"),
   MultipleChoices(300, "Multiple Choices"),

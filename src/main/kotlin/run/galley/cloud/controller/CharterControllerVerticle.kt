@@ -4,7 +4,6 @@ import generated.jooq.tables.pojos.CharterProjects
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
 import generated.jooq.tables.references.CHARTER_PROJECTS
-import generated.jooq.tables.references.VESSELS
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
@@ -116,7 +115,8 @@ class CharterControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
+        ?.toJsonAPIResourceObject()
+        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(EventBusApiResponse(dataResponse))
   }
@@ -144,7 +144,8 @@ class CharterControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_CREATE_FAILURE)
+        ?.toJsonAPIResourceObject()
+        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_CREATE_FAILURE)
 
     message.reply(
       EventBusApiResponse(
@@ -177,7 +178,8 @@ class CharterControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject() ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
+        ?.toJsonAPIResourceObject()
+        ?: throw ApiStatusReplyException(ApiStatus.CHARTER_NOT_FOUND)
 
     message.reply(EventBusApiResponse(dataResponse))
   }
@@ -218,10 +220,7 @@ class CharterControllerVerticle :
 
     // Idea: Optional, second call on delete can delete an archived charter
 
-    vertx
-      .eventBus()
-      .request<EventBusDataResponse<Charters>>(CharterDataVerticle.ARCHIVE, deleteRequest)
-      .coAwait()
+    vertx.eventBus().request<EventBusDataResponse<Charters>>(CharterDataVerticle.ARCHIVE, deleteRequest).coAwait()
 
     message.reply(EventBusApiResponse())
   }

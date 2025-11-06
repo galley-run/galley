@@ -265,7 +265,7 @@ watch(
 </script>
 
 <template>
-  <div class="block contain-layout group">
+  <div class="flex contain-layout group items-center">
     <button
       ref="triggerEl"
       type="button"

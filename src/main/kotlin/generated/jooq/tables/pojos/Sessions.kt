@@ -6,7 +6,6 @@ package generated.jooq.tables.pojos
 
 import java.io.Serializable
 import java.time.OffsetDateTime
-import java.util.Arrays
 import java.util.UUID
 
 import org.jooq.postgres.extensions.types.Inet
@@ -21,7 +20,7 @@ import run.galley.cloud.model.BaseModel
 data class Sessions(
     var id: UUID? = null,
     var userId: UUID? = null,
-    var refreshTokenHash: ByteArray? = null,
+    var refreshTokenHash: String? = null,
     var deviceName: String? = null,
     var userAgent: String? = null,
     var ipAddress: Inet? = null,
@@ -57,7 +56,7 @@ data class Sessions(
             if (o.refreshTokenHash != null)
                 return false
         }
-        else if (!Arrays.equals(this.refreshTokenHash, o.refreshTokenHash))
+        else if (this.refreshTokenHash != o.refreshTokenHash)
             return false
         if (this.deviceName == null) {
             if (o.deviceName != null)
@@ -115,7 +114,7 @@ data class Sessions(
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
         result = prime * result + (if (this.userId == null) 0 else this.userId.hashCode())
-        result = prime * result + (if (this.refreshTokenHash == null) 0 else Arrays.hashCode(this.refreshTokenHash))
+        result = prime * result + (if (this.refreshTokenHash == null) 0 else this.refreshTokenHash.hashCode())
         result = prime * result + (if (this.deviceName == null) 0 else this.deviceName.hashCode())
         result = prime * result + (if (this.userAgent == null) 0 else this.userAgent.hashCode())
         result = prime * result + (if (this.ipAddress == null) 0 else this.ipAddress.hashCode())
@@ -132,7 +131,7 @@ data class Sessions(
 
         sb.append(id)
         sb.append(", ").append(userId)
-        sb.append(", ").append("[binary...]")
+        sb.append(", ").append(refreshTokenHash)
         sb.append(", ").append(deviceName)
         sb.append(", ").append(userAgent)
         sb.append(", ").append(ipAddress)

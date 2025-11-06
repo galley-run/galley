@@ -1,0 +1,16 @@
+{% extends "../base.text.peb" %}
+{% set title = "Activate your account" %}
+{% set preheader = "Please activate your Galley account" %}
+
+{% block body %}
+Activate your account
+You've recently signed up for Galley, please activate your account by pressing the button below.
+If you didn’t request this, you can safely ignore this email.
+
+---
+
+Copy and paste this URL into your browser to activate your account:
+{{ activation_url }}
+
+
+{% endblock %}

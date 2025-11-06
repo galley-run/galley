@@ -93,7 +93,7 @@ fun Router.setupFailureHandler(): Router {
       }
 
       is HttpException -> {
-        logger.error(error.payload)
+        logger.error("HttpException", error)
 
         when (error.cause) {
           is SchemaValidationException -> {

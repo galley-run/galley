@@ -9,6 +9,7 @@ import nl.clicqo.ext.andNotDeleted
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.applyPagination
 import nl.clicqo.ext.getUUID
+import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toRecord
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition
@@ -39,7 +40,7 @@ object ProjectSql {
   }
 
   fun createProject(request: EventBusCmdDataRequest): Query {
-    val payload = request.payload ?: throw ApiStatus.REQUEST_BODY_MISSING
+    val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
 
     return Jooq.postgres
       .insertInto(CHARTER_PROJECTS)
@@ -55,7 +56,7 @@ object ProjectSql {
   }
 
   fun patchProject(request: EventBusCmdDataRequest): Query {
-    val payload = request.payload ?: throw ApiStatus.REQUEST_BODY_MISSING
+    val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
     val identifier = request.identifier
 
     return Jooq.postgres

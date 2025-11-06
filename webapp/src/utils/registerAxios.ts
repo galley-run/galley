@@ -1,15 +1,29 @@
-import axios, { type AxiosError } from 'axios'
+import axios, { AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
 type ApiErrorBody = { errors?: Array<{ title: string, code: number }> ; error?: string };
 
-class ApiError extends Error {
-  status?: number;
-  body?: ApiErrorBody;
-  constructor(message: string, status?: number, body?: ApiErrorBody) {
-    super(message);
-    this.name = "";
-    this.status = status;
-    this.body = body;
+export class ApiError<T = unknown, D = unknown> extends Error {
+  status?: number
+  body?: ApiErrorBody
+  config?: InternalAxiosRequestConfig<D>
+  request?: unknown
+  response?: AxiosResponse<T, D>
+
+  constructor(
+    message: string,
+    status?: number,
+    body?: ApiErrorBody,
+    config?: InternalAxiosRequestConfig<D>,
+    request?: unknown,
+    response?: AxiosResponse<T, D>,
+  ) {
+    super(message)
+    this.name = ''
+    this.status = status
+    this.body = body
+    this.config = config
+    this.request = request
+    this.response = response
   }
 }
 
@@ -28,7 +42,17 @@ export default function registerAxios() {
         body?.error ||
         e.message ||
         'Er ging iets mis'
-      return Promise.reject(new ApiError(msg, body?.errors?.[0]?.code ?? e.response?.status, body))
+
+      return Promise.reject(
+        new ApiError(
+          msg,
+          body?.errors?.[0]?.code ?? e.response?.status ?? 0,
+          body,
+          e.response?.config,
+          e.request,
+          e.response,
+        ),
+      )
     },
   )
 }

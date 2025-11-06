@@ -18,7 +18,6 @@ import io.vertx.openapi.contract.Operation
 import nl.clicqo.ext.camelCaseToSnakeCase
 import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.crew.CrewRole
 import java.util.Objects
 import java.util.function.Function
 
@@ -131,6 +130,11 @@ class JWTAuthHandlerScp :
       }
       val userRoles = jwt.getJsonObject("scp") ?: throw ApiStatus.USER_ROLE_FORBIDDEN
 
+      if (scopes.size == 1 && scopes[0].lowercase() == "any") {
+        ctx.next()
+        return
+      }
+
       val vesselRole =
         userRoles
           .takeIf {
@@ -154,7 +158,11 @@ class JWTAuthHandlerScp :
 
       // TODO: Fix vessels/X/charters is now not allowed for charter captain
 
-      if (scopes.contains(vesselRole) || scopes.contains(exactMatchCharterRole) || scopes.contains(vesselMatchCharterRole)) {
+      if (scopes.contains(vesselRole) || scopes.contains(exactMatchCharterRole) ||
+        scopes.contains(
+          vesselMatchCharterRole,
+        )
+      ) {
         ctx.next()
         return
       }

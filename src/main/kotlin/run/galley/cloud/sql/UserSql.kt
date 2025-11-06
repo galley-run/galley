@@ -4,6 +4,7 @@ import generated.jooq.tables.references.USERS
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusQueryDataRequest
+import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toUUID
 import org.jooq.Query
 import run.galley.cloud.ApiStatus
@@ -26,7 +27,7 @@ object UserSql {
   }
 
   fun create(request: EventBusCmdDataRequest): Query {
-    val payload = request.payload ?: throw ApiStatus.REQUEST_BODY_MISSING
+    val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
     return Jooq.postgres
       .insertInto(USERS)
       .set(

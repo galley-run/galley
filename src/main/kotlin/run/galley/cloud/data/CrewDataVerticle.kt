@@ -17,6 +17,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
     const val LIST_BY_ACTIVE_USER = "data.crew.query.list_by_active_user"
     const val LIST_BY_USER = "data.crew.query.list_by_user"
     const val CREATE = "data.crew.cmd.create"
+    const val ACTIVATE = "data.crew.cmd.grant"
   }
 
   override suspend fun start() {
@@ -26,6 +27,7 @@ class CrewDataVerticle : PostgresDataVerticle() {
       vertx.eventBus().coConsumer(LIST_BY_ACTIVE_USER, handler = ::listByActiveUser)
       vertx.eventBus().coConsumer(LIST_BY_USER, handler = ::listByUser)
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
+      vertx.eventBus().coConsumer(ACTIVATE, handler = ::activate)
     }
   }
 
@@ -64,6 +66,15 @@ class CrewDataVerticle : PostgresDataVerticle() {
     val results = pool.execute(CrewSql.create(request))
 
     val crew = results?.firstOrNull()?.let(CrewFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_CAPTAIN)
+
+    message.reply(EventBusDataResponse(DataPayload.one(crew)))
+  }
+
+  private suspend fun activate(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val results = pool.execute(CrewSql.activate(request))
+
+    val crew = results?.firstOrNull()?.let(CrewFactory::from) ?: throw ApiStatusReplyException(ApiStatus.CREW_NO_VESSEL_MEMBER)
 
     message.reply(EventBusDataResponse(DataPayload.one(crew)))
   }

@@ -275,12 +275,7 @@ paths:
       summary: List projects for charter
       operationId: project.query.list
       security:
-        - vesselCaptain: []
-        - charterCaptain: []
-        - charterBoatswain: []
-        - charterDeckhand: []
-        - charterSteward: []
-        - charterPurser: []
+        - any: []
       responses:
         '200':
           description: The request was successful, and the server has returned the requested resource in the response body.
@@ -492,6 +487,29 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /auth/activate:
+    post:
+      tags:
+        - auth
+      summary: Activate Account after Sign up
+      operationId: auth.account.cmd.grant
+      security:
+        - any: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/AccountActivation'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/sign-in:
     post:
       tags:
@@ -519,8 +537,29 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /auth/sign-out:
+    delete:
+      tags:
+        - auth
+      summary: Sign out
+      operationId: auth.cmd.revoke
+      security:
+        - any: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
+    any:
+      type: http
+      scheme: bearer
+      description: Any User Role is allowed
+      bearerFormat: JWT
+      x-vessel-role: member
     vesselCaptain:
       type: http
       scheme: bearer
@@ -627,12 +666,11 @@ components:
         country:
           type: string
           description: Country code (ISO 3166-1 alpha-2)
-          pattern: ^[A-Z]{2}$
+          pattern: ^[a-z]{2}$
           examples:
-            - NL
+            - nl
         email:
           type: string
-          format: email
           description: Billing email
           examples:
             - billing@acme.com
@@ -679,53 +717,73 @@ components:
             type:
               type: string
               enum:
-                - BillingProfile
+                - VesselBillingProfile
               description: Resource type
             attributes:
               type: object
-              required:
-                - companyName
               properties:
                 companyName:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the name of the organization
                   example: Clicqo
                 billedTo:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the name of the billing contact
                   example: Jack Sparrow
                 address1:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the first line of the billing address
                   example: 123 Main Street
                 address2:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the second line of the billing address
                 postalCode:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the postal code of the billing address
                   example: 1234 AB
                 city:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the city of the billing address
                   example: Weesp
                 state:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the state of the billing address
                 country:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the country of the billing address in ISO 3166 format
                   example: nl
                 vatNumber:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the VAT number of the organization
                   example: NL123456789B01
                 email:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the email address of the billing contact
                   example: finance@galley.run
                 phone:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   description: Captures the phone number of the billing contact
                   example: +31 123 456 7890
     CharterSummary:
@@ -1087,6 +1145,26 @@ components:
           $ref: '#/components/schemas/CharterCreate'
         project:
           $ref: '#/components/schemas/ProjectCreate'
+    AccountActivation:
+      type: object
+      required:
+        - crewId
+        - activationSalt
+        - userId
+        - vesselId
+      properties:
+        crewId:
+          type: string
+          format: uuid
+        activationSalt:
+          type: string
+          description: The Activation Salt which is a column of Crew
+        userId:
+          type: string
+          format: uuid
+        vesselId:
+          type: string
+          format: uuid
     SignIn:
       type: object
       required:

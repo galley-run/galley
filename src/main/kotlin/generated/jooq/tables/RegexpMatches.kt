@@ -68,7 +68,8 @@ open class RegexpMatches(
 
     private constructor(alias: Name, aliased: Table<RegexpMatchesRecord>?): this(alias, null, null, null, aliased, arrayOf(
         DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding()))
+        DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
+        DSL.value(null, SQLDataType.CLOB)
     ), null)
     private constructor(alias: Name, aliased: Table<RegexpMatchesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
 
@@ -112,9 +113,11 @@ open class RegexpMatches(
     fun call(
           __1: String?
         , __2: String?
+        , __3: String?
     ): RegexpMatches = RegexpMatches(DSL.name("regexp_matches"), null, arrayOf(
         DSL.value(__1, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(__2, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding()))
+        DSL.value(__2, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
+        DSL.value(__3, SQLDataType.CLOB)
     )).let { if (aliased()) it.`as`(unqualifiedName) else it }
 
     /**
@@ -123,8 +126,10 @@ open class RegexpMatches(
     fun call(
           __1: Field<String?>
         , __2: Field<String?>
+        , __3: Field<String?>
     ): RegexpMatches = RegexpMatches(DSL.name("regexp_matches"), null, arrayOf(
         __1,
-        __2
+        __2,
+        __3
     )).let { if (aliased()) it.`as`(unqualifiedName) else it }
 }

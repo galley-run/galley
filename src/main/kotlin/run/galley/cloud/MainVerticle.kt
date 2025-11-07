@@ -149,7 +149,6 @@ class MainVerticle : CoroutineVerticle() {
     val emailConfig = config.getJsonObject("messaging", JsonObject()).getJsonObject("email", JsonObject())
     vertx.deployVerticle(EmailMessagingVerticle(), deploymentOptionsOf(emailConfig)).coAwait()
 
-
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()

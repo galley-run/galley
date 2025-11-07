@@ -57,16 +57,16 @@
       <DashboardCard title="Active Regions" :loading="isRegionsLoading">{{
         engineRegions?.length ?? 0
       }}</DashboardCard>
-      <DashboardCard title="Total CPU">4</DashboardCard>
-      <DashboardCard title="Total Memory">16.6 GB</DashboardCard>
+      <DashboardCard title="Total CPU">{{ totalCpu }}</DashboardCard>
+      <DashboardCard title="Total Memory">{{ totalMemory }}</DashboardCard>
     </div>
     <div class="grid grid-cols-2 gap-8 items-start">
       <div class="card">
         <div class="card__header">
           <h2>Nodes</h2>
           <div>
-            <UIButton ghost :leading-addon="DocumentsMinimalistic" title="Visualise nodes" />
-            <UIButton ghost :leading-addon="AddCircle" title="Add node" />
+            <UIButton ghost :leading-addon="DocumentsMinimalistic" disabled title="Visualise nodes" />
+            <UIButton ghost :leading-addon="AddCircle" disabled title="Add node" />
           </div>
         </div>
         <div class="stacked-list" v-if="engineNodes">
@@ -118,7 +118,7 @@
         <div class="card__header">
           <h2>Regions</h2>
           <div>
-            <UIButton ghost :leading-addon="AddCircle" title="Add region" />
+            <UIButton ghost disabled :leading-addon="AddCircle" title="Add region" />
           </div>
         </div>
         <div class="stacked-list">
@@ -165,6 +165,7 @@ import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { computed } from 'vue'
 import UISkeleton from '@/components/FormField/UISkeleton.vue'
+import {formatBytes, sumByteSizes} from "@/utils/bytes.ts";
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
@@ -235,4 +236,8 @@ const regions = computed(() => {
     return acc
   }, {})
 })
+const totalCpu = computed(() => engineNodes.value?.reduce((acc, node) => acc + Number(node.attributes.cpu ?? 0), 0))
+const totalMemoryBytes = computed(() => sumByteSizes(engineNodes.value?.map(node => node.attributes.memory) ?? []));
+const totalMemory  = computed(() => formatBytes(totalMemoryBytes.value, { iec: false, decimals: 1, unit: 'GB' }));  // "MB/GB"
+
 </script>

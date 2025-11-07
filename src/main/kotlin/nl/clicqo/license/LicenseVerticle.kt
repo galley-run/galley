@@ -14,6 +14,7 @@ import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.coroutineEventBus
 import io.vertx.kotlin.coroutines.setPeriodicAwait
 import nl.clicqo.license.LicenseVerticle.Companion.GET_SCOPE
+import nl.clicqo.system.Debug
 import java.time.Instant
 import java.time.OffsetDateTime
 
@@ -22,9 +23,23 @@ class LicenseVerticle : CoroutineVerticle() {
   var license: String? = null
   var licensedTo: String? = null
   var expireAt: Instant? = null
+  private var publicKeyPem: String? = null
 
   override suspend fun start() {
     super.start()
+
+    val path =
+      config.getJsonObject("license", JsonObject()).getString("publicKeyPath", "license_public.pem")
+    publicKeyPem =
+      try {
+        vertx
+          .fileSystem()
+          ?.readFile(path)
+          ?.coAwait()
+          ?.toString(Charsets.UTF_8)
+      } catch (_: Exception) {
+        null
+      }
 
     coroutineEventBus {
       vertx.eventBus().coConsumer(FETCH, handler = ::fetchLicense)
@@ -33,7 +48,7 @@ class LicenseVerticle : CoroutineVerticle() {
 
     vertx
       .eventBus()
-      .request<JsonObject>(FETCH, true)
+      .request<String?>(FETCH, true)
       .coAwait()
       .body()
 
@@ -49,33 +64,31 @@ class LicenseVerticle : CoroutineVerticle() {
   private suspend fun fetchLicense(message: Message<Boolean>) {
     val showLicenseMessage = message.body() ?: false
 
-    val path =
-      config.getJsonObject("license", JsonObject()).getString("publicKeyPath", "license_public.pem")
-    val publicKeyPem =
-      vertx
-        .fileSystem()
-        ?.readFile(path)
-        ?.coAwait()
-        ?.toString(Charsets.UTF_8)
-
     val licenseKey = config.getJsonObject("license")?.getString("key")
 
-    val license =
-      if (!licenseKey.isNullOrBlank() && !publicKeyPem.isNullOrBlank()) {
-        try {
+    if (!licenseKey.isNullOrBlank() && !publicKeyPem.isNullOrBlank()) {
+      try {
+        val response =
           WebClient
             .create(vertx)
-            .postAbs("https://license.galley.run/license/check")
+            .postAbs("${Debug.getProperty("license.server") ?: "https://license.galley.run"}/license/check")
             .sendJsonObject(JsonObject().put("licenseKey", licenseKey))
             ?.coAwait()
+
+        if (response?.statusCode() == 402) {
+          scopes = JsonArray()
+          licensedTo = null
+          license = "Expired, Payment Required"
+        } else {
+          response
             ?.bodyAsJsonObject()
-            ?.takeIf {
+            ?.let {
               val signatureToken = it.getString("signature")
 
               licensedTo = it.getString("name")
               license = it.getString("license")
 
-              return@takeIf try {
+              try {
                 val user =
                   JWTAuth
                     .create(
@@ -87,41 +100,38 @@ class LicenseVerticle : CoroutineVerticle() {
 
                 scopes = user.principal().getJsonArray("feats")
                 expireAt = OffsetDateTime.parse(it.getString("expiresAt")).toInstant()
-                true
               } catch (_: Exception) {
                 if (expireAt == null || expireAt?.isBefore(Instant.now()) == true) {
                   scopes = JsonArray()
                 }
-                false
               }
             }
-        } catch (_: Exception) {
-          if (expireAt == null || expireAt?.isBefore(Instant.now()) == true) {
-            scopes = JsonArray()
-            licensedTo = null
-            license = null
-          }
-          null
         }
-      } else {
-        null
+      } catch (_: Exception) {
+        if (expireAt == null || expireAt?.isBefore(Instant.now()) == true) {
+          scopes = JsonArray()
+          licensedTo = null
+          license = null
+        }
       }
+    }
 
     if (showLicenseMessage) {
       if (this.licensedTo != null) {
         println("----------------------------------------")
-        println("[ GALLEY ENTERPRISE EDITION ]")
+        println("[ GALLEY LICENSED EDITION ]")
         println("Licensed to ${this.licensedTo}")
-        println("License: ${this.license}")
+        this.license?.run { println("License: $this") }
         println("----------------------------------------")
       } else {
         println("----------------------------------------")
-        println("[ GALLEY COMMUNITY EDITION ]")
+        println("[ GALLEY DEVELOPER EDITION ]")
+        this.license?.run { println("License: $this") }
         println("----------------------------------------")
       }
     }
 
-    message.reply(license)
+    message.reply(null)
   }
 
   companion object {

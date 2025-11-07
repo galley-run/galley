@@ -13,7 +13,8 @@ import io.vertx.kotlin.coroutines.CoroutineVerticle
 import io.vertx.kotlin.coroutines.coAwait
 import io.vertx.kotlin.coroutines.coroutineEventBus
 import io.vertx.kotlin.coroutines.setPeriodicAwait
-import nl.clicqo.license.LicenseVerticle.Companion.GET_SCOPE
+import nl.clicqo.eventbus.EventBusApiRequest
+import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.system.Debug
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -23,7 +24,14 @@ class LicenseVerticle : CoroutineVerticle() {
   var license: String? = null
   var licensedTo: String? = null
   var expireAt: Instant? = null
+  var alert: LicenseAlert? = null
   private var publicKeyPem: String? = null
+
+  companion object {
+    const val PUBLIC_GET = "license.query.get"
+    const val GET_SCOPE = "license.query.get.scope"
+    const val FETCH = "license.fetch"
+  }
 
   override suspend fun start() {
     super.start()
@@ -44,6 +52,7 @@ class LicenseVerticle : CoroutineVerticle() {
     coroutineEventBus {
       vertx.eventBus().coConsumer(FETCH, handler = ::fetchLicense)
       vertx.eventBus().coConsumer(GET_SCOPE, handler = ::getScope)
+      vertx.eventBus().coConsumer(PUBLIC_GET, handler = ::getLicensePublic)
     }
 
     vertx
@@ -65,6 +74,7 @@ class LicenseVerticle : CoroutineVerticle() {
     val showLicenseMessage = message.body() ?: false
 
     val licenseKey = config.getJsonObject("license")?.getString("key")
+    alert = null
 
     if (!licenseKey.isNullOrBlank() && !publicKeyPem.isNullOrBlank()) {
       try {
@@ -79,6 +89,7 @@ class LicenseVerticle : CoroutineVerticle() {
           scopes = JsonArray()
           licensedTo = null
           license = "Expired, Payment Required"
+          alert = LicenseAlert.PAYMENT_REQUIRED
         } else {
           response
             ?.bodyAsJsonObject()
@@ -98,7 +109,7 @@ class LicenseVerticle : CoroutineVerticle() {
                     ).authenticate(TokenCredentials(signatureToken))
                     .coAwait()
 
-                scopes = user.principal().getJsonArray("feats")
+                scopes = user.principal().getJsonArray("scope")
                 expireAt = OffsetDateTime.parse(it.getString("expiresAt")).toInstant()
               } catch (_: Exception) {
                 if (expireAt == null || expireAt?.isBefore(Instant.now()) == true) {
@@ -134,15 +145,22 @@ class LicenseVerticle : CoroutineVerticle() {
     message.reply(null)
   }
 
-  companion object {
-    const val GET_SCOPE = "license.query.get"
-    const val FETCH = "license.fetch"
+  private suspend fun getLicensePublic(message: Message<EventBusApiRequest>) {
+    message.reply(
+      EventBusApiResponse(
+        JsonObject()
+          .put("license", license)
+          .put("licensedTo", licensedTo)
+          .put("alert", alert?.toString()?.lowercase())
+          .put("scopes", scopes),
+      ),
+    )
   }
 }
 
 suspend fun Vertx.getScope(scope: String): Boolean =
   this
     .eventBus()
-    .request<Boolean>(GET_SCOPE, scope)
+    .request<Boolean>(LicenseVerticle.GET_SCOPE, scope)
     .coAwait()
     .body()

@@ -10,6 +10,7 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import registerAxios from '@/utils/registerAxios.ts'
 import { initAuthStore } from '@/stores/auth.ts'
 import { initProjectsStore } from '@/stores/projects.ts'
+import { initLicenseStore } from '@/stores/license.ts'
 
 document.documentElement.classList.toggle(
   'dark',
@@ -26,6 +27,7 @@ app.use(VueQueryPlugin)
 registerAxios()
 initAuthStore()
 initProjectsStore()
+initLicenseStore()
 
 app.use(SolarIconsPlugin, {
   weight: 'LineDuotone',

@@ -3,6 +3,7 @@ import axios from 'axios'
 import router from '@/router'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { useOnboardingStore } from '@/stores/onboarding.ts'
+import { useLicenseStore } from '@/stores/license.ts'
 
 const STORAGE_KEY = 'auth'
 
@@ -31,12 +32,9 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticating: (state) => !state.accessToken && !!state.refreshToken,
   },
   actions: {
-    async signIn(email: string) {
-      this.refreshToken = (await axios.post('/auth/sign-in', { email }))?.refreshToken
-
-      await this.refreshAccessToken()
-    },
     async setRefreshToken(refreshToken: string) {
+      const licenseStore = useLicenseStore()
+      await licenseStore.fetchLicense()
       this.refreshToken = refreshToken
 
       await this.refreshAccessToken()
@@ -77,7 +75,7 @@ export const useAuthStore = defineStore('auth', {
 
       try {
         this.accessToken = (
-          await axios.post('/auth/access-token', { refreshToken: this.refreshToken })
+          await axios.post('/auth/access-token', { refreshToken: this.refreshToken }) as { accessToken? : string }
         )?.accessToken
 
         this.extractAccessToken()
@@ -98,7 +96,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async refreshRefreshToken() {
       this.refreshToken = (
-        await axios.post('/auth/refresh-token', { refreshToken: this.refreshToken })
+        await axios.post('/auth/refresh-token', { refreshToken: this.refreshToken }) as { refreshToken? : string }
       )?.refreshToken
     },
     async startRefreshTokenTimer() {

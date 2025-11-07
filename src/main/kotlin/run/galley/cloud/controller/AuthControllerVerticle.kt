@@ -30,7 +30,6 @@ import nl.clicqo.ext.toUUID
 import nl.clicqo.messaging.email.EmailComposer
 import nl.clicqo.messaging.email.EmailMessagingVerticle
 import nl.clicqo.messaging.email.Recipients
-import org.jooq.postgres.extensions.types.Inet
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CharterCrewAccess
 import run.galley.cloud.crew.CrewAccess
@@ -44,7 +43,6 @@ import run.galley.cloud.model.VesselCrewAccess
 import run.galley.cloud.web.JWT
 import run.galley.cloud.web.issueAccessToken
 import run.galley.cloud.web.issueRefreshToken
-import java.net.InetAddress
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset

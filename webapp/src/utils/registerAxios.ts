@@ -29,7 +29,6 @@ export class ApiError<T = unknown, D = unknown> extends Error {
 
 export default function registerAxios() {
   axios.defaults.baseURL = import.meta.env.VITE_API_URL
-  // axios.defaults.headers.common['Authorization'] = `Bearer ${import.meta.env.VITE_API_TOKEN}`
   axios.defaults.headers.common['Accept'] = `application/vnd.galley.v1+json`
   axios.defaults.headers.common['Content-Type'] = `application/vnd.galley.v1+json`
 
@@ -38,7 +37,7 @@ export default function registerAxios() {
       if (res.status === 203) {
         console.error('Response Validation Incorrect (for:)', res)
       }
-      return res?.data
+      return res?.data?.data ?? res?.data
     },
     (e: AxiosError<ApiErrorBody>) => {
       const body = e.response?.data

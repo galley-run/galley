@@ -117,14 +117,19 @@ open class VesselEngineRegions(
     val GEO_REGION: TableField<VesselEngineRegionsRecord, GeoRegion?> = createField(DSL.name("geo_region"), SQLDataType.VARCHAR.nullable(false).asEnumDataType(GeoRegion::class.java), this, "")
 
     /**
-     * The column <code>public.vessel_engine_regions.location</code>.
-     */
-    val LOCATION: TableField<VesselEngineRegionsRecord, String?> = createField(DSL.name("location"), SQLDataType.CLOB.nullable(false), this, "")
-
-    /**
      * The column <code>public.vessel_engine_regions.created_at</code>.
      */
     val CREATED_AT: TableField<VesselEngineRegionsRecord, OffsetDateTime?> = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
+
+    /**
+     * The column <code>public.vessel_engine_regions.location_city</code>.
+     */
+    val LOCATION_CITY: TableField<VesselEngineRegionsRecord, String?> = createField(DSL.name("location_city"), SQLDataType.CLOB, this, "")
+
+    /**
+     * The column <code>public.vessel_engine_regions.location_country</code>.
+     */
+    val LOCATION_COUNTRY: TableField<VesselEngineRegionsRecord, String?> = createField(DSL.name("location_country"), SQLDataType.CHAR(2), this, "")
 
     private constructor(alias: Name, aliased: Table<VesselEngineRegionsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<VesselEngineRegionsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)

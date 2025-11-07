@@ -6,7 +6,7 @@
       <div class="grid grid-cols-3 gap-8 items-start">
         <div
           class="border flex flex-col gap-2.5 rounded-2xl p-4 border-navy-200 bg-navy-50"
-          :class="[mode !== 'managed_cloud' && 'opacity-30', isEngineDataLoading && 'animate-pulse']"
+          :class="[mode !== 'managed_cloud' && 'opacity-30', isEngineLoading && 'animate-pulse']"
         >
           <div class="flex justify-between">
             <h4 class="text-navy-700">Galley Managed Cloud</h4>
@@ -20,7 +20,7 @@
         </div>
         <div
           class="border flex flex-col gap-2.5 rounded-2xl p-4 border-navy-200 bg-navy-50"
-          :class="[mode !== 'managed_engine' && 'opacity-30', isEngineDataLoading && 'animate-pulse']"
+          :class="[mode !== 'managed_engine' && 'opacity-30', isEngineLoading && 'animate-pulse']"
         >
           <div class="flex justify-between">
             <h4 class="text-navy-700">Galley Managed Engine</h4>
@@ -33,7 +33,10 @@
         </div>
         <div
           class="border flex flex-col gap-2.5 rounded-2xl p-4 border-navy-200 bg-navy-50"
-          :class="[mode !== 'controlled_engine' && 'opacity-30', isEngineDataLoading && 'animate-pulse']"
+          :class="[
+            mode !== 'controlled_engine' && 'opacity-30',
+            isEngineLoading && 'animate-pulse',
+          ]"
         >
           <div class="flex justify-between">
             <h4 class="text-navy-700">Galley Controlled Engine</h4>
@@ -48,8 +51,12 @@
       </div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-      <DashboardCard title="Nodes">2</DashboardCard>
-      <DashboardCard title="Active Regions">1</DashboardCard>
+      <DashboardCard title="Nodes" :loading="isNodesLoading">{{
+        engineNodes?.length ?? 0
+      }}</DashboardCard>
+      <DashboardCard title="Active Regions" :loading="isRegionsLoading">{{
+        engineRegions?.length ?? 0
+      }}</DashboardCard>
       <DashboardCard title="Total CPU">4</DashboardCard>
       <DashboardCard title="Total Memory">16.6 GB</DashboardCard>
     </div>
@@ -62,52 +69,41 @@
             <UIButton ghost :leading-addon="AddCircle" title="Add node" />
           </div>
         </div>
-        <div class="stacked-list">
-          <div class="stacked-list__item grid-cols-[1fr_0fr_0fr]">
+        <div class="stacked-list" v-if="engineNodes">
+          <div
+            class="stacked-list__item grid-cols-[1fr_0fr_0fr]"
+            v-for="node in engineNodes"
+            :key="node.id"
+          >
             <div>
               <div class="flex items-center gap-2">
                 <FlagIcon code="nl" :size="16" class="rounded-sm" />
-                <div>app1.cloud.clicqo.nl</div>
-                <div class="badge badge--small">Ready</div>
+                <div>{{ node.attributes.name }}</div>
+                <!--                <div class="badge badge&#45;&#45;small">Ready</div>-->
               </div>
-              <p>worker &bullet; 2 CPU &bullet; 8.3 GB RAM</p>
+              <p>
+                {{ node.attributes.nodeType }} &bullet; {{ node.attributes.cpu }} CPU &bullet;
+                {{ node.attributes.memory }} RAM
+              </p>
             </div>
             <div class="text-end">
-              <p>5.254.39.94</p>
-              <p class="text-tides-700">AMS1</p>
+              <p>{{ node.attributes.ipAddress }}</p>
+              <p class="text-tides-700" v-if="regions">
+                <!--                AMS1-->
+                {{ regions[node.attributes.vesselEngineRegionId].name }}
+
+              </p>
             </div>
             <div>
               <UIDropDown
                 :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
-                ]"
-                :icon="MenuDots"
-                variant="icon"
-                menu-position="right"
-              />
-            </div>
-          </div>
-          <div class="stacked-list__item grid-cols-[1fr_0fr_0fr]">
-            <div>
-              <div class="flex items-center gap-2">
-                <FlagIcon code="nl" :size="16" class="rounded-sm" />
-                <div>db1.cloud.clicqo.nl</div>
-                <div class="badge badge--small badge--coral">Unreachable</div>
-              </div>
-              <p>worker &bullet; 2 CPU &bullet; 8.3 GB RAM</p>
-            </div>
-            <div class="text-end">
-              <p>5.254.39.95</p>
-              <p class="text-tides-700">AMS1</p>
-            </div>
-            <div>
-              <UIDropDown
-                :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
+                  { label: 'Edit this node', value: '/edit', link: true },
+                  {
+                    label: 'Delete this node',
+                    value: '/delete',
+                    link: true,
+                    variant: 'destructive',
+                  },
                 ]"
                 :icon="MenuDots"
                 variant="icon"
@@ -116,6 +112,7 @@
             </div>
           </div>
         </div>
+        <div v-else>No nodes</div>
       </div>
       <div class="card">
         <div class="card__header">
@@ -125,100 +122,26 @@
           </div>
         </div>
         <div class="stacked-list">
-          <div class="stacked-list__item grid-cols-[1fr_0fr_0fr]">
+          <div
+            class="stacked-list__item grid-cols-[1fr_1fr_0fr]"
+            v-for="region in engineRegions"
+            :key="region.id"
+          >
             <div>
               <div class="flex items-center gap-2">
-                <FlagIcon code="nl" :size="16" class="rounded-sm" />
-                <div>AMS1</div>
-                <div class="badge badge--small badge--navy">EU</div>
+                <FlagIcon :code="region.attributes.locationCountry" :size="16" class="rounded-sm" />
+                <!--                FIX COUNTRY FLAG WITH LOCATION NAME IN THE FUTURE, FOR NOW USE COUNTRY CODE AS FLAG-->
+                <div>{{ region.attributes.name }}</div>
+                <div class="badge badge--small badge--navy">{{ region.attributes.geoRegion }}</div>
               </div>
-              <p>Amsterdam, The Netherlands</p>
+              <p>{{ region.attributes.locationCity }}, {{ region.attributes.locationCountry }}</p>
             </div>
             <div class="text-end">
-              <p class="text-tides-700">mijn.host</p>
+              <p class="text-tides-700">{{ region.attributes.providerName }}</p>
             </div>
             <div>
               <UIDropDown
-                :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
-                ]"
-                :icon="MenuDots"
-                variant="icon"
-                menu-position="right"
-              />
-            </div>
-          </div>
-          <div class="stacked-list__item grid-cols-[1fr_1fr_0fr]">
-            <div>
-              <div class="flex items-center gap-2">
-                <FlagIcon code="de" :size="16" class="rounded-sm" />
-                <div>FRA</div>
-                <div class="badge badge--small badge--navy">EU</div>
-              </div>
-              <p>Frankfurt, Germany</p>
-            </div>
-            <div class="text-end">
-              <p class="text-tides-700">AWS</p>
-            </div>
-            <div>
-              <UIDropDown
-                :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
-                ]"
-                :icon="MenuDots"
-                variant="icon"
-                menu-position="right"
-              />
-            </div>
-          </div>
-          <div class="stacked-list__item grid-cols-[1fr_1fr_0fr]">
-            <div>
-              <div class="flex items-center gap-2">
-                <FlagIcon code="us" :size="16" class="rounded-sm" />
-                <div>SFO1</div>
-                <div class="badge badge--small badge--navy">USA</div>
-              </div>
-              <p>San Francisco, United States</p>
-            </div>
-            <div class="text-end">
-              <p class="text-tides-700">Digital Ocean</p>
-            </div>
-            <div>
-              <UIDropDown
-                :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
-                ]"
-                :icon="MenuDots"
-                variant="icon"
-                menu-position="right"
-              />
-            </div>
-          </div>
-          <div class="stacked-list__item grid-cols-[1fr_1fr_0fr]">
-            <div>
-              <div class="flex items-center gap-2">
-                <FlagIcon code="in" :size="16" class="rounded-sm" />
-                <div>BLR1</div>
-                <div class="badge badge--small badge--navy">APAC</div>
-              </div>
-              <p>Bangaluru, India</p>
-            </div>
-            <div class="text-end">
-              <p class="text-tides-700">Azure</p>
-            </div>
-            <div>
-              <UIDropDown
-                :items="[
-                  { label: 'clicqo.nl', value: '/edit', link: true },
-                  { label: 'clicqo.nl', value: 'https://clicqo.nl', link: 'external' },
-                  { label: 'galley.run', value: 'https://galley.run', link: true },
-                ]"
+                :items="[{ label: 'Edit region', value: '/edit', link: true }]"
                 :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
@@ -240,20 +163,76 @@ import { useQuery } from '@tanstack/vue-query'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
-import { computed, watchEffect } from 'vue'
+import { computed } from 'vue'
+import UISkeleton from '@/components/FormField/UISkeleton.vue'
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
 
-const { isLoading: isEngineDataLoading, data: engineData } = useQuery({
+interface EngineSummary {
+  name: string
+  mode: string
+}
+
+interface EngineNodeSummary {
+  name: string
+  ipAddress: string
+  nodeType: string
+  deployMode: string
+  cpu: string
+  memory: string
+  storage: string
+  vesselEngineRegionId: string
+  provisioning: string
+  deployTarget: string
+}
+
+interface EngineRegionSummary {
+  name: string
+  providerName: string
+  geoRegion: string
+  locationCity: string
+  locationCountry: string
+}
+
+interface ApiResponse<T> {
+  id: string
+  type: string
+  attributes: T
+}
+
+const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine'],
-  queryFn: () => axios.get(`/vessels/${selectedVesselId?.value}/engine`),
+  queryFn: () =>
+    axios.get(`/vessels/${selectedVesselId?.value}/engine`) as Promise<
+      ApiResponse<EngineSummary>[]
+    >,
 })
 
-const mode = computed(() => engineData?.value?.data?.[0].attributes.mode)
+const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
+  enabled: !!selectedVesselId?.value,
+  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes'],
+  queryFn: () =>
+    axios.get(`/vessels/${selectedVesselId?.value}/engine/nodes`) as Promise<
+      ApiResponse<EngineNodeSummary>[]
+    >,
+})
 
-watchEffect(() => {
-  console.log(mode.value)
+const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
+  enabled: !!selectedVesselId?.value,
+  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
+  queryFn: () =>
+    axios.get(`/vessels/${selectedVesselId?.value}/engine/regions`) as Promise<
+      ApiResponse<EngineRegionSummary>[]
+    >,
+})
+
+const mode = computed(() => engine.value?.[0]?.attributes?.mode)
+const regions = computed(() => {
+  return engineRegions.value?.reduce((acc, region) => {
+    acc[region.id] = region.attributes
+    return acc
+  }, {})
 })
 </script>

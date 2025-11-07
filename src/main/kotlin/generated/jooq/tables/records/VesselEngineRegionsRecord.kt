@@ -44,13 +44,17 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
         set(value): Unit = set(5, value)
         get(): GeoRegion? = get(5) as GeoRegion?
 
-    open var location: String?
-        set(value): Unit = set(6, value)
-        get(): String? = get(6) as String?
-
     open var createdAt: OffsetDateTime?
+        set(value): Unit = set(6, value)
+        get(): OffsetDateTime? = get(6) as OffsetDateTime?
+
+    open var locationCity: String?
         set(value): Unit = set(7, value)
-        get(): OffsetDateTime? = get(7) as OffsetDateTime?
+        get(): String? = get(7) as String?
+
+    open var locationCountry: String?
+        set(value): Unit = set(8, value)
+        get(): String? = get(8) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -61,15 +65,16 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
     /**
      * Create a detached, initialised VesselEngineRegionsRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, vesselEngineId: UUID? = null, name: String? = null, providerName: String? = null, geoRegion: GeoRegion? = null, location: String? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, vesselEngineId: UUID? = null, name: String? = null, providerName: String? = null, geoRegion: GeoRegion? = null, createdAt: OffsetDateTime? = null, locationCity: String? = null, locationCountry: String? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.vesselEngineId = vesselEngineId
         this.name = name
         this.providerName = providerName
         this.geoRegion = geoRegion
-        this.location = location
         this.createdAt = createdAt
+        this.locationCity = locationCity
+        this.locationCountry = locationCountry
         resetTouchedOnNotNull()
     }
 
@@ -84,8 +89,9 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
             this.name = value.name
             this.providerName = value.providerName
             this.geoRegion = value.geoRegion
-            this.location = value.location
             this.createdAt = value.createdAt
+            this.locationCity = value.locationCity
+            this.locationCountry = value.locationCountry
             resetTouchedOnNotNull()
         }
     }

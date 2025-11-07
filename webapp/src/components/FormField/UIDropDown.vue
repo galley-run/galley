@@ -19,7 +19,7 @@ type Item = {
   value: string
   disabled?: boolean
   link?: 'external' | boolean
-  variant?: 'danger' | undefined
+  variant?: 'destructive' | undefined
 }
 
 const {
@@ -350,8 +350,8 @@ watch(
               'px-4 py-2.5',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               !item.variant && idx === activeIndex && 'bg-navy-50',
-              item.variant === 'danger' && idx === activeIndex && 'bg-coral-100',
-              item.variant === 'danger' &&
+              item.variant === 'destructive' && idx === activeIndex && 'bg-coral-100',
+              item.variant === 'destructive' &&
                 'bg-coral-50 text-coral-500 hover:bg-coral-100 aria-selected:bg-coral-100 aria-selected:text-coral-600',
               !item.variant &&
                 'hover:bg-navy-50 aria-selected:bg-navy-600 aria-selected:text-white',

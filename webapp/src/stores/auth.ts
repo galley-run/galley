@@ -88,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
       }
       const payload = JSON.parse(atob(jwtBase64))
       this.scopes = payload?.scp
-      this.activeVesselId = Object.keys(this.scopes ?? {}).find((key) => key.split(':')[0])
+      this.activeVesselId = Object.keys(this.scopes ?? {})?.[0]?.split(":")?.[0] ?? undefined
 
       axios.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`
 

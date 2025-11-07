@@ -34,7 +34,6 @@ object VesselEngineNodeSql {
             payload
               .getString(VESSEL_ENGINE_NODES.DEPLOY_MODE.name)
               ?.let(NodeDeployMode::valueOf),
-          VESSEL_ENGINE_NODES.NAME to payload.getString(VESSEL_ENGINE_NODES.NAME.name),
           VESSEL_ENGINE_NODES.IP_ADDRESS to payload.getString(VESSEL_ENGINE_NODES.IP_ADDRESS.name),
           VESSEL_ENGINE_NODES.CPU to payload.getString(VESSEL_ENGINE_NODES.CPU.name),
           VESSEL_ENGINE_NODES.MEMORY to payload.getString(VESSEL_ENGINE_NODES.MEMORY.name),

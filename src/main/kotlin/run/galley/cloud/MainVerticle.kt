@@ -68,6 +68,7 @@ import run.galley.cloud.data.VesselEngineRegionDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
+import run.galley.cloud.ws.AgentWebSocketServer
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -152,6 +153,9 @@ class MainVerticle : CoroutineVerticle() {
 
     vertx.deployVerticle(LicenseVerticle(), deploymentOptions).coAwait()
 
+    // Initialize WebSocket server
+    val agentWebSocketServer = AgentWebSocketServer()
+
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()
@@ -201,14 +205,16 @@ class MainVerticle : CoroutineVerticle() {
         }
 
     try {
-      // Start to run the HTTP server
+      // Start to run the HTTP server with WebSocket support
       vertx
         .createHttpServer(httpServerOptions)
+        .webSocketHandshakeHandler(agentWebSocketServer.handshakeHandler())
+        .webSocketHandler(agentWebSocketServer.connectionHandler())
         .requestHandler(mainRouter)
         .listen()
         .coAwait()
 
-      logger.info("HTTP server started on port $httpPort")
+      logger.info("HTTP server started on port $httpPort with WebSocket support")
     } catch (e: Exception) {
       logger.error("HTTP server failed to start on port $httpPort", e)
       throw e

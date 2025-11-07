@@ -5,17 +5,20 @@
 
 package run.galley.cloud
 
-import io.vertx.config.ConfigRetriever
-import io.vertx.config.ConfigRetrieverOptions
-import io.vertx.config.ConfigStoreOptions
 import io.vertx.core.DeploymentOptions
 import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.http.HttpVersion
+import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.core.net.PemKeyCertOptions
+import io.vertx.ext.auth.PubSecKeyOptions
+import io.vertx.ext.auth.authentication.TokenCredentials
+import io.vertx.ext.auth.jwt.JWTAuth
+import io.vertx.ext.auth.jwt.JWTAuthOptions
 import io.vertx.ext.web.Router
+import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.HttpException
 import io.vertx.ext.web.handler.StaticHandler
@@ -42,13 +45,14 @@ import nl.clicqo.ext.setupFailureHandler
 import nl.clicqo.messaging.email.EmailComposer
 import nl.clicqo.messaging.email.EmailComposerCodec
 import nl.clicqo.messaging.email.EmailMessagingVerticle
-import org.slf4j.LoggerFactory
 import run.galley.cloud.controller.AuthControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
 import run.galley.cloud.controller.ProjectControllerVerticle
 import run.galley.cloud.controller.VesselBillingProfileControllerVerticle
 import run.galley.cloud.controller.VesselControllerVerticle
 import run.galley.cloud.controller.VesselEngineControllerVerticle
+import run.galley.cloud.controller.VesselEngineNodeControllerVerticle
+import run.galley.cloud.controller.VesselEngineRegionControllerVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
@@ -58,6 +62,8 @@ import run.galley.cloud.data.UserDataVerticle
 import run.galley.cloud.data.VesselBillingProfileDataVerticle
 import run.galley.cloud.data.VesselDataVerticle
 import run.galley.cloud.data.VesselEngineDataVerticle
+import run.galley.cloud.data.VesselEngineNodeDataVerticle
+import run.galley.cloud.data.VesselEngineRegionDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
@@ -66,16 +72,6 @@ class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun start() {
-    val configRetriever =
-      ConfigRetriever.create(
-        vertx,
-        ConfigRetrieverOptions()
-          .applyIf(vertx.fileSystem().exists("config.json").coAwait()) {
-            this.addStore(ConfigStoreOptions().setType("file").setConfig(JsonObject().put("path", "config.json")))
-          },
-      )
-    val config = configRetriever.config.coAwait().mergeIn(config)
-
     vertx.eventBus().registerDefaultCodec(EmailComposer::class.java, EmailComposerCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiRequest::class.java, EventBusApiRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
@@ -163,6 +159,8 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(VesselDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselEngineDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselBillingProfileDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineNodeDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineRegionDataVerticle(), deploymentOptions).coAwait()
 
     // Deploy the controller verticles
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
@@ -171,6 +169,8 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(VesselControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselBillingProfileControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselEngineControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineNodeControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(VesselEngineRegionControllerVerticle(), deploymentOptions).coAwait()
 
     val httpPort =
       config

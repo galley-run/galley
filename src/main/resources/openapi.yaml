@@ -162,6 +162,78 @@ paths:
           $ref: '#/components/responses/Conflict'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/engine/nodes:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+    get:
+      tags:
+        - vessel/engine
+      operationId: vessel.engine.node.query.list
+      summary: List nodes within the engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListNodesInEngine
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Node'
+          description: The request was successful, and the server has returned the requested resource in the response body.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/engine/regions:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+    get:
+      tags:
+        - vessel/engine
+      summary: List registered regions within the engine
+      operationId: vessel.engine.region.query.list
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListRegionsWithinTheEngine
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RegionSummary'
+          description: The request was successful, and the server has returned the requested resource in the response body.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/charters:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -909,6 +981,181 @@ components:
                     - 'null'
                   description: Captures the phone number of the billing contact
                   example: +31 123 456 7890
+    ScheduledUpdate:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a ScheduledUpdate, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - ScheduledUpdate
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - cron
+                - updateType
+                - execution
+              properties:
+                cron:
+                  type: string
+                  examples:
+                    - 0 1 * * *
+                updateType:
+                  enum:
+                    - SecurityUpdates
+                    - BugfixUpdates
+                    - MinorUpdates
+                    - KernelUpdates
+                  type: string
+                  default: SecurityUpdates
+                execution:
+                  type: boolean
+                  examples:
+                    - true
+                    - false
+                  description: |-
+                    If marked true, the ScheduledUpdate is automaticlly applied to the node.
+                    If marked false, the ScheduledUpdate will check periodically (see `cron` value) and notices in the UI (and via email) whenever an update is available
+    Node:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Node, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              examples:
+                - 27D9B362-0BB3-4F8D-B8E6-CF7FCEE2F327
+            type:
+              type: string
+              enum:
+                - VesselEngineNode
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - vesselEngineRegionId
+                - nodeType
+                - provisioning
+              properties:
+                ipAddress:
+                  type: string
+                  examples:
+                    - 5.254.32.75
+                name:
+                  type: string
+                  examples:
+                    - app1.cloud.clicqo.nl
+                cpu:
+                  type: string
+                  examples:
+                    - '1'
+                memory:
+                  type: string
+                  examples:
+                    - 1GB
+                storage:
+                  type: string
+                  examples:
+                    - 20GB
+                nodeType:
+                  enum:
+                    - controller
+                    - worker
+                    - controller_worker
+                  type: string
+                  default: worker
+                vesselEngineRegionId:
+                  type: string
+                  format: uuid
+                sshKey:
+                  type: string
+                provisioning:
+                  type: boolean
+                  default: Controlled
+                  description: |-
+                    When provisioning is enabled, Galley is allowed to fully manage and provision the node.
+                    When provisioning is disabled, Galley is only allowed to control the node by deploying onto the cluster
+                deployTarget:
+                  enum:
+                    - applications
+                    - databases
+                    - any
+                  type: string
+                  default: any
+                scheduledUpdates:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ScheduledUpdate'
+    RegionSummary:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Region, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - VesselEngineRegion
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - locationCity
+                - locationCountry
+                - geoRegion
+                - providerName
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - AMS1
+                locationCity:
+                  type: string
+                  examples:
+                    - Amsterdam
+                locationCountry:
+                  type: string
+                  examples:
+                    - nl
+                geoRegion:
+                  type: string
+                  enum:
+                    - eu
+                    - apac
+                    - usa
+                    - latam
+                    - africa
+                    - na
+                  examples:
+                    - eu
+                providerName:
+                  type: string
+                  examples:
+                    - mijn.host
     CharterSummary:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'

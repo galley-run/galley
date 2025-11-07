@@ -36,7 +36,7 @@
             <UIDropDown
               :items="[
                 { label: 'Edit', value: 'edit' },
-                { label: 'Delete', value: 'delete', variant: 'danger' },
+                { label: 'Delete', value: 'delete', variant: 'destructive' },
               ]"
               :icon="MenuDots"
               variant="icon"

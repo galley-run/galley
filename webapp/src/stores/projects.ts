@@ -61,9 +61,9 @@ export const useProjectsStore = defineStore('projects', {
       if (vesselIds.length === 0) return
       const data = []
       for (const vesselId of vesselIds) {
-        const charters = (await axios.get(`/vessels/${vesselId}/charters`))?.data as CharterResponse[]
+        const charters = (await axios.get(`/vessels/${vesselId}/charters`)) as CharterResponse[]
         for (const charter of charters) {
-          const projects = (await axios.get(`/vessels/${vesselId}/charters/${charter.id}/projects`))?.data as ProjectResponse[]
+          const projects = (await axios.get(`/vessels/${vesselId}/charters/${charter.id}/projects`)) as ProjectResponse[]
           data.push({
             id: charter.id,
             vesselId: charter.attributes.vesselId,

@@ -24,8 +24,9 @@ data class VesselEngineRegions(
     var name: String? = null,
     var providerName: String? = null,
     var geoRegion: GeoRegion? = null,
-    var location: String? = null,
-    var createdAt: OffsetDateTime? = null
+    var createdAt: OffsetDateTime? = null,
+    var locationCity: String? = null,
+    var locationCountry: String? = null
 ): BaseModel, Serializable {
 
 
@@ -73,17 +74,23 @@ data class VesselEngineRegions(
         }
         else if (this.geoRegion != o.geoRegion)
             return false
-        if (this.location == null) {
-            if (o.location != null)
-                return false
-        }
-        else if (this.location != o.location)
-            return false
         if (this.createdAt == null) {
             if (o.createdAt != null)
                 return false
         }
         else if (this.createdAt != o.createdAt)
+            return false
+        if (this.locationCity == null) {
+            if (o.locationCity != null)
+                return false
+        }
+        else if (this.locationCity != o.locationCity)
+            return false
+        if (this.locationCountry == null) {
+            if (o.locationCountry != null)
+                return false
+        }
+        else if (this.locationCountry != o.locationCountry)
             return false
         return true
     }
@@ -97,8 +104,9 @@ data class VesselEngineRegions(
         result = prime * result + (if (this.name == null) 0 else this.name.hashCode())
         result = prime * result + (if (this.providerName == null) 0 else this.providerName.hashCode())
         result = prime * result + (if (this.geoRegion == null) 0 else this.geoRegion.hashCode())
-        result = prime * result + (if (this.location == null) 0 else this.location.hashCode())
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.locationCity == null) 0 else this.locationCity.hashCode())
+        result = prime * result + (if (this.locationCountry == null) 0 else this.locationCountry.hashCode())
         return result
     }
 
@@ -111,8 +119,9 @@ data class VesselEngineRegions(
         sb.append(", ").append(name)
         sb.append(", ").append(providerName)
         sb.append(", ").append(geoRegion)
-        sb.append(", ").append(location)
         sb.append(", ").append(createdAt)
+        sb.append(", ").append(locationCity)
+        sb.append(", ").append(locationCountry)
 
         sb.append(")")
         return sb.toString()

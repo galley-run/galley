@@ -37,7 +37,7 @@ keytool -genseckey \
   -keypass "secret"
 ----
 
-In the root folder you also need to copy `_config.json` into `config.json` and change the variables as you need. Make sure the `jwt.secret` aligns with the secret you've put in when creating the keystore.
+In the root folder you also need to copy `_conf.json` into `conf.json` and change the variables as you need. Make sure the `jwt.secret` aligns with the secret you've put in when creating the keystore.
 
 === Running Tests
 To run the test-suite:

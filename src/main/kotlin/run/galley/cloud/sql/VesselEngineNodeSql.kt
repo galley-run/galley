@@ -22,8 +22,8 @@ object VesselEngineNodeSql {
       .insertInto(VESSEL_ENGINE_NODES)
       .set(
         mapOf(
-          VESSEL_ENGINE_NODES.NAME.name to payload.getString(VESSEL_ENGINE_NODES.NAME.name),
-          VESSEL_ENGINE_NODES.VESSEL_ID.name to payload.getUUID(VESSEL_ENGINE_NODES.VESSEL_ID.name),
+          VESSEL_ENGINE_NODES.NAME to payload.getString(VESSEL_ENGINE_NODES.NAME.name),
+          VESSEL_ENGINE_NODES.VESSEL_ID to payload.getUUID(VESSEL_ENGINE_NODES.VESSEL_ID.name),
           VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID to payload.getUUID(VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.name),
           VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID to payload.getUUID(VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID.name),
           VESSEL_ENGINE_NODES.NODE_TYPE to
@@ -34,7 +34,6 @@ object VesselEngineNodeSql {
             payload
               .getString(VESSEL_ENGINE_NODES.DEPLOY_MODE.name)
               ?.let(NodeDeployMode::valueOf),
-          VESSEL_ENGINE_NODES.NAME to payload.getString(VESSEL_ENGINE_NODES.NAME.name),
           VESSEL_ENGINE_NODES.IP_ADDRESS to payload.getString(VESSEL_ENGINE_NODES.IP_ADDRESS.name),
           VESSEL_ENGINE_NODES.CPU to payload.getString(VESSEL_ENGINE_NODES.CPU.name),
           VESSEL_ENGINE_NODES.MEMORY to payload.getString(VESSEL_ENGINE_NODES.MEMORY.name),

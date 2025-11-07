@@ -38,16 +38,20 @@ class LicenseVerticle : CoroutineVerticle() {
 
     val path =
       config.getJsonObject("license", JsonObject()).getString("publicKeyPath", "license_public.pem")
-    publicKeyPem =
-      try {
-        vertx
-          .fileSystem()
-          ?.readFile(path)
-          ?.coAwait()
-          ?.toString(Charsets.UTF_8)
-      } catch (_: Exception) {
-        null
-      }
+    val licenseKey = config.getJsonObject("license")?.getString("key")
+
+    if (licenseKey != null) {
+      publicKeyPem =
+        try {
+          vertx
+            .fileSystem()
+            ?.readFile(path)
+            ?.coAwait()
+            ?.toString(Charsets.UTF_8)
+        } catch (_: Exception) {
+          null
+        }
+    }
 
     coroutineEventBus {
       vertx.eventBus().coConsumer(FETCH, handler = ::fetchLicense)

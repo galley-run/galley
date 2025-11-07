@@ -1,7 +1,3 @@
-// src/utils/bytes.ts
-// Vue-friendly util for parsing, summing and formatting byte sizes.
-// Supports "512MB", "1 GiB", "750 MiB", "1.5 GB", "1024", etc.
-
 export type ByteSizeInput = string | number;
 
 const LETTER_INDEX: Record<string, number> = {
@@ -10,7 +6,9 @@ const LETTER_INDEX: Record<string, number> = {
 
 const UNIT_RE = /^([0-9]*\.?[0-9]+)\s*([KMGTPEZY]?i?B?|[KMGTPEZY])$/i;
 
-function parseUnit(unitRaw: string | undefined) {
+type ParsedUnit = { base: number; exp: number }; // expliciet type
+
+function parseUnit(unitRaw: string | undefined): ParsedUnit {
   let unit = (unitRaw ?? 'B').trim().toUpperCase();
   if (!unit) unit = 'B';
 
@@ -32,19 +30,20 @@ export function toBytes(value: ByteSizeInput): number {
     if (!Number.isFinite(value)) throw new Error('Number must be finite');
     return value; // already bytes
   }
-  if (typeof value !== 'string') throw new TypeError('Expected string or number');
 
   const s = value.trim().replace(',', '.'); // support "1,5 GB"
   const m = s.match(UNIT_RE);
   if (!m) throw new Error(`Cannot parse size: "${value}"`);
 
-  const num = parseFloat(m[1]);
-  const { base, exp } = parseUnit(m[2]);
+  // dwing vaste groepen af en gebruik non-null assertions
+  const [, numPart, unitPart] = m as [string, string, string, ...string[]];
+  const num = parseFloat(numPart!);
+  const { base, exp } = parseUnit(unitPart!);
   return num * Math.pow(base, exp);
 }
 
 export function sumByteSizes(list: ByteSizeInput[]): number {
-  return list.reduce((acc, v) => acc + toBytes(v), 0);
+  return list.reduce<number>((acc, v) => acc + toBytes(v), 0);
 }
 
 export type FormatOptions = {
@@ -76,7 +75,10 @@ export function formatBytes(bytes: number, opts: FormatOptions = {}): string {
     return `${value.toFixed(decimals)} ${u}`;
   }
 
-  if (Math.abs(bytes) < base) return `${bytes} B`;
+  if (Math.abs(bytes) < base) {
+    // consistente formatting met decimals
+    return `${bytes.toFixed(decimals)} B`;
+  }
   const i = Math.min(
     UNITS.length - 1,
     Math.floor(Math.log(Math.abs(bytes)) / Math.log(base))

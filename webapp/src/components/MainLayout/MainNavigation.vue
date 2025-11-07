@@ -1,47 +1,46 @@
 <template>
   <aside class="main-navigation">
-    <section v-for="(section, sIdx) in projectSections" :key="sIdx">
-      <nav>
-        <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
-        <ul class="flex flex-col gap-0.5">
-          <li v-for="(item, idx) in section.items" :key="idx">
-            <RouterLink
-              :to="item.href"
-              exact-active-class="bg-navy-50"
-              :tabindex="1"
-            >
-              <component :is="item.icon" size="20" />
-              {{ item.label }}
-            </RouterLink>
-          </li>
-        </ul>
-      </nav>
-    </section>
-    <SlashesDivider class="opacity-30 w-full px-2" />
-    <section v-for="(section, sIdx) in vesselSections" :key="sIdx">
-      <nav>
-        <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
-        <ul class="flex flex-col gap-0.5">
-          <li
-            v-for="(item, idx) in section.items"
-            :key="idx"
-          >
-            <RouterLink
-              :to="item.href"
-              exact-active-class="bg-navy-50"
-              :tabindex="1"
-            >
-              <component :is="item.icon" size="20" />
-              {{ item.label }}
-            </RouterLink>
-          </li>
-        </ul>
-      </nav>
-    </section>
+    <div class="main-navigation__sections">
+      <section v-for="(section, sIdx) in projectSections" :key="sIdx">
+        <nav>
+          <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
+          <ul class="flex flex-col gap-0.5">
+            <li v-for="(item, idx) in section.items" :key="idx">
+              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1">
+                <component :is="item.icon" size="20" />
+                {{ item.label }}
+              </RouterLink>
+            </li>
+          </ul>
+        </nav>
+      </section>
+      <SlashesDivider class="opacity-30 w-full px-2" />
+      <section v-for="(section, sIdx) in vesselSections" :key="sIdx">
+        <nav>
+          <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
+          <ul class="flex flex-col gap-0.5">
+            <li v-for="(item, idx) in section.items" :key="idx">
+              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1">
+                <component :is="item.icon" size="20" />
+                {{ item.label }}
+              </RouterLink>
+            </li>
+          </ul>
+        </nav>
+      </section>
+    </div>
+    <div
+      class="flex items-center gap-2 text-sm p-0 text-navy-700 border-t border-tides-300 px-4 py-4"
+    >
+      <div v-if="scopes.indexOf('enterprise') > -1">Enterprise Edition</div>
+      <div v-else>Community Edition</div>
+    </div>
   </aside>
 </template>
 
 <script setup lang="ts">
+import { useLicenseStore } from '@/stores/license.ts'
+
 import {
   ClipboardList,
   CloudUpload,
@@ -62,6 +61,11 @@ import {
   WalletMoney,
 } from '@solar-icons/vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
+
+import { storeToRefs } from 'pinia'
+
+const licenseStore = useLicenseStore()
+const { scopes } = storeToRefs(licenseStore)
 
 const projectSections = [
   {

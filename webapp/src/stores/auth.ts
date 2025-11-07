@@ -33,11 +33,11 @@ export const useAuthStore = defineStore('auth', {
   },
   actions: {
     async setRefreshToken(refreshToken: string) {
-      const licenseStore = useLicenseStore()
-      await licenseStore.fetchLicense()
       this.refreshToken = refreshToken
 
       await this.refreshAccessToken()
+      const licenseStore = useLicenseStore()
+      await licenseStore.fetchLicense()
     },
     async signOut() {
       const projectsStore = useProjectsStore()

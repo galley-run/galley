@@ -42,6 +42,7 @@ import nl.clicqo.ext.setupCorsHandler
 import nl.clicqo.ext.setupDefaultOptionsHandler
 import nl.clicqo.ext.setupDefaultResponse
 import nl.clicqo.ext.setupFailureHandler
+import nl.clicqo.license.LicenseVerticle
 import nl.clicqo.messaging.email.EmailComposer
 import nl.clicqo.messaging.email.EmailComposerCodec
 import nl.clicqo.messaging.email.EmailMessagingVerticle
@@ -149,6 +150,7 @@ class MainVerticle : CoroutineVerticle() {
     val emailConfig = config.getJsonObject("messaging", JsonObject()).getJsonObject("email", JsonObject())
     vertx.deployVerticle(EmailMessagingVerticle(), deploymentOptionsOf(emailConfig)).coAwait()
 
+    vertx.deployVerticle(LicenseVerticle(), deploymentOptions).coAwait()
 
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()

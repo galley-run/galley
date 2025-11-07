@@ -21,8 +21,8 @@ object VesselEngineRegionSql {
       .insertInto(VESSEL_ENGINE_REGIONS)
       .set(
         mapOf(
-          VESSEL_ENGINE_REGIONS.NAME.name to payload.getString(VESSEL_ENGINE_REGIONS.NAME.name),
-          VESSEL_ENGINE_REGIONS.VESSEL_ID.name to payload.getUUID(VESSEL_ENGINE_REGIONS.VESSEL_ID.name),
+          VESSEL_ENGINE_REGIONS.NAME to payload.getString(VESSEL_ENGINE_REGIONS.NAME.name),
+          VESSEL_ENGINE_REGIONS.VESSEL_ID to payload.getUUID(VESSEL_ENGINE_REGIONS.VESSEL_ID.name),
           VESSEL_ENGINE_REGIONS.VESSEL_ENGINE_ID to payload.getUUID(VESSEL_ENGINE_REGIONS.VESSEL_ENGINE_ID.name),
           VESSEL_ENGINE_REGIONS.PROVIDER_NAME to payload.getString(VESSEL_ENGINE_REGIONS.PROVIDER_NAME.name),
           VESSEL_ENGINE_REGIONS.GEO_REGION to payload.getString(VESSEL_ENGINE_REGIONS.GEO_REGION.name)?.let(GeoRegion::valueOf),

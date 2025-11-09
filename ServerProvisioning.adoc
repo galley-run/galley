@@ -1,0 +1,39 @@
+= Server Provisioning
+
+== Outline
+
+*Number of servers:*
+
+- Server 1: controller-1
+- Server 2: worker-1
+
+== On both machines
+
+----
+# Install K0s
+curl -sSf https://get.k0s.sh | sudo sh
+----
+
+== On controller node
+
+----
+sudo su
+mkdir -p /etc/k0s
+k0s config create > /etc/k0s/k0s.yaml
+k0s install controller -c /etc/k0s/k0s.yaml
+k0s start
+k0s status
+k0s token create --role worker --expiry=100h > /tmp/worker.token
+mkdir -p ~/.kube
+sudo k0s kubeconfig admin > ~/.kube/config
+----
+
+== On worker node
+
+----
+# Paste /tmp/worker.token content into a file on the worker node
+sudo k0s install worker --token-file /tmp/worker.token
+sudo k0s start
+sudo k0s status
+----
+

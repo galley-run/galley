@@ -1,6 +1,7 @@
 package run.galley.cloud.data
 
 import io.vertx.core.eventbus.Message
+import io.vertx.core.json.JsonObject
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.data.DataPayload
 import nl.clicqo.data.execute
@@ -11,6 +12,8 @@ import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.factory.VesselEngineFactory
 import run.galley.cloud.sql.VesselEngineSql
+import run.galley.cloud.ws.EventBusAgentRequest
+import run.galley.cloud.ws.VesselEngineAgentTunnel
 
 class VesselEngineDataVerticle : PostgresDataVerticle() {
   companion object {
@@ -32,6 +35,18 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
     val results = pool.execute(VesselEngineSql.getByVesselId(request))
 
     val vesselEngines = results?.map(VesselEngineFactory::from)
+
+    vesselEngines?.forEach { vesselEngine ->
+      // Sync nodes from cluster
+      vertx.eventBus().send(
+        VesselEngineAgentTunnel.GET_NODES,
+        EventBusAgentRequest(
+          vesselEngineId = vesselEngine.id!!,
+          payload = JsonObject(),
+          replyTo = VesselEngineNodeDataVerticle.SYNC_NODES,
+        ),
+      )
+    }
 
     message.reply(EventBusDataResponse(DataPayload.many(vesselEngines)))
   }

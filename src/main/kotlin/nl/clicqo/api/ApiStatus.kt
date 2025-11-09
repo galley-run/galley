@@ -73,6 +73,8 @@ open class ApiStatus : Throwable {
     val CONTENT_TYPE_NOT_DEFINED = ApiStatus(132, "The requested content type is not available", HttpStatus.UnsupportedMediaType)
     val RESPONSE_VALIDATION_FAILED = ApiStatus(140, "The response validation failed", HttpStatus.InternalServerError)
     val MESSAGING_EMAIL_FAILED = ApiStatus(150, "The email couldn't be send")
+    val AGENT_SEND_ACTION_REQUIRED =
+      ApiStatus(160, "An action key is required when sending a message to a Galley Agent")
 
     @Suppress("ktlint:standard:function-naming")
     fun JOOQ_MISSING_REQUIRED_FIELDS(message: String) = ApiStatus(130, "The following fields are missing in the condition: ($message)")

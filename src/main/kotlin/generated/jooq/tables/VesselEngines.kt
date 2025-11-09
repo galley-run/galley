@@ -5,8 +5,10 @@ package generated.jooq.tables
 
 
 import generated.jooq.Public
+import generated.jooq.enums.AgentConnectionStatus
 import generated.jooq.enums.EngineMode
 import generated.jooq.indexes.IDX_ENGINES_VESSEL
+import generated.jooq.indexes.IDX_VESSEL_ENGINES_CONNECTION_STATUS
 import generated.jooq.keys.UQ_ENGINES_VESSEL_NAME
 import generated.jooq.keys.VESSEL_ENGINES_PKEY
 import generated.jooq.keys.VESSEL_ENGINES__FK_ENGINES_VESSEL
@@ -109,6 +111,16 @@ open class VesselEngines(
      */
     val CREATED_AT: TableField<VesselEnginesRecord, OffsetDateTime?> = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
 
+    /**
+     * The column <code>public.vessel_engines.agent_connection_status</code>.
+     */
+    val AGENT_CONNECTION_STATUS: TableField<VesselEnginesRecord, AgentConnectionStatus?> = createField(DSL.name("agent_connection_status"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'disconnected'::agent_connection_status"), SQLDataType.VARCHAR)).asEnumDataType(AgentConnectionStatus::class.java), this, "")
+
+    /**
+     * The column <code>public.vessel_engines.last_connection_error</code>.
+     */
+    val LAST_CONNECTION_ERROR: TableField<VesselEnginesRecord, String?> = createField(DSL.name("last_connection_error"), SQLDataType.CLOB, this, "")
+
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -141,7 +153,7 @@ open class VesselEngines(
         override fun `as`(alias: Table<*>): VesselEnginesPath = VesselEnginesPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_ENGINES_VESSEL)
+    override fun getIndexes(): List<Index> = listOf(IDX_ENGINES_VESSEL, IDX_VESSEL_ENGINES_CONNECTION_STATUS)
     override fun getPrimaryKey(): UniqueKey<VesselEnginesRecord> = VESSEL_ENGINES_PKEY
     override fun getUniqueKeys(): List<UniqueKey<VesselEnginesRecord>> = listOf(UQ_ENGINES_VESSEL_NAME)
     override fun getReferences(): List<ForeignKey<VesselEnginesRecord, *>> = listOf(VESSEL_ENGINES__FK_ENGINES_VESSEL)

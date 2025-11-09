@@ -1,16 +1,21 @@
 package run.galley.cloud.ws
 
 import io.vertx.core.Handler
+import io.vertx.core.Vertx
 import io.vertx.core.http.ServerWebSocket
 import io.vertx.core.http.ServerWebSocketHandshake
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
+import nl.clicqo.ext.getUUID
+import run.galley.cloud.data.VesselEngineNodeDataVerticle
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
-class AgentWebSocketServer {
+class AgentWebSocketServer(
+  val vertx: Vertx,
+) {
   private val logger = LoggerFactory.getLogger(this::class.java)
 
   private data class AgentSession(
@@ -20,10 +25,10 @@ class AgentWebSocketServer {
     var lastPingAt: Long = System.currentTimeMillis(),
   )
 
-  // agentId -> session
+  // vesselEngineId -> session
   private val sessions = ConcurrentHashMap<String, AgentSession>()
 
-  // agentId -> pending commands (JSON-ready maps)
+  // vesselEngineId -> pending commands (JSON-ready maps)
   private val queues = ConcurrentHashMap<String, ConcurrentLinkedQueue<Map<String, Any?>>>()
 
   // simpele anti-abuse: IP → count in huidig tijdslot
@@ -62,17 +67,19 @@ class AgentWebSocketServer {
     }
   }
 
+  fun getSessionSocket(vesselEngineId: UUID): ServerWebSocket? = sessions[vesselEngineId.toString()]?.ws
+
   fun connectionHandler(): Handler<ServerWebSocket> {
     return Handler { ws ->
-      val agentId = ws.headers().get("X-Agent-Id") ?: UUID.randomUUID().toString()
+      val vesselEngineId = ws.headers().get("X-Vessel-Engine-Id") ?: UUID.randomUUID().toString()
       val remoteAddress = ws.remoteAddress()
 
-      logger.info("[WS] New connection: agentId=$agentId from $remoteAddress")
+      logger.info("[WS] New connection: vesselEngineId=$vesselEngineId from $remoteAddress")
 
       val sess = AgentSession(ws, credits = 0)
       // één actieve sessie per agent, oude sluiten
-      sessions.put(agentId, sess)?.let { old ->
-        logger.info("[WS] Closing old session for agentId=$agentId")
+      sessions.put(vesselEngineId, sess)?.let { old ->
+        logger.info("[WS] Closing old session for vesselEngineId=$vesselEngineId")
         try {
           old.ws.close((4000..4009).random().toShort())
         } catch (_: Throwable) {
@@ -80,7 +87,7 @@ class AgentWebSocketServer {
       }
 
       fun drainQueue() {
-        val q = queues[agentId] ?: return
+        val q = queues[vesselEngineId] ?: return
         var drained = 0
         while (sess.credits > 0 && q.peek() != null) {
           val m = q.poll()
@@ -91,50 +98,66 @@ class AgentWebSocketServer {
           drained++
         }
         if (drained > 0) {
-          logger.info("[WS] Drained $drained messages to agentId=$agentId (credits left: ${sess.credits})")
+          logger.info("[WS] Drained $drained messages to vesselEngineId=$vesselEngineId (credits left: ${sess.credits})")
         }
       }
 
       ws.textMessageHandler { text ->
         val obj = JsonObject(text)
         val msgType = obj.getString("type")
-        logger.info("[WS] Received from agentId=$agentId: type=$msgType")
+        logger.info("[WS] Received from vesselEngineId=$vesselEngineId: type=$msgType")
 
         when (msgType) {
           "agent.hello" -> {
             val credits = obj.getJsonObject("payload")?.getInteger("credits") ?: 0
             sess.credits += credits
-            logger.info("[WS] agent.hello from agentId=$agentId with $credits credits (total: ${sess.credits})")
+            logger.info("[WS] agent.hello from vesselEngineId=$vesselEngineId with $credits credits (total: ${sess.credits})")
             drainQueue()
           }
 
           "agent.credits" -> {
             val delta = obj.getJsonObject("payload")?.getInteger("delta") ?: 0
             sess.credits += delta
-            logger.info("[WS] agent.credits from agentId=$agentId: delta=$delta (total: ${sess.credits})")
+            logger.info("[WS] agent.credits from vesselEngineId=$vesselEngineId: delta=$delta (total: ${sess.credits})")
             drainQueue()
           }
 
           "cmd.done" -> {
             val id = obj.getString("id")
             sess.inflight.remove(id)
-            logger.info("[WS] cmd.done from agentId=$agentId: cmdId=$id")
+            logger.info("[WS] cmd.done from vesselEngineId=$vesselEngineId: cmdId=$id")
+
+            val replyTo = obj.getString("action")
+
+            try {
+              vertx.eventBus().send(
+                replyTo,
+                EventBusAgentResponse(
+                  vesselEngineId = obj.getUUID("vesselEngineId") ?: throw Exception("vesselEngineId not given"),
+                  payload = JsonObject(),
+                ),
+              )
+            } catch (e: Exception) {
+              logger.warn("[WS] Error while replying", e)
+            }
+
             // hier kun je doorzetten naar je orchestrator of audit log
           }
+
           // eventueel "cmd.error", "agent.metrics", ... afhandelen
           else -> {
-            logger.warn("[WS] Unknown message type '$msgType' from agentId=$agentId")
+            logger.warn("[WS] Unknown message type '$msgType' from vesselEngineId=$vesselEngineId")
           }
         }
       }
 
       ws.closeHandler {
-        sessions.remove(agentId)
-        logger.info("[WS] Connection closed: agentId=$agentId")
+        sessions.remove(vesselEngineId)
+        logger.info("[WS] Connection closed: vesselEngineId=$vesselEngineId")
       }
 
       ws.exceptionHandler { error ->
-        logger.error("[WS] Exception for agentId=$agentId: ${error.message}")
+        logger.error("[WS] Exception for vesselEngineId=$vesselEngineId: ${error.message}")
         // op WS-fout sluiten we netjes, sessie wordt in closeHandler opgeruimd
         try {
           ws.close()

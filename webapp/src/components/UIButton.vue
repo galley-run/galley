@@ -30,6 +30,19 @@
         'bg-transparent  ring-navy-50 text-navy-700 hover:bg-navy-50 focus:bg-navy-50 active:bg-navy-100 active:ring-navy-100 mx-2.5',
       variant === 'neutral' && !ghost && 'focus:outline-1 outline-offset-1 outline-navy-400',
       variant === 'neutral' && ghost && 'focus:outline-1 outline-offset-1 outline-navy-100',
+      variant === 'destructive' &&
+        !ghost &&
+        'bg-coral-500 text-white hover:bg-coral-600 focus:bg-coral-600 active:bg-coral-700',
+      variant === 'destructive' &&
+        ghost &&
+        $slots.default &&
+        'bg-transparent text-coral-500 hover:bg-coral-50 focus:bg-coral-50 active:bg-coral-100',
+      variant === 'destructive' &&
+        ghost &&
+        !$slots.default &&
+        'bg-transparent  ring-coral-50 text-coral-500 hover:bg-coral-50 focus:bg-coral-50 active:bg-coral-100 active:ring-coral-100 mx-2.5',
+      variant === 'destructive' && !ghost && 'focus:outline-1 outline-offset-1 outline-coral-400',
+      variant === 'destructive' && ghost && 'focus:outline-1 outline-offset-1 outline-coral-100',
       (!ghost || $slots.default) && !large && !small && 'py-2.5 gap-1.5 px-4.25',
       (!ghost || $slots.default) && large && 'text-lg py-3.25 gap-2.5 px-5',
       (!ghost || $slots.default) && small && 'text-sm py-1.75 gap-1.5 px-3.5',
@@ -85,7 +98,7 @@ const {
   ghost?: boolean
   leadingAddon?: FunctionalComponent<IconProps>
   trailingAddon?: FunctionalComponent<IconProps>
-  variant?: 'primary' | 'neutral' | 'custom' | 'icon'
+  variant?: 'primary' | 'neutral' | 'custom' | 'icon' | 'destructive'
 }>()
 
 const emit = defineEmits<{ (e: 'click', event: MouseEvent): void }>()

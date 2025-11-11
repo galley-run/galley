@@ -1,0 +1,96 @@
+= Galley Node Agent
+
+== `galley controller install <node-id>`
+
+1. Upgrades OS with latest patches
+2. Installs k0s
+3. Calls k0s config create
+4. Checks with the platform if it needs to install as controller or controller+worker
+- Note: this call is only available *within 10 minutes* of controller creation in the platform. If too late, the controller needs to be removed from the Galley UI and created as a new controller.
+- temp stores the vessel engine id of this node
+5. Calls `k0s install controller` (optionally also with flag --enable-worker)
+6. Starts K0s
+7. Calls k0s to create worker token
+8. Shows the next step to join a worker (optional when this controller is a controller+worker)
+9. Ask user to execute the following on the worker nodes:
+----
+# To finish your cluster setup add worker nodes by sshing into the worker node and call, you can do this for as many nodes as you like. They'll automatically appear in the Galley UI:
+
+curl -sSf https://galley.run/install.sh | sudo sh
+galley worker join <vessel-engine-id> <worker-token from tmp>
+----
+
+== `galley worker join <vessel-engine-id> <token>`
+
+1. Upgrades OS with latest patches
+2. Stores the token in a tmp file
+3. Installs k0s
+4. Run k0s install worker with the token from the tmp file
+5. Starts k0s
+6. Write the Galley Agent config with the vessel engine id (and optionally a custom platformWsUrl)
+7. Downloads and applies the Galley Agent Deployment scripts
+8. Deletes the tmp file
+
+Once the Galley Agent runs it should call the Galley platform and add the worker nodes to the Vessel Engine
+
+== `galley node provision`
+
+Installs the Galley Node Agent which connects to galley over websockets, it will regularly check with the platform if `provisioning_security_updates` is enabled on the node and updates the schedule according to what is set by the user in the Galley UI.
+
+The Galley Node agent is a small agent that lives in each node that is provisioned.
+Once a node is enabled as provisioning in the UI, the user manually needs to call `galley node provision --node "882A6684-2769-4211-8E98-13236E73B954"` which actually calls the platform to enable provisioning on the node.
+
+== `galley controller invite`
+
+1. Checks if k0s is installed
+2. Checks if k0s is running
+3. Calls k0s to create controller join token
+4. Write the join token to a tmp file
+5. It will show the shell execution for a next controller node to join with something like:
+6. Deletes the tmp file
+
+----
+curl -sSf https://galley.run/install.sh | sudo sh
+galley controller join <vessel-engine-id> <join-token from tmp>
+----
+
+== `galley worker invite`
+
+1. Checks if k0s is installed
+2. Checks if k0s is running
+3. Calls k0s to create worker join token
+4. Write the join token to a tmp file
+5. It will show the shell execution for a next controller node to join with something like:
+6. Deletes the tmp file
+
+----
+curl -sSf https://galley.run/install.sh | sudo sh
+galley worker join <vessel-engine-id> <join-token from tmp>
+----
+
+== `galley controller join <vessel-engine-id> <join-token>`
+
+This will:
+
+1. Upgrades OS with latest patches
+2. Stores the token in a tmp file
+3. install k0s
+4. calls k0s controller <join-token>
+5. Starts k0s
+6. Calls galley platform to let it know a controller has been added for the vessel engine
+7. Deletes the tmp file
+
+== `galley config set <key> <value>`
+
+The following keys are available:
+
+The config will be stored in a `~/.galley.config` file of the logged in user.
+
+- `platform-url`, the value can be something like `api.galley.run` and will customise any call made to the Galley platform from now on
+
+== Flags
+
+Any call can have the following flags:
+
+- `--platform-url "api.galley.run"` This will let the agents know to use a different platform url for the specific call
+- `--config "./galley"` If you want to store the galley configs in a custom file, you can let the commands know to look for a different file

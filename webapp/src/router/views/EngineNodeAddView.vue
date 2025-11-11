@@ -120,10 +120,10 @@
               description="Make this node dedicated for high IOPS and memory intensive workloads."
             />
           </div>
-          <label
-            >Separate apps and databases to improve performance, reliability, and security, or run
-            both on the same node for simplicity in small setups.</label
-          >
+          <label>
+            Separate apps and databases to improve performance, reliability, and security, or run
+            both on the same node for simplicity in small setups.
+          </label>
         </UIFormField>
       </div>
 
@@ -171,7 +171,8 @@
         <UICodeLine comment>Install Galley Node Agent (as root)</UICodeLine>
         <UICodeLine>curl -sSf https://galley.run/install.sh | sh</UICodeLine>
         <UICodeLine empty />
-        <UICodeLine>galley connect --node “03260D35-C0C0-4AA9-9F72-1620B02CC9D5” --pubkey “ssh-ed...ACTUAL PUB KEY...” --platform-url “cloud.galley.run”</UICodeLine>
+<!--        <UICodeLine>galley connect &#45;&#45;node “03260D35-C0C0-4AA9-9F72-1620B02CC9D5” &#45;&#45;pubkey “ssh-ed...ACTUAL PUB KEY...” &#45;&#45;platform-url “cloud.galley.run”</UICodeLine>-->
+        <UICodeLine>galley setup-controller --vessel "{{selectedVesselId}}" --node "A049DBBC-7023-4CBC-8DBF-205EA163A490" </UICodeLine>
       </UICodeBlock>
 
       <div class="card__footer form-footer">

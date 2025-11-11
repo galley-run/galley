@@ -129,9 +129,9 @@
 
       <SlashesDivider class="opacity-30 mb-6" />
 
-      <h6>Provisioning</h6>
+      <h6 v-if="featureProvisioningEnabled">Provisioning</h6>
 
-      <div class="grid xl:grid-cols-4 gap-8">
+      <div class="grid xl:grid-cols-4 gap-8" v-if="featureProvisioningEnabled">
         <UIFormField>
           <UILabel for="provisioning">Automatic Provisioning</UILabel>
           <UIToggle
@@ -167,6 +167,13 @@
         </UIFormField>
       </div>
 
+      <UICodeBlock title="Run this on your node">
+        <UICodeLine comment>Install Galley Node Agent (as root)</UICodeLine>
+        <UICodeLine>curl -sSf https://galley.run/install.sh | sh</UICodeLine>
+        <UICodeLine empty />
+        <UICodeLine>galley connect --node “03260D35-C0C0-4AA9-9F72-1620B02CC9D5” --pubkey “ssh-ed...ACTUAL PUB KEY...” --platform-url “cloud.galley.run”</UICodeLine>
+      </UICodeBlock>
+
       <div class="card__footer form-footer">
         <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/vessel/engine"
           >Back to engine
@@ -201,6 +208,8 @@ import { ArrowLeft, Key } from '@solar-icons/vue'
 import UIRadioButton from '@/components/FormField/UIRadioButton.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
 import UIToggle from '@/components/FormField/UIToggle.vue'
+import UICodeBlock from '@/components/CodeBlock/UICodeBlock.vue'
+import UICodeLine from '@/components/CodeBlock/UICodeLine.vue'
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
@@ -235,6 +244,8 @@ const deploy = ref('')
 const sshKey = ref('')
 const region = computed(() => regions.value?.[0]?.value)
 const provisioning = ref(true)
+
+const featureProvisioningEnabled = ref(false)
 
 watch(nodeType, (value) => {
   if (value === 'controller') {

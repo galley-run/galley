@@ -8,6 +8,16 @@
   --font-sans: 'DM Sans', sans-serif;
   --font-mono: 'DM Mono', sans-serif;
 
+  --animate-fade-flash: fade-flash 1.5s ease-in-out;
+    @keyframes fade-flash {
+      0%, 100% {
+        opacity: 0;
+      }
+      25%, 75% {
+        opacity: 0.9;
+      }
+    }
+
   /* Galley Colors - Light Mode */
   --color-coral-50: oklch(0.918 0.034 31.159);
   --color-coral-100: oklch(0.879 0.052 28.463);
@@ -214,7 +224,7 @@
     }
 
     .card__footer {
-      @apply border-t border-t-tides-300 -mx-8 pt-5 -mb-3 px-6 flex items-center;
+      @apply border-t border-t-tides-300 -mx-8 pt-5 -mb-3 px-6 flex items-center mt-6;
 
       > :first-child {
         @apply mr-auto;

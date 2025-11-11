@@ -167,14 +167,14 @@
 
 @layer components {
   .main-navigation {
-    @apply bg-white flex flex-col justify-between;
+    @apply bg-white flex flex-col justify-between min-w-52;
 
     .main-navigation__sections {
       @apply border-r border-r-tides-200 px-4 py-6 gap-6 flex flex-col;
 
       li {
         a, button {
-          @apply flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative focus:bg-navy-50 focus:outline-1 outline-offset-1 outline-navy-100;
+          @apply flex items-center gap-2 text-navy-800 hover:bg-navy-50 rounded-lg py-1.5 px-2 relative focus:bg-navy-50 focus:outline-1 outline-offset-1 outline-navy-100 aria-disabled:opacity-30 aria-disabled:pointer-events-none;
         }
       }
     }
@@ -211,6 +211,19 @@
       div:last-of-type {
         @apply flex items-center;
       }
+    }
+
+    .card__footer {
+      @apply border-t border-t-tides-300 -mx-8 pt-5 -mb-3 px-6 flex items-center;
+
+      > :first-child {
+        @apply mr-auto;
+      }
+
+      > :only-child {
+        @apply ml-auto mr-0;
+      }
+    ;
     }
   }
 
@@ -249,6 +262,10 @@
         }
       }
     }
+  }
+
+  span.fi {
+    @apply rounded-sm;
   }
 
   .badge {
@@ -290,12 +307,16 @@
       @apply ml-0.75;
     }
 
-    label:not(:first-child) {
-      @apply text-tides-800 text-sm mx-0.75;
+    label {
+      @apply group-aria-disabled:opacity-30;
     }
 
     label.form-field__error-message {
-      @apply group-has-[:user-invalid]:block hidden text-coral-500;
+      @apply group-has-[:user-invalid]:block hidden text-coral-500 text-sm mx-0.75;
+    }
+
+    label:not(.form-field__error-message):not(:first-child):not(:has(> input)) {
+      @apply text-tides-800 text-sm mx-0.75;
     }
   }
 
@@ -320,7 +341,7 @@
     @apply border bg-white w-full border-tides-600 rounded-lg px-3 py-0 has-focus-within:border-navy-700/50 hover:outline-1 has-focus-within:outline-1 focus:border-navy-700/50 focus:outline-1 outline-navy-100 outline-offset-1  has-[:user-invalid]:bg-red-50  has-[:user-invalid]:border-red-200;
 
     input {
-      @apply py-2.5 form-field-input-value w-full outline-none;
+      @apply py-2.5 form-field-input-value h-10 w-full outline-none;
 
       &:-webkit-autofill,
       &:-webkit-autofill:hover,
@@ -356,6 +377,26 @@
       @apply border-l border-tides-600 ml-3 pl-3;
     }
   }
+
+  .dropdown {
+    @apply border bg-white w-full border-tides-600 rounded-lg px-3 py-0 has-focus-within:border-navy-700/50 hover:outline-1 has-focus-within:outline-1 focus:border-navy-700/50 focus:outline-1 outline-navy-100 outline-offset-1  has-[:user-invalid]:bg-red-50  has-[:user-invalid]:border-red-200;
+
+    div:not(:last-child):first-of-type {
+      @apply border-r border-tides-600 mr-3 pr-3;
+    }
+
+    svg:not(:first-child):last-of-type {
+      @apply ml-3;
+    }
+
+    div:not(:first-child):last-of-type {
+      @apply border-l border-tides-600 ml-3 pl-3;
+    }
+  }
+
+  .dropdown__trailing-addon {
+    @apply form-field-input-value text-tides-700
+  }
 }
 
 @utility heading-h1 {
@@ -387,11 +428,11 @@
 }
 
 @utility form-field-help {
-  @apply font-sans text-sm font-medium tracking-[-0.02em] leading-[1.4];
+  @apply font-sans text-base font-medium tracking-[-0.02em] leading-5;
 }
 
 @utility form-field-input-value {
-  @apply font-sans text-base font-normal tracking-[-0.02em] leading-none;
+  @apply font-sans text-base font-normal tracking-[-0.02em] leading-5;
 }
 
 @utility form-field-dropdown-value {
@@ -403,7 +444,7 @@
 }
 
 @utility form-field-label-bold {
-  @apply font-sans text-sm font-semibold tracking-[-0.02em] leading-[1.4];
+  @apply font-sans text-base font-bold tracking-[-0.02em] leading-5;
 }
 
 @utility min-h-main {

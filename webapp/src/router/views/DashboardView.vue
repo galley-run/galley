@@ -6,7 +6,7 @@
         <a href="https://analytics.clicqo.nl" target="_blank">https://analytics.clicqo.nl</a>
       </DashboardCard>
       <DashboardCard title="Region">
-        <FlagIcon code="nl" :size="16" class="rounded-sm" />
+        <FlagIcon code="nl" :size="16" />
         <div>AMS1</div>
       </DashboardCard>
       <DashboardCard title="Health Check">

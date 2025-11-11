@@ -6,7 +6,7 @@
           <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
           <ul class="flex flex-col gap-0.5">
             <li v-for="(item, idx) in section.items" :key="idx">
-              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1">
+              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1" :aria-disabled="item.disabled">
                 <component :is="item.icon" size="20" />
                 {{ item.label }}
               </RouterLink>
@@ -20,7 +20,7 @@
           <h6 class="text-tides-800 px-2 pb-2">{{ section.label }}</h6>
           <ul class="flex flex-col gap-0.5">
             <li v-for="(item, idx) in section.items" :key="idx">
-              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1">
+              <RouterLink :to="item.href" exact-active-class="bg-navy-50" :tabindex="1" :aria-disabled="item.disabled">
                 <component :is="item.icon" size="20" />
                 {{ item.label }}
               </RouterLink>
@@ -72,32 +72,32 @@ const projectSections = [
     label: 'The Galley',
     items: [
       { icon: PresentationGraph, label: 'Dashboard', href: '/' },
-      { icon: Routing3, label: 'Gateway', href: '/gateway' },
-      { icon: Server2, label: 'Applications', href: '/applications' },
-      { icon: Database, label: 'Databases', href: '/databases' },
-      { icon: FolderWithFiles, label: 'Object Storage', href: '/object-storage' },
+      { icon: Routing3, label: 'Gateway', href: '/gateway', disabled: true, },
+      { icon: Server2, label: 'Applications', href: '/applications', disabled: true, },
+      { icon: Database, label: 'Databases', href: '/databases', disabled: true, },
+      { icon: FolderWithFiles, label: 'Object Storage', href: '/object-storage', disabled: true, },
     ],
   },
   {
     label: 'The Pantry',
     items: [
-      { icon: Password, label: 'Secrets', href: '/secrets' },
-      { icon: ClipboardList, label: 'Configs', href: '/configs' },
+      { icon: Password, label: 'Secrets', href: '/secrets', disabled: true, },
+      { icon: ClipboardList, label: 'Configs', href: '/configs', disabled: true, },
     ],
   },
   {
     label: "Captain's Quarters",
     items: [
-      { icon: CloudUpload, label: 'Releases', href: '/releases' },
-      { icon: Graph, label: 'Monitoring', href: '/monitoring' },
+      { icon: CloudUpload, label: 'Releases', href: '/releases', disabled: true, },
+      { icon: Graph, label: 'Monitoring', href: '/monitoring', disabled: true, },
     ],
   },
   {
     label: 'Below Deck',
     items: [
-      { icon: LinkCircle, label: 'Networking', href: '/networking' },
-      { icon: CodeFile, label: 'Automations', href: '/automations' },
-      { icon: Settings, label: 'Settings', href: '/settings' },
+      { icon: LinkCircle, label: 'Networking', href: '/networking', disabled: true, },
+      { icon: CodeFile, label: 'Automations', href: '/automations', disabled: true, },
+      { icon: Settings, label: 'Settings', href: '/settings', disabled: true, },
     ],
   },
 ]
@@ -106,18 +106,18 @@ const vesselSections = [
   {
     label: 'Charter',
     items: [
-      { icon: Settings, label: 'Settings', href: '/charter/settings' },
-      { icon: WalletMoney, label: 'Billing', href: '/charter/billing' },
+      { icon: Settings, label: 'Settings', href: '/charter/settings', disabled: true, },
+      { icon: WalletMoney, label: 'Billing', href: '/charter/billing', disabled: true, },
       { icon: ServerSquareCloud, label: 'Compute Plans', href: '/charter/compute-plans' },
-      { icon: Diploma, label: 'Compliance', href: '/charter/compliance' },
-      { icon: UsersGroupTwoRounded, label: 'Crew', href: '/charter/crew' },
+      { icon: Diploma, label: 'Compliance', href: '/charter/compliance', disabled: true, },
+      { icon: UsersGroupTwoRounded, label: 'Crew', href: '/charter/crew', disabled: true, },
     ],
   },
   {
     label: 'Vessel',
     items: [
-      { icon: Settings, label: 'Settings', href: '/vessel/settings' },
-      { icon: WalletMoney, label: 'Billing', href: '/vessel/billing' },
+      { icon: Settings, label: 'Settings', href: '/vessel/settings', disabled: true, },
+      { icon: WalletMoney, label: 'Billing', href: '/vessel/billing', disabled: true, },
       { icon: ServerPath, label: 'Engine', href: '/vessel/engine' },
     ],
   },

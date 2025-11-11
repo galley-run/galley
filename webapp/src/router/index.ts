@@ -14,6 +14,7 @@ import {useAuthStore} from '@/stores/auth.ts'
 import LoginLayout from '@/router/layouts/LoginLayout.vue'
 import LoginView from '@/router/views/Login/LoginView.vue'
 import LogoutView from '@/router/views/Login/LogoutView.vue'
+import EngineNodeAddView from '@/router/views/EngineNodeAddView.vue'
 
 const routes = [
   {
@@ -48,6 +49,7 @@ const routes = [
       { path: '', component: DashboardView },
       { path: '/charter/compute-plans', component: ComputePlansView },
       { path: '/vessel/engine', component: EngineView },
+      { path: '/vessel/engine/node/add', component: EngineNodeAddView }
     ],
   },
 ]

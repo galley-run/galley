@@ -46,7 +46,6 @@
             Already running k0s? Connect your cluster with the lightweight Galley Agent. Deploy apps
             and databases for your tenants without giving up server control.
           </p>
-          <p class="italic">(Currently unavailable)</p>
         </div>
       </div>
     </div>
@@ -65,8 +64,18 @@
         <div class="card__header">
           <h2>Nodes</h2>
           <div>
-            <UIButton ghost :leading-addon="DocumentsMinimalistic" disabled title="Visualise nodes" />
-            <UIButton ghost :leading-addon="AddCircle" disabled title="Add node" />
+            <UIButton
+              ghost
+              :leading-addon="DocumentsMinimalistic"
+              disabled
+              title="Visualise nodes"
+            />
+            <UIButton
+              ghost
+              :leading-addon="AddCircle"
+              title="Add node"
+              to="/vessel/engine/node/add"
+            />
           </div>
         </div>
         <div class="stacked-list" v-if="engineNodes">
@@ -77,7 +86,7 @@
           >
             <div>
               <div class="flex items-center gap-2">
-                <FlagIcon code="nl" :size="16" class="rounded-sm" />
+                <FlagIcon code="nl" :size="16" />
                 <div>{{ node.attributes.name }}</div>
                 <!--                <div class="badge badge&#45;&#45;small">Ready</div>-->
               </div>
@@ -91,7 +100,6 @@
               <p class="text-tides-700" v-if="regions">
                 <!--                AMS1-->
                 {{ regions[node.attributes.vesselEngineRegionId].name }}
-
               </p>
             </div>
             <div>
@@ -129,7 +137,7 @@
           >
             <div>
               <div class="flex items-center gap-2">
-                <FlagIcon :code="region.attributes.locationCountry" :size="16" class="rounded-sm" />
+                <FlagIcon :code="region.attributes.locationCountry" :size="16" />
                 <!--                FIX COUNTRY FLAG WITH LOCATION NAME IN THE FUTURE, FOR NOW USE COUNTRY CODE AS FLAG-->
                 <div>{{ region.attributes.name }}</div>
                 <div class="badge badge--small badge--navy">{{ region.attributes.geoRegion }}</div>
@@ -164,43 +172,12 @@ import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
 import { computed } from 'vue'
-import UISkeleton from '@/components/FormField/UISkeleton.vue'
-import {formatBytes, sumByteSizes} from "@/utils/bytes.ts";
+import { formatBytes, sumByteSizes } from '@/utils/bytes.ts'
+import type { ApiResponse } from '@/types/api'
+import type { EngineNodeSummary, EngineRegionSummary, EngineSummary } from '@/types/api/engine'
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
-
-interface EngineSummary {
-  name: string
-  mode: string
-}
-
-interface EngineNodeSummary {
-  name: string
-  ipAddress: string
-  nodeType: string
-  deployMode: string
-  cpu: string
-  memory: string
-  storage: string
-  vesselEngineRegionId: string
-  provisioning: string
-  deployTarget: string
-}
-
-interface EngineRegionSummary {
-  name: string
-  providerName: string
-  geoRegion: string
-  locationCity: string
-  locationCountry: string
-}
-
-interface ApiResponse<T> {
-  id: string
-  type: string
-  attributes: T
-}
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: !!selectedVesselId?.value,
@@ -236,8 +213,13 @@ const regions = computed(() => {
     return acc
   }, {})
 })
-const totalCpu = computed(() => engineNodes.value?.reduce((acc, node) => acc + Number(node.attributes.cpu ?? 0), 0))
-const totalMemoryBytes = computed(() => sumByteSizes(engineNodes.value?.map(node => node.attributes.memory) ?? []));
-const totalMemory  = computed(() => formatBytes(totalMemoryBytes.value, { iec: false, decimals: 1, unit: 'GB' }));  // "MB/GB"
-
+const totalCpu = computed(() =>
+  engineNodes.value?.reduce((acc, node) => acc + Number(node.attributes.cpu ?? 0), 0),
+)
+const totalMemoryBytes = computed(() =>
+  sumByteSizes(engineNodes.value?.map((node) => node.attributes.memory) ?? []),
+)
+const totalMemory = computed(() =>
+  formatBytes(totalMemoryBytes.value, { iec: false, decimals: 1, unit: 'GB' }),
+) // "MB/GB"
 </script>

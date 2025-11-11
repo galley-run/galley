@@ -136,22 +136,48 @@
           <UILabel for="provisioning">Automatic Provisioning</UILabel>
           <UIToggle
             id="domainName"
+            :disabled="!domainName || !ipAddress"
             label="Let Galley to automatically manage and provision this node"
             v-model="provisioning"
           />
-          <label for="domainName">
-            A freshly installed server (or VPS) is necessary. We recommend to use Ubuntu Server LTS as OS.
+          <label for="provisioning" v-if="!domainName || !ipAddress"
+            >A valid domain name and IP address are required to enable automatic
+            provisioning.</label
+          >
+          <label for="provisioning" v-else>
+            A freshly installed server (or VPS) is necessary. We recommend to use Ubuntu Server LTS
+            as OS.
           </label>
+        </UIFormField>
+        <UIFormField v-if="provisioning">
+          <UILabel for="sshKey">SSH Key</UILabel>
+          <UIDropDown
+            id="sshKey"
+            v-model="sshKey"
+            :items="[
+              /** Add other ssh keys here */
+              { label: 'Create new SSH key', value: 'create' },
+            ]"
+            placeholder="Select or create SSH key"
+          >
+            <template #buttonLeadingAddon>
+              <Key class="shrink-0" />
+            </template>
+          </UIDropDown>
         </UIFormField>
       </div>
 
       <div class="card__footer form-footer">
         <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/vessel/engine"
-          >Back to engine</UIButton
-        >
+          >Back to engine
+        </UIButton>
+        <UIButton :disabled="isPending" ghost variant="destructive"
+          >Delete this node
+        </UIButton>
         <UIButton :disabled="isPending" type="submit"
-          >Sign in <LoadingIndicator v-if="isPending"
-        /></UIButton>
+          >Add this node to your engine
+          <LoadingIndicator v-if="isPending" />
+        </UIButton>
       </div>
     </div>
   </form>
@@ -171,9 +197,10 @@ import type { ApiResponse } from '@/types/api'
 import type { EngineRegionSummary } from '@/types/api/engine'
 import UIButton from '@/components/UIButton.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
-import { ArrowLeft } from '@solar-icons/vue'
+import { ArrowLeft, Key } from '@solar-icons/vue'
 import UIRadioButton from '@/components/FormField/UIRadioButton.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
+import UIToggle from '@/components/FormField/UIToggle.vue'
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
@@ -201,16 +228,24 @@ const regions = computed(
     })) ?? [],
 )
 
-const domainName = ref('')
-const ipAddress = ref('')
+const domainName = ref('app.cloud.run')
+const ipAddress = ref('4')
 const nodeType = ref('controller')
 const deploy = ref('')
+const sshKey = ref('')
 const region = computed(() => regions.value?.[0]?.value)
-const provisioning = ref(false)
+const provisioning = ref(true)
 
 watch(nodeType, (value) => {
   if (value === 'controller') {
     deploy.value = ''
+  }
+})
+
+watch(sshKey, (value) => {
+  if (value === 'create') {
+    // start loader, create new ssh key in the background, reload keys and select the newly created one
+    alert('Create SSH key')
   }
 })
 

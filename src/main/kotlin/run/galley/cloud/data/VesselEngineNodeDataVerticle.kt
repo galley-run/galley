@@ -9,9 +9,11 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.k8s.parsers.K8sParserNodeList
 import run.galley.cloud.model.factory.VesselEngineNodeFactory
 import run.galley.cloud.sql.VesselEngineNodeSql
 import run.galley.cloud.ws.EventBusAgentRequest
+import run.galley.cloud.ws.EventBusAgentResponse
 
 class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
   companion object {
@@ -50,8 +52,10 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }
 
-  private suspend fun syncNodes(message: Message<EventBusAgentRequest>) {
+  private suspend fun syncNodes(message: Message<EventBusAgentResponse>) {
     val request = message.body()
-    println(request.toSocketMessage())
+
+    val nodes = K8sParserNodeList(request.payload).nodes
+    println(nodes)
   }
 }

@@ -120,6 +120,7 @@ val IDX_USER_IDENTITIES_EMAIL_TRGM: Index = Internal.createIndex(DSL.name("idx_u
 val IDX_USER_IDENTITIES_PROVIDER_SUBJECT: Index = Internal.createIndex(DSL.name("idx_user_identities_provider_subject"), UserIdentities.USER_IDENTITIES, arrayOf(UserIdentities.USER_IDENTITIES.PROVIDER, UserIdentities.USER_IDENTITIES.SUBJECT), false)
 val IDX_USER_IDENTITIES_USER_PROVIDER: Index = Internal.createIndex(DSL.name("idx_user_identities_user_provider"), UserIdentities.USER_IDENTITIES, arrayOf(UserIdentities.USER_IDENTITIES.USER_ID, UserIdentities.USER_IDENTITIES.PROVIDER), false)
 val IDX_USERS_EMAIL_TRGM: Index = Internal.createIndex(DSL.name("idx_users_email_trgm"), Users.USERS, arrayOf(Users.USERS.EMAIL), false)
+val IDX_VESSEL_ENGINES_CONNECTION_STATUS: Index = Internal.createIndex(DSL.name("idx_vessel_engines_connection_status"), VesselEngines.VESSEL_ENGINES, arrayOf(VesselEngines.VESSEL_ENGINES.AGENT_CONNECTION_STATUS), false)
 val IDX_VESSELS_USER: Index = Internal.createIndex(DSL.name("idx_vessels_user"), Vessels.VESSELS, arrayOf(Vessels.VESSELS.USER_ID), false)
 val IDX_WEBAUTHN_USER: Index = Internal.createIndex(DSL.name("idx_webauthn_user"), WebauthnCredentials.WEBAUTHN_CREDENTIALS, arrayOf(WebauthnCredentials.WEBAUTHN_CREDENTIALS.USER_ID), false)
 val IDX_WEBHOOK_DELIVERIES_EVENT: Index = Internal.createIndex(DSL.name("idx_webhook_deliveries_event"), WebhookDeliveries.WEBHOOK_DELIVERIES, arrayOf(WebhookDeliveries.WEBHOOK_DELIVERIES.OUTBOX_EVENT_ID), false)

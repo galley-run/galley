@@ -9,13 +9,17 @@ import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.k8s.parsers.K8sParserNodeList
 import run.galley.cloud.model.factory.VesselEngineNodeFactory
 import run.galley.cloud.sql.VesselEngineNodeSql
+import run.galley.cloud.ws.EventBusAgentRequest
+import run.galley.cloud.ws.EventBusAgentResponse
 
 class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
   companion object {
     const val CREATE = "data.vessel.engine.node.cmd.create"
     const val LIST_BY_VESSEL_ID = "data.vessel.engine.node.query.list_by_vessel_id"
+    const val SYNC_NODES = "data.vessel.engine.node.cmd.sync_nodes"
   }
 
   override suspend fun start() {
@@ -24,6 +28,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     coroutineEventBus {
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
       vertx.eventBus().coConsumer(LIST_BY_VESSEL_ID, handler = ::listByVesselId)
+      vertx.eventBus().coConsumer(SYNC_NODES, handler = ::syncNodes)
     }
   }
 
@@ -45,5 +50,12 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
+  }
+
+  private suspend fun syncNodes(message: Message<EventBusAgentResponse>) {
+    val request = message.body()
+
+    val nodes = K8sParserNodeList(request.payload).nodes
+    println(nodes)
   }
 }

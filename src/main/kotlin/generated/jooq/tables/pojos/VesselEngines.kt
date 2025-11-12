@@ -4,6 +4,7 @@
 package generated.jooq.tables.pojos
 
 
+import generated.jooq.enums.AgentConnectionStatus
 import generated.jooq.enums.EngineMode
 
 import java.io.Serializable
@@ -22,7 +23,9 @@ data class VesselEngines(
     var vesselId: UUID? = null,
     var name: String? = null,
     var mode: EngineMode? = null,
-    var createdAt: OffsetDateTime? = null
+    var createdAt: OffsetDateTime? = null,
+    var agentConnectionStatus: AgentConnectionStatus? = null,
+    var lastConnectionError: String? = null
 ): BaseModel, Serializable {
 
 
@@ -64,6 +67,18 @@ data class VesselEngines(
         }
         else if (this.createdAt != o.createdAt)
             return false
+        if (this.agentConnectionStatus == null) {
+            if (o.agentConnectionStatus != null)
+                return false
+        }
+        else if (this.agentConnectionStatus != o.agentConnectionStatus)
+            return false
+        if (this.lastConnectionError == null) {
+            if (o.lastConnectionError != null)
+                return false
+        }
+        else if (this.lastConnectionError != o.lastConnectionError)
+            return false
         return true
     }
 
@@ -75,6 +90,8 @@ data class VesselEngines(
         result = prime * result + (if (this.name == null) 0 else this.name.hashCode())
         result = prime * result + (if (this.mode == null) 0 else this.mode.hashCode())
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.agentConnectionStatus == null) 0 else this.agentConnectionStatus.hashCode())
+        result = prime * result + (if (this.lastConnectionError == null) 0 else this.lastConnectionError.hashCode())
         return result
     }
 
@@ -86,6 +103,8 @@ data class VesselEngines(
         sb.append(", ").append(name)
         sb.append(", ").append(mode)
         sb.append(", ").append(createdAt)
+        sb.append(", ").append(agentConnectionStatus)
+        sb.append(", ").append(lastConnectionError)
 
         sb.append(")")
         return sb.toString()

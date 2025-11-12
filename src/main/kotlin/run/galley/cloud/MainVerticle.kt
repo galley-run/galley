@@ -13,12 +13,7 @@ import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.core.net.PemKeyCertOptions
-import io.vertx.ext.auth.PubSecKeyOptions
-import io.vertx.ext.auth.authentication.TokenCredentials
-import io.vertx.ext.auth.jwt.JWTAuth
-import io.vertx.ext.auth.jwt.JWTAuthOptions
 import io.vertx.ext.web.Router
-import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.handler.BodyHandler
 import io.vertx.ext.web.handler.HttpException
 import io.vertx.ext.web.handler.StaticHandler
@@ -68,6 +63,12 @@ import run.galley.cloud.data.VesselEngineRegionDataVerticle
 import run.galley.cloud.db.FlywayMigrationVerticle
 import run.galley.cloud.model.BaseModel
 import run.galley.cloud.web.OpenApiBridge
+import run.galley.cloud.ws.AgentWebSocketServer
+import run.galley.cloud.ws.EventBusAgentRequest
+import run.galley.cloud.ws.EventBusAgentRequestCodec
+import run.galley.cloud.ws.EventBusAgentResponse
+import run.galley.cloud.ws.EventBusAgentResponseCodec
+import run.galley.cloud.ws.VesselEngineAgentTunnel
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -78,6 +79,8 @@ class MainVerticle : CoroutineVerticle() {
     vertx.eventBus().registerDefaultCodec(EventBusApiResponse::class.java, EventBusApiResponseCodec())
     vertx.eventBus().registerDefaultCodec(EventBusCmdDataRequest::class.java, EventBusCmdDataRequestCodec())
     vertx.eventBus().registerDefaultCodec(EventBusQueryDataRequest::class.java, EventBusQueryDataRequestCodec())
+    vertx.eventBus().registerDefaultCodec(EventBusAgentRequest::class.java, EventBusAgentRequestCodec())
+    vertx.eventBus().registerDefaultCodec(EventBusAgentResponse::class.java, EventBusAgentResponseCodec())
     @Suppress("UNCHECKED_CAST")
     vertx.eventBus().registerDefaultCodec(
       EventBusDataResponse::class.java,
@@ -152,6 +155,10 @@ class MainVerticle : CoroutineVerticle() {
 
     vertx.deployVerticle(LicenseVerticle(), deploymentOptions).coAwait()
 
+    // Initialize WebSocket server
+    val agentWebSocketServer = AgentWebSocketServer(vertx)
+    VesselEngineAgentTunnel(vertx, agentWebSocketServer, coroutineContext)
+
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(UserDataVerticle(), deploymentOptions).coAwait()
@@ -201,14 +208,16 @@ class MainVerticle : CoroutineVerticle() {
         }
 
     try {
-      // Start to run the HTTP server
+      // Start to run the HTTP server with WebSocket support
       vertx
         .createHttpServer(httpServerOptions)
+        .webSocketHandshakeHandler(agentWebSocketServer.handshakeHandler())
+        .webSocketHandler(agentWebSocketServer.connectionHandler())
         .requestHandler(mainRouter)
         .listen()
         .coAwait()
 
-      logger.info("HTTP server started on port $httpPort")
+      logger.info("HTTP server started on port $httpPort with WebSocket support")
     } catch (e: Exception) {
       logger.error("HTTP server failed to start on port $httpPort", e)
       throw e

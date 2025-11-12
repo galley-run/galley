@@ -4,6 +4,7 @@
 package generated.jooq.tables.records
 
 
+import generated.jooq.enums.AgentConnectionStatus
 import generated.jooq.enums.EngineMode
 import generated.jooq.tables.VesselEngines
 
@@ -40,6 +41,14 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
         set(value): Unit = set(4, value)
         get(): OffsetDateTime? = get(4) as OffsetDateTime?
 
+    open var agentConnectionStatus: AgentConnectionStatus?
+        set(value): Unit = set(5, value)
+        get(): AgentConnectionStatus? = get(5) as AgentConnectionStatus?
+
+    open var lastConnectionError: String?
+        set(value): Unit = set(6, value)
+        get(): String? = get(6) as String?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -49,12 +58,14 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
     /**
      * Create a detached, initialised VesselEnginesRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, name: String? = null, mode: EngineMode? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, name: String? = null, mode: EngineMode? = null, createdAt: OffsetDateTime? = null, agentConnectionStatus: AgentConnectionStatus? = null, lastConnectionError: String? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.name = name
         this.mode = mode
         this.createdAt = createdAt
+        this.agentConnectionStatus = agentConnectionStatus
+        this.lastConnectionError = lastConnectionError
         resetTouchedOnNotNull()
     }
 
@@ -68,6 +79,8 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
             this.name = value.name
             this.mode = value.mode
             this.createdAt = value.createdAt
+            this.agentConnectionStatus = value.agentConnectionStatus
+            this.lastConnectionError = value.lastConnectionError
             resetTouchedOnNotNull()
         }
     }

@@ -866,6 +866,20 @@ components:
                   description: Engine operation mode
                   examples:
                     - managed_engine
+                agentConnectionStatus:
+                  type: string
+                  enum:
+                    - connected
+                    - disconnected
+                    - error
+                  description: Show connection with agent.
+                  examples:
+                    - disconnected
+                lastConnectionError:
+                  type:
+                    - string
+                    - 'null'
+                  description: Shows what failure was registered last time the connection noticed an error
     BillingProfileCreate:
       type: object
       description: Request body for POST /billing-profiles.

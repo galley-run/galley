@@ -16,7 +16,7 @@ data class EventBusAgentRequest(
     }
 
     return JsonObject()
-      .put("vesselEngineId", vesselEngineId)
+      .put("vesselEngineId", vesselEngineId.toString())
       .put("action", action)
       .put("payload", payload)
       .put("replyTo", replyTo)

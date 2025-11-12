@@ -9,6 +9,7 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.applyConditions
 import nl.clicqo.ext.getUUID
 import nl.clicqo.ext.keysToSnakeCase
+import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
 import run.galley.cloud.ApiStatus
@@ -47,6 +48,16 @@ object VesselEngineNodeSql {
 
     return Jooq.postgres
       .selectFrom(VESSEL_ENGINE_NODES)
+      .applyConditions(*conditions)
+  }
+
+  fun get(request: EventBusQueryDataRequest): Query {
+    val conditions = buildConditions(request.filters)
+    val id = request.identifiers["id"]?.toUUID() ?: throw ApiStatus.ID_MISSING
+
+    return Jooq.postgres
+      .selectFrom(VESSEL_ENGINE_NODES)
+      .where(VESSEL_ENGINE_NODES.ID.eq(id))
       .applyConditions(*conditions)
   }
 

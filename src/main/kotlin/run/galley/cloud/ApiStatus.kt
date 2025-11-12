@@ -63,4 +63,7 @@ object ApiStatus {
 
   val VESSEL_ENGINE_ID_INCORRECT = ApiStatus(2200, "The Vessel engine id is incorrect")
   val VESSEL_ENGINE_NOT_FOUND = ApiStatus(2201, "The Vessel engine not found", HttpStatus.NotFound)
+
+  val VESSEL_ENGINE_NODE_ID_INCORRECT = ApiStatus(2300, "The Vessel engine node id is incorrect")
+  val VESSEL_ENGINE_NODE_NOT_FOUND = ApiStatus(2301, "The Vessel engine node is not found", HttpStatus.NotFound)
 }

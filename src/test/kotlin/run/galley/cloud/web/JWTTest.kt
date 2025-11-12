@@ -50,11 +50,11 @@ class JWTTest {
 
   @Test
   fun `accessToken sets subject and short TTL and inherits issuer audience alg`() {
-    val userId = UUID.randomUUID().toString()
+    val userId = UUID.randomUUID()
 
     val o = JWT.accessToken(userId)
 
-    assertEquals(userId, o.subject)
+    assertEquals(userId.toString(), o.subject)
     // default is 30 sec in the code
     assertEquals(30, o.expiresInSeconds)
     assertEquals("run.galley.auth", o.issuer)
@@ -64,11 +64,11 @@ class JWTTest {
 
   @Test
   fun `refreshToken sets subject and long TTL and inherits issuer audience alg`() {
-    val userId = UUID.randomUUID().toString()
+    val userId = UUID.randomUUID()
 
     val o = JWT.refreshToken(userId)
 
-    assertEquals(userId, o.subject)
+    assertEquals(userId.toString(), o.subject)
     // 90 days in seconds
     assertEquals(7_776_000, o.expiresInSeconds)
     assertEquals("run.galley.auth", o.issuer)

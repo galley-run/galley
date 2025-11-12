@@ -225,7 +225,6 @@ const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
       .get<ApiResponse<EngineRegionSummary>[]>(
         `/vessels/${selectedVesselId?.value}/engine/regions`,
       )
-      .then((response) => response.data),
 })
 
 const regions = computed(

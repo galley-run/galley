@@ -103,5 +103,3 @@ fun JWTAuth.issueGalleyNodeAgentToken(
   vesselEngineNodeId: UUID,
   extraClaims: JsonObject = JsonObject(),
 ): String = generateToken(extraClaims, JWT.galleyNodeAgentToken(vesselEngineNodeId))
-
-fun User.getVesselId(): UUID? = this.principal().getUUID("vesselId")

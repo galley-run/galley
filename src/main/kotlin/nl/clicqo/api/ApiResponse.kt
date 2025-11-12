@@ -115,9 +115,9 @@ class ApiResponse(
       routingContext
         .request()
         .getHeader("Accept")
-        .contains(contentType)
+        ?.contains(contentType)
 
-    if (!acceptHeaderMatch) {
+    if (acceptHeaderMatch == null || !acceptHeaderMatch) {
       routingContext
         .response()
         .setStatusCode(HttpStatus.NotAcceptable.code)

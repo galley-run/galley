@@ -13,7 +13,6 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
-import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.VesselEngineNodeDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject

@@ -99,7 +99,7 @@ class MainVerticle : CoroutineVerticle() {
     val openApiBridge = OpenApiBridge(vertx, config).initialize()
     val openApiRouter = openApiBridge.buildRouter().createRouter()
     openApiRouter.run {
-      setupCorsHandler(config.getJsonObject("api").getJsonArray("cors", JsonArray().add(".*")))
+      setupCorsHandler(config.getJsonObject("api.galley.run").getJsonArray("cors", JsonArray().add(".*")))
       setupDefaultOptionsHandler()
       setupDefaultResponse()
       setupFailureHandler()
@@ -107,7 +107,7 @@ class MainVerticle : CoroutineVerticle() {
       patch().handler(BodyHandler.create())
       put().handler(BodyHandler.create())
     }
-    mainRouter.route().virtualHost(config.getJsonObject("api").getString("host", "localhost")).subRouter(openApiRouter)
+    mainRouter.route().virtualHost(config.getJsonObject("api.galley.run").getString("host", "localhost")).subRouter(openApiRouter)
 
     val webAppRouter = Router.router(vertx)
     webAppRouter.run {
@@ -130,11 +130,38 @@ class MainVerticle : CoroutineVerticle() {
         }
       }
     }
-    val webAppConfig = config.getJsonObject("webapp", JsonObject())
+    val webAppConfig = config.getJsonObject("cloud.galley.run", JsonObject())
     mainRouter
       .route()
       .virtualHost(webAppConfig.getString("host", "localhost"))
       .subRouter(webAppRouter)
+
+    val getAppRouter = Router.router(vertx)
+    getAppRouter.run {
+      route(
+        "/*",
+      ).handler(
+        StaticHandler
+          .create(
+            "getroot",
+          ).setCachingEnabled(false)
+          .setDirectoryListing(false)
+          .setIncludeHidden(false),
+      )
+      errorHandler(404) { ctx ->
+        val req = ctx.request()
+        if (req.headers().get("Accept")?.contains("text/html") == true) {
+          ctx.redirect("https://galley.run")
+        } else {
+          ctx.fail(HttpException(404, "Not Found"))
+        }
+      }
+    }
+    val getAppConfig = config.getJsonObject("get.galley.run", JsonObject())
+    mainRouter
+      .route()
+      .virtualHost(getAppConfig.getString("host", "localhost"))
+      .subRouter(getAppRouter)
 
     // Deploy verticles
     val deploymentOptions =
@@ -182,6 +209,10 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(VesselEngineNodeControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselEngineRegionControllerVerticle(), deploymentOptions).coAwait()
 
+    val httpHost =
+      config
+        .getJsonObject("http", JsonObject())
+        .getString("host")
     val httpPort =
       config
         .getJsonObject("http", JsonObject())
@@ -197,6 +228,7 @@ class MainVerticle : CoroutineVerticle() {
 
     val httpServerOptions =
       HttpServerOptions()
+        .applyIf(!httpHost.isNullOrBlank()) { this.setHost(httpHost) }
         .setPort(httpPort)
         .applyIf(!certPath.isNullOrBlank() && !keyPath.isNullOrBlank()) {
           this

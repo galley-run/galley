@@ -17,7 +17,7 @@ interface BaseModel {
         .put(
           "id",
           this::class.java
-            .getDeclaredFields()
+            .declaredFields
             .firstOrNull { it.name == "id" }
             ?.let {
               it.isAccessible = true
@@ -25,7 +25,7 @@ interface BaseModel {
             },
         ).apply {
           this@BaseModel::class.java
-            .getDeclaredFields()
+            .declaredFields
             .filter { it.name != "id" }
             .forEach { field ->
               field.isAccessible = true
@@ -47,7 +47,7 @@ interface BaseModel {
     val attributes = json.getJsonObject("attributes")
 
     this::class.java
-      .getDeclaredFields()
+      .declaredFields
       .forEach { field ->
         field.isAccessible = true
         when (field.name) {

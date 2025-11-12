@@ -13,13 +13,17 @@
       "access": 90
     }
   },
-  "api": {
+  "api.galley.run": {
     "openApiFile": "openapi.yaml",
     "cors": [".*"],
     "host": "api.galley.dev"
   },
-  "webapp": {
+  "cloud.galley.run": {
     "host": "cloud.galley.dev",
+    "cors": ["*"]
+  },
+  "get.galley.run": {
+    "host": "get.galley.dev",
     "cors": ["*"]
   },
   "db": {

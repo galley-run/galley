@@ -30,7 +30,7 @@ fun String.toLocalDate(): LocalDate =
     throw ApiStatus.DATE_PARSE_EXCEPTION
   }
 
-fun String.isValidEmail(): Boolean = this.matches(Regex("^[\\w\\-.+]+@([\\w-]+\\.)+[\\w-]{2,}\$"))
+fun String.isValidEmail(): Boolean = this.matches(Regex("^[\\w\\-.+]+@([\\w-]+\\.)+[\\w-]{2,}$"))
 
 fun String.toSingular(): String =
   when (this) {

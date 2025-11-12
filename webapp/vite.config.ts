@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
+const isStorybookProcess = process.env.npm_lifecycle_event === 'storybook'
 
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
@@ -10,7 +11,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [
     vue(),
-    vueDevTools(),
+    !isStorybookProcess && vueDevTools(),
     tailwindcss()
   ],
   build: {

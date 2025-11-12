@@ -25,7 +25,7 @@ class OpenApiBridge(
   override val vertx: Vertx,
   override val config: JsonObject,
 ) : OpenAPIBridgeRouter(vertx, config) {
-  val logger = LoggerFactory.getLogger(this::class.java)
+  private val logger = LoggerFactory.getLogger(this::class.java)
 
   override suspend fun buildRouter(): RouterBuilder {
 //    /**

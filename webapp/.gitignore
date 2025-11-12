@@ -38,3 +38,6 @@ coverage
 __screenshots__/
 
 .env.local
+
+*storybook.log
+storybook-static

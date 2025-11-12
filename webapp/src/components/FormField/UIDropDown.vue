@@ -34,7 +34,7 @@ const {
   menuPosition = 'left',
   id,
 } = defineProps<{
-  variant?: 'inline' | 'default' | 'leadingAddon' | 'trailingAddon' | 'both' | 'icon'
+  variant?: 'inline' | 'default' | 'icon'
   modelValue?: string | null
   items: Item[]
   placeholder?: string
@@ -273,7 +273,7 @@ watch(
       :aria-expanded="isOpen"
       :aria-haspopup="'listbox'"
       :disabled="disabled"
-      class="transition-all flex items-center py-1.5 px-3 gap-1.5 text-navy-700 text-base cursor-pointer focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg focus:outline-1 outline-offset-1 outline-navy-100 active:bg-navy-100"
+      class="transition-all flex items-center py-1.5 px-3 gap-1.5  text-base cursor-pointer focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg focus:outline-1 outline-offset-1 outline-navy-100 active:bg-navy-100"
       @click="toggle"
       v-if="variant === 'inline'"
     >
@@ -295,7 +295,7 @@ watch(
     />
     <button
       v-else
-      class="text-input grid grid-cols-[1fr_auto_0fr] items-center gap-1.5 group-has-[:user-invalid]:bg-red-50 group-has-[:user-invalid]:border-red-200"
+      class="dropdown grid grid-cols-[1fr_auto_0fr] items-center group-has-[:user-invalid]:bg-red-50 group-has-[:user-invalid]:border-red-200"
       @click="toggle"
       @keydown="toggleKey"
       ref="triggerEl"
@@ -305,10 +305,16 @@ watch(
       :aria-haspopup="'listbox'"
       :disabled="disabled"
     >
-      <span class="flex form-field-input-value tracking-tight truncate py-3">
-        {{ selectedItem?.label ?? placeholder ?? 'Select...' }}
+      <span class="flex form-field-input-value tracking-tight truncate py-2.5 gap-2 items-center">
+        <slot name="leadingAddon" :item="selectedItem" />
+        <slot name="buttonLeadingAddon" />
+        <template v-if="selectedItem?.label">{{selectedItem?.label}}</template>
+        <span class="text-tides-600" v-else-if="placeholder">{{placeholder}}</span>
+        <span class="text-tides-600" v-else>Select...</span>
       </span>
       <slot />
+      <slot name="buttonTrailingAddon" />
+      <slot name="trailingAddon" :item="selectedItem" />
       <DoubleAltArrowDown size="20" :class="[isOpen ? 'rotate-180' : '']" />
     </button>
 
@@ -347,7 +353,7 @@ watch(
             :aria-selected="item.value === modelValue"
             :data-index="idx"
             :class="[
-              'px-4 py-2.5',
+              'px-4 py-2.5 grid grid-cols-[auto_1fr_0fr] gap-2.5 items-center',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               !item.variant && idx === activeIndex && 'bg-navy-50',
               item.variant === 'destructive' && idx === activeIndex && 'bg-coral-100',
@@ -359,7 +365,9 @@ watch(
             @mouseenter="!item.disabled && (activeIndex = idx)"
             @mousedown.prevent="selectAt(idx)"
           >
-            {{ item.label }}
+            <slot name="leadingAddon" :item="item" />
+            <div :class="!$slots.leadingAddon && 'col-span-2'">{{ item.label }}</div>
+            <slot name="trailingAddon" :item="item" />
           </div>
         </template>
       </div>

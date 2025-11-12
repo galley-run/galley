@@ -221,9 +221,11 @@ const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
   queryFn: () =>
-    axios.get(`/vessels/${selectedVesselId?.value}/engine/regions`) as Promise<
-      ApiResponse<EngineRegionSummary>[]
-    >,
+    axios
+      .get<ApiResponse<EngineRegionSummary>[]>(
+        `/vessels/${selectedVesselId?.value}/engine/regions`,
+      )
+      .then((response) => response.data),
 })
 
 const regions = computed(

@@ -16,7 +16,7 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&flagPlatformURL, "platform-url", "", "Use if you need a different Platform API url")
+	rootCmd.PersistentFlags().StringVar(&flagPlatformURL, "platform-url", "api.galley.run", "Use if you need a different Platform API url")
 	rootCmd.PersistentFlags().BoolVar(&flagDryRun, "dry-run", false, "Show all steps we will take during a command, without executing them.")
 
 	rootCmd.AddCommand(controllerCmd)

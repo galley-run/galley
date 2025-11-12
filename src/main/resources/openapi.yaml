@@ -200,6 +200,62 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/engine/node:
+    get:
+      tags:
+        - vessel/engine
+      operationId: nodeAgent.vessel.engine.node.query.get
+      summary: A special endpoint for the Galley Node Agent to get Vessel Node information
+      security:
+        - galleyNodeAgent: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.galley-node-agent.v1+json:
+              schema:
+                type: object
+                title: GetVesselNode
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /vessels/{vesselId}/engine/nodes/{nodeId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/nodeId'
+    get:
+      summary: Get single node within the engine
+      operationId: vessel.engine.node.query.get
+      description: Returns a record of type Node.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/engine/regions:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -772,6 +828,11 @@ components:
       bearerFormat: JWT
       x-vessel-role: member
       x-charter-role: steward
+    galleyNodeAgent:
+      type: http
+      scheme: bearer
+      description: Access during engine node setup by the Galley Node Agent This token has a short TTL and gives access to a specific node while this is being provisioned.
+      bearerFormat: JWT
   schemas:
     JSONAPIResource:
       type: object
@@ -1128,8 +1189,10 @@ components:
                 vesselEngineRegionId:
                   type: string
                   format: uuid
-                sshKey:
-                  type: string
+                token:
+                  type:
+                    - string
+                    - 'null'
                 provisioning:
                   type: boolean
                   default: Controlled
@@ -1731,6 +1794,14 @@ components:
       name: vesselId
       in: path
       required: true
+      schema:
+        type: string
+        format: uuid
+    nodeId:
+      name: nodeId
+      in: path
+      required: true
+      description: Unique identifier of the node
       schema:
         type: string
         format: uuid

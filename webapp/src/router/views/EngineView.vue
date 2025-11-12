@@ -183,31 +183,23 @@ const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine'],
   queryFn: () =>
-    axios
-      .get<ApiResponse<EngineSummary>[]>(`/vessels/${selectedVesselId?.value}/engine`)
-      .then((response) => response.data),
+    axios.get<ApiResponse<EngineSummary>[]>(`/vessels/${selectedVesselId?.value}/engine`),
 })
 
 const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes'],
   queryFn: () =>
-    axios
-      .get<ApiResponse<EngineNodeSummary>[]>(
-        `/vessels/${selectedVesselId?.value}/engine/nodes`,
-      )
-      .then((response) => response.data),
+    axios.get<ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
 })
 
 const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
   queryFn: () =>
-    axios
-      .get<ApiResponse<EngineRegionSummary>[]>(
-        `/vessels/${selectedVesselId?.value}/engine/regions`,
-      )
-      .then((response) => response.data),
+    axios.get<ApiResponse<EngineRegionSummary>[]>(
+      `/vessels/${selectedVesselId?.value}/engine/regions`,
+    ),
 })
 
 const mode = computed(() => engine.value?.[0]?.attributes?.mode)

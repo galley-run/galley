@@ -3,15 +3,17 @@ package run.galley.cloud.model
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Row
+import nl.clicqo.ext.applyIf
 import nl.clicqo.ext.toSingular
 import java.time.OffsetDateTime
+import java.util.UUID
 
 interface BaseModel {
   companion object {
     fun from(row: Row): BaseModel = error("BaseModel.from(Row) is abstract: call <Concrete>.Companion.from(Row)")
   }
 
-  fun toJsonAPIResourceObject(): JsonObject {
+  fun toJsonAPIResourceObject(mergeInAttributes: JsonObject? = null): JsonObject {
     val attributes =
       JsonObject()
         .put(
@@ -30,8 +32,17 @@ interface BaseModel {
             .forEach { field ->
               field.isAccessible = true
               val value = field.get(this@BaseModel)
-              put(field.name, if (value is OffsetDateTime) value.toString() else value)
+              put(
+                field.name,
+                when (value) {
+                  is OffsetDateTime -> value.toString()
+                  is UUID -> value.toString()
+                  else -> value
+                },
+              )
             }
+        }.applyIf(mergeInAttributes != null) {
+          this.mergeIn(mergeInAttributes)
         }
     val id = attributes.getString("id")
     attributes.remove("id")

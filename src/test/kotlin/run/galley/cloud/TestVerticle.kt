@@ -34,7 +34,7 @@ open class TestVerticle {
     "type": "pkcs12",
     "pepper": "long-and-random-string"
   },
-  "api": {
+  "api.galley.run": {
     "openApiFile": "openapi.yaml",
     "cors": [".*"]
   },

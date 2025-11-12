@@ -105,13 +105,13 @@ abstract class BaseIntegrationTest {
               .put("pepper", "test-pepper-key-for-testing-only-not-production")
               .put("ttl", JsonObject().put("access", 90)),
           ).put(
-            "api",
+            "api.galley.run",
             JsonObject()
               .put("openApiFile", "openapi.yaml")
               .put("host", "localhost")
               .put("cors", listOf("*")),
           ).put(
-            "webapp",
+            "cloud.galley.run",
             JsonObject()
               .put("host", "localhost")
               .put("cors", listOf("*")),

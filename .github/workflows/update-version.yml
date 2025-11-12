@@ -1,0 +1,53 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (without v prefix, e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK 25
+      uses: actions/setup-java@v4
+      with:
+        java-version: '25'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.23'
+
+    - name: Update POM version
+      run: |
+        mvn versions:set -DnewVersion=${{ inputs.version }}
+        mvn versions:commit
+
+    - name: Build and deploy node-agent
+      run: |
+        cd node-agent
+        make build deploy
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add pom.xml src/main/resources/getroot/
+        git commit -m "Prepare release v${{ inputs.version }}"
+        git push origin HEAD:main
+
+    - name: Create and push tag
+      run: |
+        git tag v${{ inputs.version }}
+        git push origin v${{ inputs.version }}

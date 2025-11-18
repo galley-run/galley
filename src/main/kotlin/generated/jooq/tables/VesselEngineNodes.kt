@@ -6,8 +6,11 @@ package generated.jooq.tables
 
 import generated.jooq.Public
 import generated.jooq.enums.NodeDeployMode
+import generated.jooq.enums.NodeProvisioningStatus
 import generated.jooq.enums.NodeType
 import generated.jooq.indexes.IDX_NODES_ENGINE
+import generated.jooq.indexes.IDX_NODES_OS_METADATA_GIN
+import generated.jooq.indexes.IDX_NODES_PROVISIONING_STATUS
 import generated.jooq.indexes.IDX_NODES_PROVISIONING_TIME
 import generated.jooq.indexes.IDX_NODES_REGION
 import generated.jooq.indexes.IDX_NODES_TYPE_MODE
@@ -24,11 +27,15 @@ import generated.jooq.tables.VesselEngines.VesselEnginesPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.VesselEngineNodesRecord
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
+
+import nl.clicqo.data.JooqJsonbObjectBinding
 
 import org.jooq.Condition
 import org.jooq.Field
@@ -175,6 +182,16 @@ open class VesselEngineNodes(
      */
     val CREATED_AT: TableField<VesselEngineNodesRecord, OffsetDateTime?> = createField(DSL.name("created_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6).nullable(false).defaultValue(DSL.field(DSL.raw("now()"), SQLDataType.TIMESTAMPWITHTIMEZONE)), this, "")
 
+    /**
+     * The column <code>public.vessel_engine_nodes.provisioning_status</code>.
+     */
+    val PROVISIONING_STATUS: TableField<VesselEngineNodesRecord, NodeProvisioningStatus?> = createField(DSL.name("provisioning_status"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'open'::node_provisioning_status"), SQLDataType.VARCHAR)).asEnumDataType(NodeProvisioningStatus::class.java), this, "")
+
+    /**
+     * The column <code>public.vessel_engine_nodes.os_metadata</code>.
+     */
+    val OS_METADATA: TableField<VesselEngineNodesRecord, ClusterSerializable?> = createField(DSL.name("os_metadata"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
+
     private constructor(alias: Name, aliased: Table<VesselEngineNodesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<VesselEngineNodesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<VesselEngineNodesRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -207,7 +224,7 @@ open class VesselEngineNodes(
         override fun `as`(alias: Table<*>): VesselEngineNodesPath = VesselEngineNodesPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_NODES_ENGINE, IDX_NODES_PROVISIONING_TIME, IDX_NODES_REGION, IDX_NODES_TYPE_MODE, IDX_NODES_VESSEL, UQ_NODES_IP)
+    override fun getIndexes(): List<Index> = listOf(IDX_NODES_ENGINE, IDX_NODES_OS_METADATA_GIN, IDX_NODES_PROVISIONING_STATUS, IDX_NODES_PROVISIONING_TIME, IDX_NODES_REGION, IDX_NODES_TYPE_MODE, IDX_NODES_VESSEL, UQ_NODES_IP)
     override fun getPrimaryKey(): UniqueKey<VesselEngineNodesRecord> = VESSEL_ENGINE_NODES_PKEY
     override fun getReferences(): List<ForeignKey<VesselEngineNodesRecord, *>> = listOf(VESSEL_ENGINE_NODES__FK_NODES_ENGINE, VESSEL_ENGINE_NODES__FK_NODES_PROVISIONING_LOCKER, VESSEL_ENGINE_NODES__FK_NODES_REGION, VESSEL_ENGINE_NODES__FK_NODES_VESSEL)
 

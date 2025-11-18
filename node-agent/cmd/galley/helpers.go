@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 func getGalleyNode(baseURL, token string) (*DataResource[VesselEngineNodeAttributes], error) {
@@ -32,7 +35,7 @@ func getGalleyNode(baseURL, token string) (*DataResource[VesselEngineNodeAttribu
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			fmt.Printf("failed to make request: %w", err)
+			log.Printf("failed to close response body: %v", err)
 			return
 		}
 	}(resp.Body)
@@ -61,4 +64,24 @@ func checkCommands(names ...string) {
 			_ = fmt.Errorf("warning: command not found in PATH: %s\n", name)
 		}
 	}
+}
+
+// getRealUserHomeDir returns the home directory of the actual user,
+// even when running under sudo. It checks SUDO_USER and SUDO_HOME
+// environment variables to determine the original user's home.
+func getRealUserHomeDir() (string, error) {
+	// When running under sudo, use the actual user's home directory
+	if sudoUser := os.Getenv("SUDO_USER"); sudoUser != "" {
+		// Try SUDO_HOME first (if set)
+		if sudoHome := os.Getenv("SUDO_HOME"); sudoHome != "" {
+			return sudoHome, nil
+		}
+		// Construct home path for the sudo user
+		if sudoUser == "root" {
+			return "/root", nil
+		}
+		return filepath.Join("/home", sudoUser), nil
+	}
+	// Fallback to regular user home directory
+	return os.UserHomeDir()
 }

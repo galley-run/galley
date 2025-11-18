@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import MainLayout from '@/router/layouts/MainLayout.vue'
 import DashboardView from '@/router/views/DashboardView.vue'
 import ComputePlansView from '@/router/views/ComputePlansView.vue'
-import EngineView from '@/router/views/EngineView.vue'
+import EngineView from '@/router/views/Engine/EngineView.vue'
 import OnboardingLayout from '@/router/layouts/OnboardingLayout.vue'
 import RegistrationView from '@/router/views/Onboarding/RegistrationView.vue'
 import SecurityScreeningView from '@/router/views/Onboarding/SecurityScreeningView.vue'
@@ -14,7 +14,8 @@ import {useAuthStore} from '@/stores/auth.ts'
 import LoginLayout from '@/router/layouts/LoginLayout.vue'
 import LoginView from '@/router/views/Login/LoginView.vue'
 import LogoutView from '@/router/views/Login/LogoutView.vue'
-import EngineNodeAddView from '@/router/views/EngineNodeAddView.vue'
+import EngineNodeAddView from '@/router/views/Engine/Node/EngineNodeAddView.vue'
+import EngineNodeFirstControllerView from '@/router/views/Engine/Node/EngineNodeFirstControllerView.vue'
 
 const routes = [
   {
@@ -49,7 +50,9 @@ const routes = [
       { path: '', component: DashboardView },
       { path: '/charter/compute-plans', component: ComputePlansView },
       { path: '/vessel/engine', component: EngineView },
-      { path: '/vessel/engine/node/add', component: EngineNodeAddView }
+      { path: '/vessel/engine/node/controller', component: EngineNodeFirstControllerView },
+      { path: '/vessel/engine/node/add', component: EngineNodeAddView },
+      { path: '/vessel/engine/node/:nodeId', component: EngineNodeAddView },
     ],
   },
 ]

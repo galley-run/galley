@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: galley
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: galley-agent
+  namespace: galley
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: galley-deployer
+  namespace: galley
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments","statefulsets","daemonsets","replicasets"]
+    verbs: ["get","list","watch","create","update","patch","delete"]
+  - apiGroups: [""]
+    resources: ["pods","services","configmaps","secrets"]
+    verbs: ["get","list","watch","create","update","patch","delete"]
+  - apiGroups: ["batch"]
+    resources: ["jobs","cronjobs"]
+    verbs: ["get","list","watch","create","update","patch","delete"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses"]
+    verbs: ["get","list","watch","create","update","patch","delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: galley-deployer-binding
+  namespace: galley
+subjects:
+  - kind: ServiceAccount
+    name: galley-agent
+    namespace: galley
+roleRef:
+  kind: Role
+  name: galley-deployer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: galley-agent
+  namespace: galley
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: galley-agent }
+  template:
+    metadata:
+      labels: { app: galley-agent }
+    spec:
+      serviceAccountName: galley-agent
+      containers:
+        - name: agent
+          image: ghcr.io/your-org/galley-agent:latest # <-- jouw image
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false

@@ -5,8 +5,11 @@ package generated.jooq.tables.records
 
 
 import generated.jooq.enums.NodeDeployMode
+import generated.jooq.enums.NodeProvisioningStatus
 import generated.jooq.enums.NodeType
 import generated.jooq.tables.VesselEngineNodes
+
+import io.vertx.core.shareddata.ClusterSerializable
 
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -85,6 +88,14 @@ open class VesselEngineNodesRecord() : UpdatableRecordImpl<VesselEngineNodesReco
         set(value): Unit = set(15, value)
         get(): OffsetDateTime? = get(15) as OffsetDateTime?
 
+    open var provisioningStatus: NodeProvisioningStatus?
+        set(value): Unit = set(16, value)
+        get(): NodeProvisioningStatus? = get(16) as NodeProvisioningStatus?
+
+    open var osMetadata: ClusterSerializable?
+        set(value): Unit = set(17, value)
+        get(): ClusterSerializable? = get(17) as ClusterSerializable?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -94,7 +105,7 @@ open class VesselEngineNodesRecord() : UpdatableRecordImpl<VesselEngineNodesReco
     /**
      * Create a detached, initialised VesselEngineNodesRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, vesselEngineId: UUID? = null, vesselEngineRegionId: UUID? = null, nodeType: NodeType? = null, deployMode: NodeDeployMode? = null, name: String? = null, ipAddress: String? = null, cpu: String? = null, memory: String? = null, storage: String? = null, provisioning: Boolean? = null, provisioningLockerId: UUID? = null, provisioningSecurityUpdates: Boolean? = null, provisioningSecurityUpdatesSchedule: String? = null, createdAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, vesselEngineId: UUID? = null, vesselEngineRegionId: UUID? = null, nodeType: NodeType? = null, deployMode: NodeDeployMode? = null, name: String? = null, ipAddress: String? = null, cpu: String? = null, memory: String? = null, storage: String? = null, provisioning: Boolean? = null, provisioningLockerId: UUID? = null, provisioningSecurityUpdates: Boolean? = null, provisioningSecurityUpdatesSchedule: String? = null, createdAt: OffsetDateTime? = null, provisioningStatus: NodeProvisioningStatus? = null, osMetadata: ClusterSerializable? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.vesselEngineId = vesselEngineId
@@ -111,6 +122,8 @@ open class VesselEngineNodesRecord() : UpdatableRecordImpl<VesselEngineNodesReco
         this.provisioningSecurityUpdates = provisioningSecurityUpdates
         this.provisioningSecurityUpdatesSchedule = provisioningSecurityUpdatesSchedule
         this.createdAt = createdAt
+        this.provisioningStatus = provisioningStatus
+        this.osMetadata = osMetadata
         resetTouchedOnNotNull()
     }
 
@@ -135,6 +148,8 @@ open class VesselEngineNodesRecord() : UpdatableRecordImpl<VesselEngineNodesReco
             this.provisioningSecurityUpdates = value.provisioningSecurityUpdates
             this.provisioningSecurityUpdatesSchedule = value.provisioningSecurityUpdatesSchedule
             this.createdAt = value.createdAt
+            this.provisioningStatus = value.provisioningStatus
+            this.osMetadata = value.osMetadata
             resetTouchedOnNotNull()
         }
     }

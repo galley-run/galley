@@ -7,14 +7,36 @@
 set -eu
 
 GALLEY_BIN="/usr/local/bin/galley"
-GALLEY_URL="${GALLEY_URL:-https://galley.run/install.sh}"
+GALLEY_URL="${GALLEY_URL:-https://galley.run}"
 GALLEY_STATE_DIR="/var/lib/galley"
 GALLEY_RESUME_ARGS_FILE="$GALLEY_STATE_DIR/resume.args"
 GALLEY_RESUME_WRAPPER="/usr/local/bin/galley-install-resume"
 GALLEY_RESUME_UNIT="galley-install-resume.service"
-GALLEY_DOWNLOAD_BASE="${GALLEY_DOWNLOAD_BASE:-https://downloads.galley.run}"
 GALLEY_VERSION="${GALLEY_VERSION:-v0.1.0}"
 TMPDIR="${TMPDIR:-/tmp}"
+
+# Try to read config file for download_base if it exists
+read_config_download_base() {
+  CONFIG_FILE="$HOME/.galley/config"
+  if [ -f "$CONFIG_FILE" ]; then
+    # Simple YAML parser for download_base
+    grep "^download_base:" "$CONFIG_FILE" | sed 's/download_base:[[:space:]]*//' | tr -d '"' | xargs
+  fi
+}
+
+# Check SUDO_USER's home for config if running as root
+if [ "$(id -u)" -eq 0 ] && [ -n "${SUDO_USER:-}" ]; then
+  USER_HOME=$(eval echo "~$SUDO_USER")
+  CONFIG_FILE="$USER_HOME/.galley/config"
+  if [ -f "$CONFIG_FILE" ]; then
+    CONFIG_DOWNLOAD_BASE=$(grep "^download_base:" "$CONFIG_FILE" | sed 's/download_base:[[:space:]]*//' | tr -d '"' | xargs)
+  fi
+elif [ -f "$HOME/.galley/config" ]; then
+  CONFIG_DOWNLOAD_BASE=$(grep "^download_base:" "$HOME/.galley/config" | sed 's/download_base:[[:space:]]*//' | tr -d '"' | xargs)
+fi
+
+# Priority: env var > config file > default
+GALLEY_DOWNLOAD_BASE="${GALLEY_DOWNLOAD_BASE:-${CONFIG_DOWNLOAD_BASE:-https://get.galley.run}}"
 
 require_root_or_sudo() {
   if [ "$(id -u)" -ne 0 ]; then
@@ -54,6 +76,20 @@ detect_distro() {
     echo "/etc/os-release not found" >&2
     exit 1
   fi
+}
+
+sync_time() {
+  if command -v timedatectl >/dev/null 2>&1; then
+    timedatectl set-ntp true 2>/dev/null || true
+  fi
+  if command -v ntpdate >/dev/null 2>&1; then
+    ntpdate -s time.nist.gov 2>/dev/null || ntpdate -s pool.ntp.org 2>/dev/null || true
+  elif command -v chronyd >/dev/null 2>&1; then
+    systemctl restart chronyd 2>/dev/null || true
+  elif command -v systemd-timesyncd >/dev/null 2>&1; then
+    systemctl restart systemd-timesyncd 2>/dev/null || true
+  fi
+  sleep 2
 }
 
 update_security_no_reboot() {
@@ -110,13 +146,13 @@ install_resume_unit() {
   cat > "$GALLEY_RESUME_WRAPPER" <<'WRAP'
 #!/bin/sh
 set -eu
-GALLEY_URL="${GALLEY_URL:-https://galley.run/install.sh}"
+GALLEY_URL="${GALLEY_URL:-https://galley.run}"
 ARGS_FILE="/var/lib/galley/resume.args"
 if [ ! -f "$ARGS_FILE" ]; then
   exit 0
 fi
 ARGS="$(cat "$ARGS_FILE")"
-curl -sSf "$GALLEY_URL" | sh -s -- --resume $ARGS
+curl -sSf "$GALLEY_URL" | sudo sh -s -- --resume $ARGS
 WRAP
   chmod 0755 "$GALLEY_RESUME_WRAPPER"
 
@@ -170,7 +206,7 @@ download_cli() {
     echo "Unsupported architecture $(uname -m)" >&2
     exit 1
   fi
-  URL="$GALLEY_DOWNLOAD_BASE/$GALLEY_VERSION/galley-$T"
+  URL="$GALLEY_DOWNLOAD_BASE/bin/$GALLEY_VERSION/galley-$T"
   TMP="$TMPDIR/galley.$$"
   echo "Downloading galley CLI from $URL ..."
   curl -fL "$URL" -o "$TMP"
@@ -192,11 +228,28 @@ main() {
     install_resume_unit "$*"
   fi
 
+  echo "Synchronizing system time..."
+  sync_time
+
   echo "Applying security updates..."
   update_security_no_reboot
 
   if needs_reboot; then
-    force_reboot_now
+    if [ $RESUME -eq 0 ]; then
+      printf "A reboot is required to complete security updates. The installation will automatically resume after reboot.\nReboot now? [y/N] "
+      read -r answer
+      case "$answer" in
+        [Yy]*)
+          force_reboot_now
+          ;;
+        *)
+          echo "Reboot cancelled. Please reboot manually and re-run the installer to complete setup."
+          exit 1
+          ;;
+      esac
+    else
+      force_reboot_now
+    fi
   fi
 
   cleanup_resume_unit

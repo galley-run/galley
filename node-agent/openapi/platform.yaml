@@ -1,0 +1,204 @@
+
+openapi: 3.1.0
+info:
+  title: Galley Platform API (Agent/CLI subset)
+  version: 0.1.0
+servers:
+  - url: https://api.galley.run
+
+paths:
+  /v1/vessels/engines/{engineId}/desired-role:
+    get:
+      summary: Return the desired role for a node during initial install
+      description: |
+        Only available within a short UI-configured time window after controller creation.
+        Returns either `controller` or `controller+worker`.
+      parameters:
+        - name: engineId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: nodeId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    enum: [controller, controller+worker]
+                  expiresAt:
+                    type: string
+                    format: date-time
+        "410":
+          description: Window expired
+
+  /v1/vessels/engines/{engineId}/events:
+    post:
+      summary: Audit log event from node/agent
+      description: |
+        Accepts important changes and install steps. Retries should be idempotent using `eventId`.
+      parameters:
+        - name: engineId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  format: uuid
+                nodeId:
+                  type: string
+                type:
+                  type: string
+                at:
+                  type: string
+                  format: date-time
+                data:
+                  type: object
+      responses:
+        "202":
+          description: Accepted
+
+  /v1/vessels/engines/{engineId}/controllers/joined:
+    post:
+      summary: Notify platform that a controller joined
+      parameters:
+        - name: engineId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+      responses:
+        "204":
+          description: No Content
+
+  /v1/vessels/engines/{engineId}/workers/joined:
+    post:
+      summary: Notify platform that a worker joined
+      parameters:
+        - name: engineId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nodeId:
+                  type: string
+      responses:
+        "204":
+          description: No Content
+
+  /v1/nodes/{nodeId}/provisioning/schedule:
+    get:
+      summary: Retrieve security update schedule for node provisioning
+      description: Returns a systemd-compatible schedule window and current policy.
+      parameters:
+        - name: nodeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  window:
+                    type: object
+                    properties:
+                      tz:
+                        type: string
+                      start:
+                        type: string
+                        example: "03:00"
+                      durationMinutes:
+                        type: integer
+                  nextPlanned:
+                    type: string
+                    format: date-time
+
+  /v1/vessels/engines/{engineId}/join-window:
+    post:
+      summary: Open a short unauthenticated join window for a vessel engine
+      description: Returns an `expiresAt` timestamp; during the window limited unauthenticated endpoints can be used.
+      parameters:
+        - name: engineId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ttlSeconds:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  expiresAt:
+                    type: string
+                    format: date-time
+
+  /v1/ws:
+    get:
+      summary: WebSocket endpoint for agents
+      description: |
+        The agent connects with `wss://.../v1/ws?nodeId=...&engineId=...`.
+        Messages are small JSON frames.
+      parameters:
+        - name: nodeId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: engineId
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        "101":
+          description: Switching Protocols

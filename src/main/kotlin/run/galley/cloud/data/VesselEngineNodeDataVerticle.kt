@@ -12,12 +12,12 @@ import run.galley.cloud.ApiStatus
 import run.galley.cloud.k8s.parsers.K8sParserNodeList
 import run.galley.cloud.model.factory.VesselEngineNodeFactory
 import run.galley.cloud.sql.VesselEngineNodeSql
-import run.galley.cloud.ws.EventBusAgentRequest
 import run.galley.cloud.ws.EventBusAgentResponse
 
 class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
   companion object {
     const val CREATE = "data.vessel.engine.node.cmd.create"
+    const val GET = "data.vessel.engine.node.query.get"
     const val LIST_BY_VESSEL_ID = "data.vessel.engine.node.query.list_by_vessel_id"
     const val SYNC_NODES = "data.vessel.engine.node.cmd.sync_nodes"
   }
@@ -28,6 +28,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     coroutineEventBus {
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
       vertx.eventBus().coConsumer(LIST_BY_VESSEL_ID, handler = ::listByVesselId)
+      vertx.eventBus().coConsumer(GET, handler = ::get)
       vertx.eventBus().coConsumer(SYNC_NODES, handler = ::syncNodes)
     }
   }
@@ -39,6 +40,17 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     val vesselEngines = results?.map(VesselEngineNodeFactory::from)
 
     message.reply(EventBusDataResponse(DataPayload.many(vesselEngines)))
+  }
+
+  private suspend fun get(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val results = pool.execute(VesselEngineNodeSql.get(request))
+
+    val vesselEngine =
+      results?.firstOrNull()?.let(VesselEngineNodeFactory::from)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+
+    message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }
 
   private suspend fun create(message: Message<EventBusCmdDataRequest>) {

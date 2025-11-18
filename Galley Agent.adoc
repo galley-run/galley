@@ -1,10 +1,10 @@
 = Galley Node Agent
 
-== `galley controller install <node-id>`
+== `galley controller join <jwttoken>`
 
 1. Upgrades OS with latest patches
 2. Installs k0s
-3. Calls k0s config create
+= 3. Calls k0s config create
 4. Checks with the platform if it needs to install as controller or controller+worker
 - Note: this call is only available *within 10 minutes* of controller creation in the platform. If too late, the controller needs to be removed from the Galley UI and created as a new controller.
 - temp stores the vessel engine id of this node
@@ -16,7 +16,7 @@
 ----
 # To finish your cluster setup add worker nodes by sshing into the worker node and call, you can do this for as many nodes as you like. They'll automatically appear in the Galley UI:
 
-curl -sSf https://galley.run/install.sh | sudo sh
+curl -sSf https://get.galley.run | sudo sh
 galley worker join <vessel-engine-id> <worker-token from tmp>
 ----
 
@@ -50,7 +50,7 @@ Once a node is enabled as provisioning in the UI, the user manually needs to cal
 6. Deletes the tmp file
 
 ----
-curl -sSf https://galley.run/install.sh | sudo sh
+curl -sSf https://get.galley.run | sudo sh
 galley controller join <vessel-engine-id> <join-token from tmp>
 ----
 
@@ -64,7 +64,7 @@ galley controller join <vessel-engine-id> <join-token from tmp>
 6. Deletes the tmp file
 
 ----
-curl -sSf https://galley.run/install.sh | sudo sh
+curl -sSf https://get.galley.run | sudo sh
 galley worker join <vessel-engine-id> <join-token from tmp>
 ----
 
@@ -94,3 +94,14 @@ Any call can have the following flags:
 
 - `--platform-url "api.galley.run"` This will let the agents know to use a different platform url for the specific call
 - `--config "./galley"` If you want to store the galley configs in a custom file, you can let the commands know to look for a different file
+
+== `galley node prepare`
+
+1. Update OS with latest patches
+2. Install k0s
+3. Enables auto patch security updates
+4. Disables root login
+5. Encourages SSH key login only (disable user password login over ssh)
+6. Checks if FTP is enabled and warns and suggests disabling
+7. Checks for other open ports to the server and warns about them
+8. Reboot where possible

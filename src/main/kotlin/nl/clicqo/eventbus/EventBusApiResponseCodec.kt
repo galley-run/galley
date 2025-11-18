@@ -18,6 +18,7 @@ class EventBusApiResponseCodec : MessageCodec<EventBusApiResponse, EventBusApiRe
         .put("included", s?.included)
         .put("errors", s?.errors)
         .put("version", s?.version)
+        .put("contentType", s?.contentType)
         .put("format", s?.format)
         .put("httpStatus", s?.httpStatus)
 
@@ -44,6 +45,7 @@ class EventBusApiResponseCodec : MessageCodec<EventBusApiResponse, EventBusApiRe
       included = json.getJsonArray("included"),
       errors = json.getJsonArray("errors"),
       version = json.getString("version", "v1"),
+      contentType = json.getString("content_type", "application/vnd.galley.v1+json"),
       format = json.getString("format", "json"),
       httpStatus = json.getString("httpStatus")?.let { HttpStatus.valueOf(it) } ?: HttpStatus.NoContent,
     )

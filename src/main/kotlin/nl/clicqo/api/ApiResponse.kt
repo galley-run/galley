@@ -61,8 +61,7 @@ class ApiResponse(
   fun fromEventBusApiResponse(eventBusApiResponse: EventBusApiResponse): ApiResponse {
     this.httpStatus = eventBusApiResponse.httpStatus
 
-    this.contentType =
-      "application/vnd.galley.${eventBusApiResponse.version}+${eventBusApiResponse.format}"
+    this.contentType = eventBusApiResponse.contentType
     this.body =
       JsonObject()
         .put(
@@ -103,6 +102,7 @@ class ApiResponse(
       .putHeader("content-type", contentType)
 
     routingContext
+      .response()
       .end(build())
   }
 
@@ -111,6 +111,21 @@ class ApiResponse(
     operationId: String,
     contract: OpenAPIContract,
   ) {
+    val acceptHeaderMatch =
+      routingContext
+        .request()
+        .getHeader("Accept")
+        ?.contains(contentType)
+
+    if (acceptHeaderMatch == null || !acceptHeaderMatch) {
+      routingContext
+        .response()
+        .setStatusCode(HttpStatus.NotAcceptable.code)
+        .setStatusMessage(HttpStatus.NotAcceptable.statusMessage)
+        .end()
+      return
+    }
+
     routingContext
       .response()
       .setStatusCode(httpStatus.code)

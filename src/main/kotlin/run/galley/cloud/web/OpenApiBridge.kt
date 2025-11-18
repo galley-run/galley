@@ -32,6 +32,7 @@ class OpenApiBridge(
 //     * Add security handlers for each scope.
 //     */
     val scpAuthHandler = JWTAuthHandlerScp(authProvider)
+    val galleyNodeAgentAuthHandler = JWTAuthHandlerGalleyNodeAgent(authProvider)
 
     openAPIRouterBuilder
       .security("charterSteward")
@@ -46,6 +47,8 @@ class OpenApiBridge(
       .httpHandler(scpAuthHandler)
       .security("vesselCaptain")
       .httpHandler(scpAuthHandler)
+      .security("galleyNodeAgent")
+      .httpHandler(galleyNodeAgentAuthHandler)
       .security("any")
       .httpHandler(scpAuthHandler)
 

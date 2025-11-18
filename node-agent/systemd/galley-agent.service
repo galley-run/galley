@@ -1,0 +1,14 @@
+
+[Unit]
+Description=Galley WS Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/galley node provision --platform-ws-url=wss://api.galley.run/ws
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

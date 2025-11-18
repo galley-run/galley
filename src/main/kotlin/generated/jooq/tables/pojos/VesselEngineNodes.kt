@@ -5,7 +5,10 @@ package generated.jooq.tables.pojos
 
 
 import generated.jooq.enums.NodeDeployMode
+import generated.jooq.enums.NodeProvisioningStatus
 import generated.jooq.enums.NodeType
+
+import io.vertx.core.shareddata.ClusterSerializable
 
 import java.io.Serializable
 import java.time.OffsetDateTime
@@ -34,7 +37,9 @@ data class VesselEngineNodes(
     var provisioningLockerId: UUID? = null,
     var provisioningSecurityUpdates: Boolean? = null,
     var provisioningSecurityUpdatesSchedule: String? = null,
-    var createdAt: OffsetDateTime? = null
+    var createdAt: OffsetDateTime? = null,
+    var provisioningStatus: NodeProvisioningStatus? = null,
+    var osMetadata: ClusterSerializable? = null
 ): BaseModel, Serializable {
 
 
@@ -142,6 +147,18 @@ data class VesselEngineNodes(
         }
         else if (this.createdAt != o.createdAt)
             return false
+        if (this.provisioningStatus == null) {
+            if (o.provisioningStatus != null)
+                return false
+        }
+        else if (this.provisioningStatus != o.provisioningStatus)
+            return false
+        if (this.osMetadata == null) {
+            if (o.osMetadata != null)
+                return false
+        }
+        else if (this.osMetadata != o.osMetadata)
+            return false
         return true
     }
 
@@ -164,6 +181,8 @@ data class VesselEngineNodes(
         result = prime * result + (if (this.provisioningSecurityUpdates == null) 0 else this.provisioningSecurityUpdates.hashCode())
         result = prime * result + (if (this.provisioningSecurityUpdatesSchedule == null) 0 else this.provisioningSecurityUpdatesSchedule.hashCode())
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
+        result = prime * result + (if (this.provisioningStatus == null) 0 else this.provisioningStatus.hashCode())
+        result = prime * result + (if (this.osMetadata == null) 0 else this.osMetadata.hashCode())
         return result
     }
 
@@ -186,6 +205,8 @@ data class VesselEngineNodes(
         sb.append(", ").append(provisioningSecurityUpdates)
         sb.append(", ").append(provisioningSecurityUpdatesSchedule)
         sb.append(", ").append(createdAt)
+        sb.append(", ").append(provisioningStatus)
+        sb.append(", ").append(osMetadata)
 
         sb.append(")")
         return sb.toString()

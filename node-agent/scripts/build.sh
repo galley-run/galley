@@ -3,27 +3,49 @@
 # Build Galley CLI for multiple Linux targets and generate SHASUMS.
 # Usage:
 #   scripts/build.sh [version]
-# If version is omitted, we derive it from `git describe --tags --always`.
+# If version is provided, it will be written to the VERSION file.
+# Otherwise, version is read from the VERSION file in the project root.
 
 set -eu
 
 ROOT="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 OUT="${OUT:-$ROOT/dist}"
 PKG="${PKG:-./cmd/galley}"
-VERSION="${1:-${VERSION:-}}"
+VERSION_FILE="$ROOT/VERSION"
 
-if [ -z "${VERSION}" ]; then
-  if command -v git >/dev/null 2>&1 && git -C "$ROOT" rev-parse --git-dir >/dev/null 2>&1; then
-    VERSION="$(git -C "$ROOT" describe --tags --always --dirty 2>/dev/null || echo v0.0.0)"
-  else
-    VERSION="v0.0.0"
-  fi
+# Check if version is provided as argument
+if [ -n "${1:-}" ]; then
+  VERSION="$1"
+  # Add 'v' prefix if not present
+  case "$VERSION" in
+    v*) ;;
+    *) VERSION="v$VERSION" ;;
+  esac
+  echo "==> Writing new version $VERSION to VERSION file"
+  echo "$VERSION" > "$VERSION_FILE"
+# Otherwise read from VERSION file
+elif [ -f "$VERSION_FILE" ]; then
+  VERSION="$(cat "$VERSION_FILE" | xargs)"
+  # Add 'v' prefix if not present
+  case "$VERSION" in
+    v*) ;;
+    *) VERSION="v$VERSION" ;;
+  esac
+else
+  echo "Error: VERSION file not found at $VERSION_FILE and no version provided"
+  exit 1
 fi
 
 echo "==> Building version: $VERSION"
+
+# Clean dist directory before building
+if [ -d "$OUT" ]; then
+  echo "==> Cleaning dist directory"
+  rm -rf "$OUT"
+fi
 mkdir -p "$OUT"
 
-LDFLAGS="-s -w -X main.version=$VERSION -X main.commit=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown) -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+LDFLAGS="-s -w -X main.Version=$VERSION -X main.commit=$(git -C "$ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown) -X main.date=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 build_one() {
   GOOS="$1"; GOARCH="$2"; GOARM="${3:-}"

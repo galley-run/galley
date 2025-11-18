@@ -118,7 +118,6 @@ class MainVerticle : CoroutineVerticle() {
           .create(
             "webroot",
           ).setCachingEnabled(false)
-          .setDirectoryListing(false)
           .setIncludeHidden(false),
       )
       errorHandler(404) { ctx ->
@@ -139,14 +138,21 @@ class MainVerticle : CoroutineVerticle() {
     val getAppRouter = Router.router(vertx)
     getAppRouter.run {
       route(
-        "/*",
+        "/",
       ).handler(
         StaticHandler
           .create(
             "getroot",
-          ).setCachingEnabled(false)
-          .setDirectoryListing(false)
-          .setIncludeHidden(false),
+          ).setIndexPage("install.sh"),
+      )
+      route(
+        "/bin/*",
+      ).handler(
+        StaticHandler
+          .create(
+            "getroot/bin",
+          ).setDirectoryListing(true)
+          .setCachingEnabled(false),
       )
       errorHandler(404) { ctx ->
         val req = ctx.request()

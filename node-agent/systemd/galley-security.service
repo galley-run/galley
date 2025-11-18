@@ -1,0 +1,7 @@
+
+[Unit]
+Description=Apply security updates (Galley)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/sh -c '/usr/bin/apt-get update -y && /usr/bin/apt-get upgrade -y'

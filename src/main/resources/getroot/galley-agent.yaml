@@ -84,11 +84,6 @@ spec:
                 configMapKeyRef:
                   name: galley-agent-config
                   key: GALLEY_AGENT_ID
-          volumeMounts:
-            - name: config
-              mountPath: /app/conf.json
-              subPath: conf.json
-              readOnly: true
           resources:
             requests:
               cpu: "1000m"
@@ -116,12 +111,5 @@ spec:
             timeoutSeconds: 3
             successThreshold: 1
             failureThreshold: 3
-      volumes:
-        - name: config
-          configMap:
-            name: galley-agent-config
-            items:
-              - key: conf.json
-                path: conf.json
       restartPolicy: Always
       terminationGracePeriodSeconds: 30

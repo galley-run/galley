@@ -823,6 +823,8 @@ class CharterApiIntegrationTest : BaseIntegrationTest() {
       val resp2 =
         client
           .delete("/vessels/$vesselId/charters/$charterId")
+          .putHeader("Content-Type", "application/vnd.galley.v1+json")
+          .putHeader("Accept", "application/vnd.galley.v1+json")
           .putHeader("Authorization", "Bearer $validToken")
           .send()
           .coAwait()

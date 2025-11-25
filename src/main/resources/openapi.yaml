@@ -200,6 +200,92 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/engine/nodes/{nodeId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/nodeId'
+    get:
+      summary: Get single node within the engine
+      operationId: vessel.engine.node.query.get
+      description: Returns a record of type Node.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/engine/node:
+    get:
+      tags:
+        - vessel/engine
+      operationId: nodeAgent.vessel.engine.node.query.get
+      summary: A special endpoint for the Galley Node Agent to get Vessel Node information as long as its provisioning status is marked "open"
+      security:
+        - galleyNodeAgent: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.galley-node-agent.v1+json:
+              schema:
+                type: object
+                title: GetVesselNode
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /vessels/engine/node/{nodeId}:
+    parameters:
+      - $ref: '#/components/parameters/nodeId'
+    patch:
+      tags:
+        - vessel/engine
+      operationId: nodeAgent.vessel.engine.node.query.patch
+      summary: A special endpoint for the Galley Node Agent to update Vessel Node information as long as its provisioning status is marked "open"
+      security:
+        - galleyNodeAgent: []
+      requestBody:
+        required: true
+        description: Node information we may update from the Galley Node Agent
+        content:
+          application/vnd.galley-node-agent.v1+json:
+            schema:
+              $ref: '#/components/schemas/NodeAgentPartialUpdate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/vnd.galley-node-agent.v1+json:
+              schema:
+                type: object
+                title: GetVesselNode
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /vessels/{vesselId}/engine/regions:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -772,6 +858,11 @@ components:
       bearerFormat: JWT
       x-vessel-role: member
       x-charter-role: steward
+    galleyNodeAgent:
+      type: http
+      scheme: bearer
+      description: Access during engine node setup by the Galley Node Agent This token has a short TTL and gives access to a specific node while this is being provisioned.
+      bearerFormat: JWT
   schemas:
     JSONAPIResource:
       type: object
@@ -1115,9 +1206,12 @@ components:
                   examples:
                     - 1GB
                 storage:
-                  type: string
+                  type:
+                    - number
+                    - string
                   examples:
-                    - 20GB
+                    - 30G
+                    - 30000000000
                 nodeType:
                   enum:
                     - controller
@@ -1128,14 +1222,29 @@ components:
                 vesselEngineRegionId:
                   type: string
                   format: uuid
-                sshKey:
+                vesselEngineId:
                   type: string
+                  format: uuid
+                token:
+                  type:
+                    - string
+                    - 'null'
                 provisioning:
                   type: boolean
                   default: Controlled
                   description: |-
                     When provisioning is enabled, Galley is allowed to fully manage and provision the node.
                     When provisioning is disabled, Galley is only allowed to control the node by deploying onto the cluster
+                osMetadata:
+                  type:
+                    - object
+                    - 'null'
+                provisioningStatus:
+                  type: string
+                  description: Marks if the server's provisioning status. Open is waiting to be provisioned and may show a token.
+                  enum:
+                    - open
+                    - ready
                 deployTarget:
                   enum:
                     - applications
@@ -1147,6 +1256,33 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/ScheduledUpdate'
+    NodeAgentPartialUpdate:
+      description: Data transfer object for partially updating an existing Node by the Galley Node Agent (PATCH operation).
+      type: object
+      required:
+        - provisioningStatus
+      properties:
+        provisioningStatus:
+          type: string
+          description: Marks if the server's provisioning status. Open is waiting to be provisioned and may show a token.
+          enum:
+            - ready
+        cpu:
+          type: string
+          examples:
+            - '1'
+        memory:
+          type: string
+          examples:
+            - 1GB
+        storage:
+          type: string
+          examples:
+            - 20GB
+        osMetadata:
+          type:
+            - object
+            - 'null'
     RegionSummary:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'
@@ -1731,6 +1867,14 @@ components:
       name: vesselId
       in: path
       required: true
+      schema:
+        type: string
+        format: uuid
+    nodeId:
+      name: nodeId
+      in: path
+      required: true
+      description: Unique identifier of the node
       schema:
         type: string
         format: uuid

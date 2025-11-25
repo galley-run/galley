@@ -10,6 +10,7 @@ data class EventBusApiResponse(
   // Headers
   val version: String = "v1",
   val format: String = "json",
+  val contentType: String = "application/vnd.galley.$version+$format",
   val httpStatus: HttpStatus = HttpStatus.NoContent,
   // For the JSON:API Body spec
   val errors: JsonArray? = null,

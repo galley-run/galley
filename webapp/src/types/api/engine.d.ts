@@ -12,8 +12,9 @@ export interface EngineNodeSummary {
   memory: string
   storage: string
   vesselEngineRegionId: string
-  provisioning: string
-  deployTarget: string
+  provisioning: boolean
+  osMetadata: object
+  provisioningStatus: string
 }
 
 export interface EngineRegionSummary {

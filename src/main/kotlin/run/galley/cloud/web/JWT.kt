@@ -57,16 +57,22 @@ object JWT {
 
   // Keep a long expiration time for access tokens
   const val TTL_REFRESH_TOKEN = 7776000 // 90 days
+  const val TTL_NODE_AGENT = 3600 // 60 minutes
 
-  fun accessToken(userId: String): JWTOptions =
+  fun accessToken(userId: UUID): JWTOptions =
     jwtOptions
-      .setSubject(userId)
+      .setSubject(userId.toString())
       .setExpiresInSeconds(TTL_ACCESS_TOKEN)
 
-  fun refreshToken(userId: String): JWTOptions =
+  fun refreshToken(userId: UUID): JWTOptions =
     jwtOptions
-      .setSubject(userId)
+      .setSubject(userId.toString())
       .setExpiresInSeconds(TTL_REFRESH_TOKEN)
+
+  fun galleyNodeAgentToken(vesselEngineNodeId: UUID): JWTOptions =
+    jwtOptions
+      .setSubject(vesselEngineNodeId.toString())
+      .setExpiresInSeconds(TTL_NODE_AGENT)
 
   fun claims(vesselId: UUID): JsonObject = JsonObject().put("vesselId", vesselId.toString())
 }
@@ -85,12 +91,15 @@ fun JWTAuth.issueAccessToken(
         }
       },
     ),
-    JWT.accessToken(userId.toString()),
+    JWT.accessToken(userId),
   )
 
 fun JWTAuth.issueRefreshToken(
   userId: UUID,
   extraClaims: JsonObject = JsonObject(),
-): String = generateToken(extraClaims, JWT.refreshToken(userId.toString()))
+): String = generateToken(extraClaims, JWT.refreshToken(userId))
 
-fun User.getVesselId(): UUID? = this.principal().getUUID("vesselId")
+fun JWTAuth.issueGalleyNodeAgentToken(
+  vesselEngineNodeId: UUID,
+  extraClaims: JsonObject = JsonObject(),
+): String = generateToken(extraClaims, JWT.galleyNodeAgentToken(vesselEngineNodeId))

@@ -22,7 +22,7 @@ const { isLoading, data } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes'],
   queryFn: () =>
-    axios.get<ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
+    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
 })
 
 watch(data, (nodes) => {

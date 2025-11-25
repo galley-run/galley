@@ -57,7 +57,7 @@ object JWT {
 
   // Keep a long expiration time for access tokens
   const val TTL_REFRESH_TOKEN = 7776000 // 90 days
-  const val TTL_NODE_AGENT = 600 // 10 minutes
+  const val TTL_NODE_AGENT = 3600 // 60 minutes
 
   fun accessToken(userId: UUID): JWTOptions =
     jwtOptions

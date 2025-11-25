@@ -4,19 +4,95 @@ import io.vertx.core.Handler
 import io.vertx.core.Vertx
 import io.vertx.core.http.ServerWebSocket
 import io.vertx.core.http.ServerWebSocketHandshake
+import io.vertx.core.http.WebSocket
+import io.vertx.core.http.WebSocketConnectOptions
 import io.vertx.core.internal.logging.LoggerFactory
-import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
-import nl.clicqo.ext.fromBase64
-import nl.clicqo.ext.getUUID
+import io.vertx.kotlin.coroutines.coAwait
+import io.vertx.kotlin.coroutines.dispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import nl.clicqo.ext.toUUID
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedQueue
 
 class AgentWebSocketServer(
   val vertx: Vertx,
+  val outboundConnections: JsonObject? = null,
 ) {
   private val logger = LoggerFactory.getLogger(this::class.java)
+  private var reconnectTimerId: Long? = null
+  private var backoff = 1000L
+
+  // Overrides an inbound connection with an outbound connection on the requested vesselEngineId
+  suspend fun createOutboundConnection(vesselEngineId: UUID): WebSocket? {
+    if (outboundConnections == null || outboundConnections.isEmpty) {
+      return null
+    }
+
+    val ws =
+      try {
+        vertx
+          .createWebSocketClient()
+          .connect(
+            WebSocketConnectOptions()
+              .setURI(outboundConnections.getString(vesselEngineId.toString()))
+              .addHeader("X-Vessel-Engine-Id", vesselEngineId.toString())
+              .addHeader("Authorization", "Bearer dev"),
+          ).coAwait()
+      } catch (e: Exception) {
+        logger.error("Error while connecting to $vesselEngineId", e)
+        null
+      }
+
+    if (ws == null) {
+      scheduleReconnect(vesselEngineId)
+      return null
+    }
+
+    // Create agent session
+    val connectionId = UUID.randomUUID().toString()
+
+    val conn =
+      AgentConnection(
+        vertx = vertx,
+        connectionId = connectionId,
+        ws = ws,
+        credits = 0,
+        status = ConnectionStatus.ACTIVE,
+        vesselEngineId = vesselEngineId,
+      )
+    ws.textMessageHandler(conn::textMessageHandler)
+    val agentSession = AgentSession()
+    agentSession.connections[connectionId] = conn
+
+    ws.closeHandler {
+      logger.info("Closing connection $connectionId")
+      scheduleReconnect(vesselEngineId)
+    }
+    ws.shutdownHandler {
+      logger.info("Shutting down connection $connectionId")
+    }
+    ws.exceptionHandler {
+      logger.info("Uncaught exception in connection $connectionId")
+      scheduleReconnect(vesselEngineId)
+    }
+
+    sessions[vesselEngineId.toString()] = agentSession
+
+    return ws
+  }
+
+  private fun scheduleReconnect(vesselEngineId: UUID) {
+    reconnectTimerId =
+      vertx.setTimer(backoff) {
+        val scope = CoroutineScope(vertx.dispatcher() + SupervisorJob())
+        scope.launch {
+          createOutboundConnection(vesselEngineId)
+        }
+      }
+  }
 
   enum class ConnectionStatus {
     CONNECTING,
@@ -25,24 +101,8 @@ class AgentWebSocketServer(
     SHUTTING_DOWN,
   }
 
-  private data class AgentConnection(
-    val connectionId: String,
-    val ws: ServerWebSocket,
-    var credits: Int,
-    val inflight: MutableSet<String> = mutableSetOf(),
-    var lastPingAt: Long = System.currentTimeMillis(),
-    var status: ConnectionStatus = ConnectionStatus.CONNECTING,
-  )
-
-  private data class AgentSession(
-    val connections: ConcurrentHashMap<String, AgentConnection> = ConcurrentHashMap(),
-  )
-
   // vesselEngineId -> session with multiple connections
   private val sessions = ConcurrentHashMap<String, AgentSession>()
-
-  // vesselEngineId -> pending commands (JSON-ready maps)
-  private val queues = ConcurrentHashMap<String, ConcurrentLinkedQueue<Map<String, Any?>>>()
 
   // simpele anti-abuse: IP → count in huidig tijdslot
   private val handshakesPerIp = ConcurrentHashMap<String, Int>()
@@ -80,7 +140,7 @@ class AgentWebSocketServer(
     }
   }
 
-  fun getSessionSocket(vesselEngineId: UUID): ServerWebSocket? {
+  fun getSessionSocket(vesselEngineId: UUID): WebSocket? {
     val agentSession = sessions[vesselEngineId.toString()] ?: return null
     // Return first active connection found
     return agentSession.connections.values
@@ -88,8 +148,8 @@ class AgentWebSocketServer(
       ?.ws
   }
 
-  fun connectionHandler(): Handler<ServerWebSocket> {
-    return Handler { ws ->
+  fun connectionHandler(): Handler<ServerWebSocket> =
+    Handler { ws ->
       val vesselEngineId = ws.headers().get("X-Vessel-Engine-Id") ?: UUID.randomUUID().toString()
       val connectionId = ws.headers().get("X-Session-Id") ?: UUID.randomUUID().toString()
       val remoteAddress = ws.remoteAddress()
@@ -101,87 +161,18 @@ class AgentWebSocketServer(
 
       val conn =
         AgentConnection(
+          vertx = vertx,
           connectionId = connectionId,
           ws = ws,
           credits = 0,
           status = ConnectionStatus.CONNECTING,
+          vesselEngineId = vesselEngineId.toUUID(),
         )
       agentSession.connections[connectionId] = conn
 
       logger.info("[WS] Total connections for vesselEngineId=$vesselEngineId: ${agentSession.connections.size}")
 
-      fun drainQueue() {
-        val q = queues[vesselEngineId] ?: return
-        var drained = 0
-        while (conn.credits > 0 && q.peek() != null) {
-          val m = q.poll()
-          val id = m["id"] as String
-          conn.credits -= 1
-          conn.inflight += id
-          ws.writeTextMessage(Json.encode(m))
-          drained++
-        }
-        if (drained > 0) {
-          logger.info("[WS] Drained $drained messages to connectionId=$connectionId (credits left: ${conn.credits})")
-        }
-      }
-
-      ws.textMessageHandler { text ->
-        val obj = JsonObject(text)
-        val msgType = obj.getString("type")
-        logger.info("[WS] Received from vesselEngineId=$vesselEngineId, connectionId=$connectionId: type=$msgType")
-
-        when (msgType) {
-          "agent.hello" -> {
-            val credits = obj.getJsonObject("payload")?.getInteger("credits") ?: 0
-            conn.credits += credits
-            conn.status = ConnectionStatus.ACTIVE
-            logger.info("[WS] agent.hello from connectionId=$connectionId with $credits credits (total: ${conn.credits})")
-            drainQueue()
-          }
-
-          "agent.credits" -> {
-            val delta = obj.getJsonObject("payload")?.getInteger("delta") ?: 0
-            conn.credits += delta
-            logger.info("[WS] agent.credits from connectionId=$connectionId: delta=$delta (total: ${conn.credits})")
-            drainQueue()
-          }
-
-          "cmd.done" -> {
-            val vesselEngineId =
-              try {
-                obj.getUUID("id") ?: throw Exception("vesselEngineId not given")
-              } catch (e: Exception) {
-                logger.warn("[WS] Error while replying and parsing the vesselEngineId", e)
-                return@textMessageHandler
-              }
-
-            conn.inflight.remove(vesselEngineId.toString())
-            val replyTo = obj.getString("action")
-
-            logger.info("[WS] cmd.done from connectionId=$connectionId: vesselEngineId=$vesselEngineId for $replyTo")
-
-            try {
-              vertx.eventBus().send(
-                replyTo,
-                EventBusAgentResponse(
-                  vesselEngineId = vesselEngineId,
-                  payload = JsonObject(obj.getString("result").fromBase64()),
-                ),
-              )
-            } catch (e: Exception) {
-              logger.warn("[WS] Error while replying", e)
-            }
-
-            // hier kun je doorzetten naar je orchestrator of audit log
-          }
-
-          // eventueel "cmd.error", "agent.metrics", ... afhandelen
-          else -> {
-            logger.warn("[WS] Unknown message type '$msgType' from connectionId=$connectionId")
-          }
-        }
-      }
+      ws.textMessageHandler(conn::textMessageHandler)
 
       ws.shutdownHandler {
         conn.status = ConnectionStatus.SHUTTING_DOWN
@@ -219,5 +210,4 @@ class AgentWebSocketServer(
         }
       }
     }
-  }
 }

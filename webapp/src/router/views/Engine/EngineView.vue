@@ -88,7 +88,7 @@
               <div class="flex items-center gap-2">
                 <FlagIcon code="nl" :size="16" />
                 <div>{{ node.attributes.name }}</div>
-                <!--                <div class="badge badge&#45;&#45;small">Ready</div>-->
+                <div class="badge badge--cliona badge--small" v-if="node.attributes.provisioningStatus === 'open'">Setup required</div>
               </div>
               <p>
                 {{ node.attributes.nodeType }} &bullet; {{ node.attributes.cpu }} CPU &bullet;
@@ -180,24 +180,24 @@ const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine'],
+  enabled: computed(() => !!selectedVesselId?.value),
+  queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine']),
   queryFn: () =>
-    axios.get<ApiResponse<EngineSummary>[]>(`/vessels/${selectedVesselId?.value}/engine`),
+    axios.get<ApiResponse<EngineSummary>[], ApiResponse<EngineSummary>[]>(`/vessels/${selectedVesselId?.value}/engine`),
 })
 
 const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes'],
+  enabled: computed(() =>!!selectedVesselId?.value),
+  queryKey: computed(() =>['vessel', selectedVesselId?.value, 'engine', 'nodes']),
   queryFn: () =>
-    axios.get<ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
+    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
 })
 
 const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
+  enabled: computed(() =>!!selectedVesselId?.value),
+  queryKey: computed(() =>['vessel', selectedVesselId?.value, 'engine', 'regions']),
   queryFn: () =>
-    axios.get<ApiResponse<EngineRegionSummary>[]>(
+    axios.get<ApiResponse<EngineRegionSummary>[], ApiResponse<EngineRegionSummary>[]>(
       `/vessels/${selectedVesselId?.value}/engine/regions`,
     ),
 })

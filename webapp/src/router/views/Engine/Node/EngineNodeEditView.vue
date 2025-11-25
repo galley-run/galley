@@ -13,18 +13,11 @@
       <div class="grid xl:grid-cols-4 gap-8">
         <UIFormField>
           <UILabel required for="name">Domain name</UILabel>
-          <UITextInput
-            required
-            id="name"
-            placeholder="e.g. app1.cloud.galley.run"
-            v-model="name"
-          />
+          <UITextInput required id="name" placeholder="e.g. app1.cloud.galley.run" v-model="name" />
           <label for="name" class="form-field__error-message">
             The domain name is a required field.
           </label>
-          <label for="name"
-            >This name is used internally in Galley to identify this node.</label
-          >
+          <label for="name">This name is used internally in Galley to identify this node.</label>
         </UIFormField>
         <UIFormField>
           <UILabel required for="ipAddress">IP Address</UILabel>
@@ -172,17 +165,31 @@
         </UIFormField>
       </div>
 
-      <UICodeBlock title="SSH into your machine and run:" v-if="engineNode && !isLoading">
-        <UICodeLine comment>All executions below need to be run via sudo to make server-wide changes.</UICodeLine>
+      <UICodeBlock
+        title="SSH into your machine and run:"
+        v-if="engineNode && engineNode.attributes.token && !isLoading"
+      >
+        <UICodeLine comment
+          >All executions below need to be run via sudo to make server-wide changes.</UICodeLine
+        >
         <UICodeLine empty />
-        <UICodeLine comment>Installs Galley Node Agent</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>First, run this on your controller node:</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'">sudo galley worker invite</UICodeLine>
+        <UICodeLine empty />
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>Run the rest of the commands on your worker node:</UICodeLine>
         <UICodeLine>curl -sSf {{ getUrl }} | sudo sh</UICodeLine>
         <UICodeLine empty />
-        <UICodeLine comment>Prepares your node with latest updates and secures your machine</UICodeLine>
+        <UICodeLine comment
+          >Prepares your node with latest updates and secures your machine</UICodeLine
+        >
         <UICodeLine> sudo galley node prepare </UICodeLine>
         <UICodeLine empty />
-        <UICodeLine comment>Mark this node as controller in your cluster</UICodeLine>
-        <UICodeLine> sudo galley controller join {{ engineNode.attributes.token }} </UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'" comment>Mark this node as controller in your cluster</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'">sudo galley controller join {{ engineNode.attributes.token }}</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'" comment>Mark this node as single-node cluster</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'">sudo galley controller join {{ engineNode.attributes.token }} --single</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>Mark this node as worker in your cluster</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'">sudo galley worker join</UICodeLine>
       </UICodeBlock>
 
       <div class="card__footer form-footer">
@@ -209,14 +216,14 @@ import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useMutation, useQuery } from '@tanstack/vue-query'
 import axios from 'axios'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
 import FlagIcon from 'vue3-flag-icons'
 import type { ApiResponse } from '@/types/api'
-import type { EngineRegionSummary } from '@/types/api/engine'
+import type { EngineNodeSummary, EngineRegionSummary } from '@/types/api/engine'
 import UIButton from '@/components/UIButton.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 import { ArrowLeft, Key, DoubleAltArrowRight } from '@solar-icons/vue'
@@ -241,16 +248,20 @@ const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
   queryFn: () =>
-    axios.get<ApiResponse<EngineRegionSummary>[]>(
+    axios.get<ApiResponse<EngineRegionSummary>[], ApiResponse<EngineRegionSummary>[]>(
       `/vessels/${selectedVesselId?.value}/engine/regions`,
     ),
 })
 
-const { isLoading, data: engineNode } = useQuery({
+const {
+  isLoading,
+  data: engineNode,
+  refetch: refetchNode,
+} = useQuery({
   enabled: !!selectedVesselId?.value && !!nodeId,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes', nodeId],
   queryFn: () =>
-    axios.get<ApiResponse<EngineRegionSummary>[]>(
+    axios.get<ApiResponse<EngineNodeSummary>, ApiResponse<EngineNodeSummary>>(
       `/vessels/${selectedVesselId?.value}/engine/nodes/${nodeId}`,
     ),
 })
@@ -285,14 +296,31 @@ const sshKey = ref('')
 const region = ref(computed(() => regions.value?.[0]?.value))
 const provisioning = ref(true)
 
+let refreshNodeTimeout: NodeJS.Timeout
 watch(engineNode, (value) => {
   if (value) {
     name.value = value.attributes.name
     ipAddress.value = value.attributes.ipAddress
     nodeType.value = value.attributes.nodeType
-    deploy.value = value.attributes.deploy
+    deploy.value = value.attributes.deployMode
     provisioning.value = value.attributes.provisioning
-    region.value = value.attributes.region
+    // region.value = value.attributes.vesselEngineRegionId
+
+    if (refreshNodeTimeout) {
+      clearTimeout(refreshNodeTimeout)
+    }
+
+    if (value.attributes.provisioningStatus === 'open') {
+      refreshNodeTimeout = setTimeout(async () => {
+        await refetchNode()
+      }, 30000)
+    }
+  }
+})
+
+onBeforeUnmount(() => {
+  if (refreshNodeTimeout) {
+    clearTimeout(refreshNodeTimeout)
   }
 })
 

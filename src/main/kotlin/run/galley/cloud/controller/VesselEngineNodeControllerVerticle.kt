@@ -1,6 +1,10 @@
 package run.galley.cloud.controller
 
+import generated.jooq.enums.EngineMode
+import generated.jooq.enums.NodeProvisioningStatus
 import generated.jooq.tables.pojos.VesselEngineNodes
+import generated.jooq.tables.pojos.VesselEngines
+import generated.jooq.tables.references.VESSEL_ENGINES
 import generated.jooq.tables.references.VESSEL_ENGINE_NODES
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
@@ -8,12 +12,15 @@ import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
+import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusDataResponse
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
+import nl.clicqo.ext.toUUID
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.data.VesselEngineDataVerticle
 import run.galley.cloud.data.VesselEngineNodeDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
 import run.galley.cloud.web.JWT
@@ -24,6 +31,7 @@ class VesselEngineNodeControllerVerticle :
   CoroutineEventBusSupport {
   companion object {
     const val NODE_AGENT_GET = "nodeAgent.vessel.engine.node.query.get"
+    const val NODE_AGENT_PATCH = "nodeAgent.vessel.engine.node.query.patch"
     const val LIST = "vessel.engine.node.query.list"
     const val GET = "vessel.engine.node.query.get"
   }
@@ -35,6 +43,7 @@ class VesselEngineNodeControllerVerticle :
       vertx.eventBus().coConsumer(LIST, handler = ::list)
       vertx.eventBus().coConsumer(GET, handler = ::get)
       vertx.eventBus().coConsumer(NODE_AGENT_GET, handler = ::getForNodeAgent)
+      vertx.eventBus().coConsumer(NODE_AGENT_PATCH, handler = ::patchByNodeAgent)
     }
   }
 
@@ -63,26 +72,30 @@ class VesselEngineNodeControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject(
-          JsonObject()
-            .put(
-              "token",
-              JWT
-                .authProvider(vertx, config)
-                .issueGalleyNodeAgentToken(
-                  nodeId,
-                ),
-            ),
-        )
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
 
-    message.reply(EventBusApiResponse(dataResponse))
+    val token =
+      if (dataResponse.provisioningStatus === NodeProvisioningStatus.open) {
+        JWT
+          .authProvider(vertx, config)
+          .issueGalleyNodeAgentToken(
+            nodeId,
+          )
+      } else {
+        null
+      }
+    val obj =
+      dataResponse.toJsonAPIResourceObject(
+        JsonObject()
+          .put("token", token),
+      )
+
+    message.reply(EventBusApiResponse(obj))
   }
 
   private suspend fun getForNodeAgent(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val user = apiRequest.user
-    val nodeId = user?.subject() ?: throw ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT
+    val nodeId = apiRequest.user?.subject() ?: throw ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT
 
     val dataRequest =
       EventBusQueryDataRequest(
@@ -92,7 +105,7 @@ class VesselEngineNodeControllerVerticle :
           ),
       )
 
-    val dataResponse =
+    val vesselEngineNode =
       vertx
         .eventBus()
         .request<EventBusDataResponse<VesselEngineNodes>>(VesselEngineNodeDataVerticle.GET, dataRequest)
@@ -100,10 +113,64 @@ class VesselEngineNodeControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject()
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
 
-    message.reply(EventBusApiResponse(dataResponse, contentType = "application/vnd.galley-node-agent.v1+json"))
+    // Only allow this endpoint when the provisioning status is open
+    if (vesselEngineNode.provisioningStatus !== NodeProvisioningStatus.open) {
+      throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+    }
+
+    message.reply(
+      EventBusApiResponse(
+        vesselEngineNode.toJsonAPIResourceObject(),
+        contentType = "application/vnd.galley-node-agent.v1+json",
+      ),
+    )
+  }
+
+  private suspend fun patchByNodeAgent(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val nodeId = apiRequest.user?.subject()?.toUUID() ?: throw ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        payload = apiRequest.body,
+        identifier = nodeId,
+        filters =
+          filters {
+            VESSEL_ENGINE_NODES.PROVISIONING_STATUS eq NodeProvisioningStatus.open
+          },
+      )
+
+    val vesselEngineNode =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<VesselEngineNodes>>(VesselEngineNodeDataVerticle.PATCH, dataRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toOne()
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+
+    val vesselEngineDataRequest =
+      EventBusCmdDataRequest(
+        payload = JsonObject().put(VESSEL_ENGINES.MODE.name, EngineMode.managed_cloud.toString()),
+        identifier = vesselEngineNode.vesselEngineId,
+      )
+
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<VesselEngines>>(
+        VesselEngineDataVerticle.PATCH,
+        vesselEngineDataRequest,
+      ).coAwait()
+
+    message.reply(
+      EventBusApiResponse(
+        vesselEngineNode.toJsonAPIResourceObject(),
+        contentType = "application/vnd.galley-node-agent.v1+json",
+      ),
+    )
   }
 
   private suspend fun list(message: Message<EventBusApiRequest>) {

@@ -69,6 +69,7 @@ import run.galley.cloud.ws.EventBusAgentRequestCodec
 import run.galley.cloud.ws.EventBusAgentResponse
 import run.galley.cloud.ws.EventBusAgentResponseCodec
 import run.galley.cloud.ws.VesselEngineAgentTunnel
+import java.util.UUID
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -189,8 +190,11 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(LicenseVerticle(), deploymentOptions).coAwait()
 
     // Initialize WebSocket server
-    val agentWebSocketServer = AgentWebSocketServer(vertx)
+    val agentWebSocketServer = AgentWebSocketServer(vertx, config.getJsonObject("_outboundAgent"))
     VesselEngineAgentTunnel(vertx, agentWebSocketServer, coroutineContext)
+    config.getJsonObject("_outboundAgent").forEach {
+      agentWebSocketServer.createOutboundConnection(UUID.fromString(it.key))
+    }
 
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()

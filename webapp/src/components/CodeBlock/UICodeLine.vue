@@ -22,7 +22,8 @@ const copied = ref(false)
 
 function copyLine(event: Event) {
   const text = (event.target as HTMLElement).textContent || ''
-  navigator.clipboard.writeText(text)
+  console.log(text.trim())
+  navigator.clipboard.writeText(text.trim())
   copied.value = true
   setTimeout(() => copied.value = false, 1600)
 }

@@ -11,15 +11,20 @@
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import SlashDivider from '@/assets/SlashDivider.vue'
 import { MenuDots } from '@solar-icons/vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, watch } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { useAuthStore } from '@/stores/auth.ts'
 import { storeToRefs } from 'pinia'
 
 const projectStore = useProjectsStore()
+
 const authStore = useAuthStore()
-const { chartersForDropdown, projectsForDropdown, selectedCharterId, selectedProjectId } = storeToRefs(projectStore)
+const { chartersForDropdown, projectsForDropdown, charters, selectedCharterId, selectedProjectId } = storeToRefs(projectStore)
+
+watch(selectedCharterId, (newCharterId) => {
+  selectedProjectId.value = Object.values(charters.value).find(charter => charter.id === newCharterId)?.projects?.[0]?.id ?? ''
+})
 
 onMounted(() => {
   projectStore.fetchCharters(authStore.vesselIds)

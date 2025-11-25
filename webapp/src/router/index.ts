@@ -14,7 +14,7 @@ import {useAuthStore} from '@/stores/auth.ts'
 import LoginLayout from '@/router/layouts/LoginLayout.vue'
 import LoginView from '@/router/views/Login/LoginView.vue'
 import LogoutView from '@/router/views/Login/LogoutView.vue'
-import EngineNodeAddView from '@/router/views/Engine/Node/EngineNodeAddView.vue'
+import EngineNodeEditView from '@/router/views/Engine/Node/EngineNodeEditView.vue'
 import EngineNodeFirstControllerView from '@/router/views/Engine/Node/EngineNodeFirstControllerView.vue'
 
 const routes = [
@@ -51,8 +51,8 @@ const routes = [
       { path: '/charter/compute-plans', component: ComputePlansView },
       { path: '/vessel/engine', component: EngineView },
       { path: '/vessel/engine/node/controller', component: EngineNodeFirstControllerView },
-      { path: '/vessel/engine/node/add', component: EngineNodeAddView },
-      { path: '/vessel/engine/node/:nodeId', component: EngineNodeAddView },
+      { path: '/vessel/engine/node/add', component: EngineNodeEditView },
+      { path: '/vessel/engine/node/:nodeId', component: EngineNodeEditView },
     ],
   },
 ]

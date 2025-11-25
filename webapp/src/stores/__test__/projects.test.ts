@@ -361,7 +361,6 @@ describe('useProjectsStore', () => {
 
   describe('state mutations', () => {
     it('allows manual selection changes', () => {
-      store.selectedVesselId = 'vessel1'
       store.selectedCharterId = 'charter1'
       store.selectedProjectId = 'project1'
 

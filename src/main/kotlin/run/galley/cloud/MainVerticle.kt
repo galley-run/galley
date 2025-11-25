@@ -192,7 +192,8 @@ class MainVerticle : CoroutineVerticle() {
     // Initialize WebSocket server
     val agentWebSocketServer = AgentWebSocketServer(vertx, config.getJsonObject("_outboundAgent"))
     VesselEngineAgentTunnel(vertx, agentWebSocketServer, coroutineContext)
-    config.getJsonObject("_outboundAgent").forEach {
+    // For development purpose only
+    config.getJsonObject("_outboundAgent")?.forEach {
       agentWebSocketServer.createOutboundConnection(UUID.fromString(it.key))
     }
 

@@ -3,6 +3,7 @@ package main
 type VesselEngineNodeAttributes struct {
 	VesselEngineRegionID string `json:"vesselEngineRegionId"`
 	NodeType             string `json:"nodeType"`
+	VesselEngineID       string `json:"vesselEngineId"`
 	Name                 string `json:"name"`
 	IPAddress            string `json:"ipAddress"`
 	CPU                  string `json:"cpu"`

@@ -347,20 +347,6 @@ func TestGetAvailableLTSVersion(t *testing.T) {
 	})
 }
 
-func TestGetAvailableNonLTSVersion(t *testing.T) {
-	t.Run("checks for non-LTS version availability", func(t *testing.T) {
-		version, available := getAvailableNonLTSVersion()
-		if available {
-			t.Logf("Non-LTS version available: %s", version)
-			if version == "" {
-				t.Error("getAvailableNonLTSVersion() returned available=true but empty version")
-			}
-		} else {
-			t.Log("No non-LTS version available (or do-release-upgrade not found)")
-		}
-	})
-}
-
 func TestVersionFunctionsDoNotPanic(t *testing.T) {
 	tests := []struct {
 		name string
@@ -373,10 +359,6 @@ func TestVersionFunctionsDoNotPanic(t *testing.T) {
 		{
 			name: "getAvailableLTSVersion",
 			fn:   func() { _, _ = getAvailableLTSVersion() },
-		},
-		{
-			name: "getAvailableNonLTSVersion",
-			fn:   func() { _, _ = getAvailableNonLTSVersion() },
 		},
 	}
 

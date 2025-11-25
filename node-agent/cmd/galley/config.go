@@ -10,9 +10,11 @@ import (
 )
 
 type Config struct {
-	DownloadBase string `yaml:"download_base"`
-	PlatformURL  string `yaml:"platform_url"`
-	ClientURL    string `yaml:"client_url"`
+	DownloadBase   string `yaml:"download_base"`
+	PlatformURL    string `yaml:"platform_url"`
+	ClientURL      string `yaml:"client_url"`
+	VesselEngineId string `yaml:"vessel_engine_id"`
+	NodeType       string `yaml:"node_type"`
 }
 
 var configCmd = &cobra.Command{
@@ -125,6 +127,43 @@ func getDefaultConfig() *Config {
 	}
 }
 
+// getConfigValue retrieves a config value by key
+func getConfigValue(config *Config, key string) (string, error) {
+	switch key {
+	case "download_base":
+		return config.DownloadBase, nil
+	case "platform_url":
+		return config.PlatformURL, nil
+	case "client_url":
+		return config.ClientURL, nil
+	case "vessel_engine_id":
+		return config.VesselEngineId, nil
+	case "node_type":
+		return config.NodeType, nil
+	default:
+		return "", fmt.Errorf("unknown config key: %s (available: download_base, platform_url, client_url)", key)
+	}
+}
+
+// setConfigValue sets a config value by key
+func setConfigValue(config *Config, key, value string) error {
+	switch key {
+	case "download_base":
+		config.DownloadBase = value
+	case "platform_url":
+		config.PlatformURL = value
+	case "client_url":
+		config.ClientURL = value
+	case "vessel_engine_id":
+		config.VesselEngineId = value
+	case "node_type":
+		config.NodeType = value
+	default:
+		return fmt.Errorf("unknown config key: %s (available: download_base, platform_url, client_url)", key)
+	}
+	return nil
+}
+
 func runConfigSet(cmd *cobra.Command, args []string) error {
 	key := args[0]
 	value := args[1]
@@ -134,15 +173,8 @@ func runConfigSet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	switch key {
-	case "download_base":
-		config.DownloadBase = value
-	case "platform_url":
-		config.PlatformURL = value
-	case "client_url":
-		config.ClientURL = value
-	default:
-		return fmt.Errorf("unknown config key: %s (available: download_base, platform_url, client_url)", key)
+	if err := setConfigValue(config, key, value); err != nil {
+		return err
 	}
 
 	if err := saveConfig(config); err != nil {
@@ -161,16 +193,9 @@ func runConfigGet(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	var value string
-	switch key {
-	case "download_base":
-		value = config.DownloadBase
-	case "platform_url":
-		value = config.PlatformURL
-	case "client_url":
-		value = config.ClientURL
-	default:
-		return fmt.Errorf("unknown config key: %s (available: download_base, platform_url, client_url)", key)
+	value, err := getConfigValue(config, key)
+	if err != nil {
+		return err
 	}
 
 	fmt.Println(value)
@@ -186,6 +211,8 @@ func runConfigList(cmd *cobra.Command, args []string) error {
 	fmt.Printf("download_base: %s\n", config.DownloadBase)
 	fmt.Printf("platform_url: %s\n", config.PlatformURL)
 	fmt.Printf("client_url: %s\n", config.ClientURL)
+	fmt.Printf("vessel_engine_id: %s\n", config.VesselEngineId)
+	fmt.Printf("node_type: %s\n", config.NodeType)
 	return nil
 }
 

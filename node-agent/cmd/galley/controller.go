@@ -56,13 +56,13 @@ This command will:
 	RunE: func(cobraCmd *cobra.Command, args []string) error {
 		token := args[0]
 
-		vesselEngineId, err := extractJWTSubject(token)
+		vesselEngineNodeId, err := extractJWTSubject(token)
 		if err != nil {
 			return err
 		}
 
 		logAction("Starting controller join", map[string]string{
-			"vessel_engine_id": vesselEngineId,
+			"vessel_engine_node_id": vesselEngineNodeId,
 		})
 
 		platformURL := getPlatformURL()
@@ -84,6 +84,22 @@ This command will:
 		}
 
 		nodeType := node.Attributes.NodeType
+		vesselEngineId := node.Attributes.VesselEngineID
+
+		config, err := loadConfig()
+		if err := setConfigValue(config, "vessel_engine_id", vesselEngineId); err != nil {
+			return fmt.Errorf("failed to save vessel_engine_id %w in Galley config", err)
+		}
+		logAction("VesselEngineId saved in Galley config", map[string]string{
+			"vessel_engine_id": vesselEngineId,
+		})
+		if err := setConfigValue(config, "node_type", nodeType); err != nil {
+			return fmt.Errorf("failed to save node_type %w in Galley config", err)
+		}
+		logAction("NodeType saved in Galley config", map[string]string{
+			"node_type": nodeType,
+		})
+
 		log.Printf("Joining cluster as: %s", nodeType)
 
 		// Install k0s controller
@@ -106,16 +122,30 @@ This command will:
 			"status":    "success",
 		})
 
-		// Generate worker token and display join instructions
-		workerToken, err := generateWorkerToken()
-		if err != nil {
-			log.Printf("Warning: Failed to generate worker token: %v", err)
-			log.Println("You can manually create a token later with: k0s token create --role worker")
-		} else {
-			displayWorkerJoinInstructions(vesselEngineId, workerToken)
+		if err := markGalleyNodeReady(platformURL, vesselEngineNodeId, token); err != nil {
+			return fmt.Errorf("failed to mark node as ready in Galley: %w", err)
 		}
 
-		fmt.Printf("\n💡 View all actions taken by Galley CLI: galley logs\n")
+		fmt.Println("\n" + strings.Repeat("=", 60))
+		fmt.Println("✓ Controller marked as ready in Galley")
+		fmt.Println("\n" + strings.Repeat("=", 60))
+
+		logAction("Controller marking ready in Galley completed", map[string]string{
+			"status": "success",
+		})
+
+		if nodeType == "controller" {
+			// Generate worker token and display join instructions
+			workerToken, err := generateWorkerToken(flagInviteExpiry)
+			if err != nil {
+				log.Printf("Warning: Failed to generate worker token: %v", err)
+				log.Println("You can manually create a token later with: k0s token create --role worker")
+			} else {
+				displayWorkerJoinInstructions(vesselEngineId, workerToken)
+			}
+		}
+
+		fmt.Printf("\n💡 All actions taken by Galley CLI are logged and can be viewed via: galley logs\n")
 		fmt.Printf("   Log file location: %s\n\n", getLogPath())
 
 		return nil
@@ -124,5 +154,5 @@ This command will:
 
 func init() {
 	controllerCmd.AddCommand(controllerJoinCmd)
-	//controllerInviteCmd.Flags().StringVar(&flagInviteExpiry, "expiry", "10m", "Token vervaltijd, bijv. 10m of 1h")
+	controllerJoinCmd.Flags().StringVar(&flagInviteExpiry, "expiry", "1h", "K0s token expiry time, e.g. 10m or 1h")
 }

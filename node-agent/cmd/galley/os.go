@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -25,6 +26,7 @@ var packageManagers = []packageManager{
 			{"apt-get", "update"},
 			{"apt-get", "install", "-y", "unattended-upgrades"},
 			{"apt-get", "upgrade", "-y"},
+			{"apt-get", "dist-upgrade", "-y"},
 			{"apt-get", "autoremove", "-y"},
 			{"apt-get", "autoclean"},
 		},
@@ -146,64 +148,90 @@ func updateOS(progress *PrepareProgress, reader *bufio.Reader) error {
 
 func promptDistUpgrade(ctx context.Context, reader *bufio.Reader) error {
 	currentVersion := getCurrentOSVersion()
+
+	// Check if do-release-upgrade is available
+	if _, err := exec.LookPath("do-release-upgrade"); err != nil {
+		return nil
+	}
+
+	const cfgPath = "/etc/update-manager/release-upgrades"
+
+	original, err := os.ReadFile(cfgPath)
+	if err == nil {
+		currentPrompt := getReleasePromptFromConfig(string(original))
+
+		// If the system is not on LTS track, ask if we may switch it to LTS
+		if currentPrompt != "" && currentPrompt != "lts" {
+			fmt.Println("\n" + strings.Repeat("-", 60))
+			fmt.Println("Ubuntu Release Policy")
+			fmt.Println(strings.Repeat("-", 60))
+			fmt.Printf("Current policy: %s\n", currentPrompt)
+			fmt.Println("\nGalley recommends using the LTS release track for servers,")
+			fmt.Println("to minimise unexpected changes and keep upgrades predictable.")
+			fmt.Print("\nSwitch release policy to LTS-only before checking for upgrades? [Y/n]: ")
+
+			response, readErr := reader.ReadString('\n')
+			if readErr != nil {
+				return fmt.Errorf("failed to read input: %w", readErr)
+			}
+			response = strings.TrimSpace(strings.ToLower(response))
+
+			if response == "" || response == "y" || response == "yes" {
+				updated := updateReleaseUpgradesPrompt(string(original), "lts")
+				if updated != string(original) {
+					if err := os.WriteFile(cfgPath, []byte(updated), 0644); err != nil {
+						fmt.Printf("⚠️  Warning: failed to update %s: %v\n", cfgPath, err)
+						// Continue with existing policy, but we will still only *suggest* LTS upgrades
+					} else {
+						fmt.Println("✓ Release policy updated to LTS-only.")
+					}
+				}
+			} else {
+				fmt.Println("\nKeeping existing release policy. No distribution upgrade will be suggested.")
+				return nil
+			}
+		}
+	}
+
+	return suggestLTSUpgrade(ctx, reader, currentVersion)
+}
+
+func suggestLTSUpgrade(ctx context.Context, reader *bufio.Reader, currentVersion string) error {
 	ltsVersion, hasLTS := getAvailableLTSVersion()
-
-	if hasLTS && ltsVersion != "" && ltsVersion != currentVersion {
-		fmt.Println("\n" + strings.Repeat("-", 60))
-		fmt.Println("Distribution Upgrade")
-		fmt.Println(strings.Repeat("-", 60))
-		fmt.Printf("Current version: %s\n", currentVersion)
-		fmt.Printf("Available LTS:   %s\n", ltsVersion)
-		fmt.Println("\nThis will perform a 'dist-upgrade' which may upgrade major")
-		fmt.Println("packages and potentially the OS to a newer LTS version.")
-		fmt.Print("\nUpgrade to latest LTS? [Y/n]: ")
-
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			return fmt.Errorf("failed to read input: %w", err)
-		}
-
-		response = strings.TrimSpace(strings.ToLower(response))
-
-		// Default to "yes" if user just presses Enter
-		if response == "" || response == "y" || response == "yes" {
-			fmt.Println("\nPerforming distribution upgrade to latest LTS...")
-			if err := runCommandWithContext(ctx, "apt-get", "dist-upgrade", "-y"); err != nil {
-				return fmt.Errorf("dist-upgrade failed: %w", err)
-			}
-			fmt.Println("✓ Distribution upgrade completed")
-			return nil
-		}
-
-		fmt.Println("\nLTS upgrade declined.")
+	if !hasLTS || ltsVersion == "" || ltsVersion == currentVersion {
+		fmt.Println("\nNo newer Ubuntu LTS release detected or distribution upgrade skipped.")
+		return nil
 	}
 
-	// Check if there's a newer non-LTS version available
-	nonLTSVersion, hasNonLTS := getAvailableNonLTSVersion()
-	if hasNonLTS && nonLTSVersion != "" && nonLTSVersion != currentVersion {
-		fmt.Println("\n" + strings.Repeat("-", 60))
-		fmt.Printf("Current version:     %s\n", currentVersion)
-		fmt.Printf("Available non-LTS:   %s\n", nonLTSVersion)
-		fmt.Print("\nUpgrade to latest non-LTS version? [Y/n]: ")
+	fmt.Println("\n" + strings.Repeat("-", 60))
+	fmt.Println("Distribution Upgrade (LTS)")
+	fmt.Println(strings.Repeat("-", 60))
+	fmt.Printf("Current version: %s\n", currentVersion)
+	fmt.Printf("Available LTS:   %s\n", ltsVersion)
+	fmt.Println("\nThis will perform a release upgrade to the latest Ubuntu LTS version.")
+	fmt.Print("\nUpgrade to latest LTS? [Y/n]: ")
 
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			return fmt.Errorf("failed to read input: %w", err)
+	response, err := reader.ReadString('\n')
+	if err != nil {
+		return fmt.Errorf("failed to read input: %w", err)
+	}
+	response = strings.TrimSpace(strings.ToLower(response))
+
+	if response == "" || response == "y" || response == "yes" {
+		fmt.Println("\nPerforming distribution upgrade to latest LTS...")
+		if err := runCommandWithContext(
+			ctx,
+			"do-release-upgrade",
+			"-f", "DistUpgradeViewNonInteractive",
+			"-y",
+		); err != nil {
+			return fmt.Errorf("do-release-upgrade to LTS failed: %w", err)
 		}
-
-		response = strings.TrimSpace(strings.ToLower(response))
-
-		if response == "" || response == "y" || response == "yes" {
-			fmt.Println("\nPerforming distribution upgrade to latest non-LTS...")
-			if err := runCommandWithContext(ctx, "apt-get", "dist-upgrade", "-y"); err != nil {
-				return fmt.Errorf("dist-upgrade failed: %w", err)
-			}
-			fmt.Println("✓ Distribution upgrade completed")
-			return nil
-		}
+		fmt.Println("✓ Distribution upgrade to LTS completed")
+		return nil
 	}
 
-	fmt.Println("\nDistribution upgrade skipped.")
+	fmt.Println("\nLTS upgrade declined.")
 	return nil
 }
 
@@ -223,12 +251,11 @@ func getCurrentOSVersion() string {
 }
 
 func getAvailableLTSVersion() (string, bool) {
-	// Check if update-manager-core is available
+	// Check if update-manager-core/do-release-upgrade is available
 	if _, err := exec.LookPath("do-release-upgrade"); err != nil {
 		return "", false
 	}
 
-	// Check for LTS releases only
 	cmd := exec.Command("do-release-upgrade", "--check-dist-upgrade-only")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -236,9 +263,7 @@ func getAvailableLTSVersion() (string, bool) {
 	}
 
 	outputStr := string(output)
-	// Look for "New release 'XX.XX' available" pattern
 	if strings.Contains(outputStr, "New release") {
-		// Extract version number using regex-like parsing
 		version := extractVersionFromOutput(outputStr)
 		if version != "" {
 			return version, true
@@ -248,29 +273,36 @@ func getAvailableLTSVersion() (string, bool) {
 	return "", false
 }
 
-func getAvailableNonLTSVersion() (string, bool) {
-	// Check if update-manager-core is available
-	if _, err := exec.LookPath("do-release-upgrade"); err != nil {
-		return "", false
+func getReleasePromptFromConfig(content string) string {
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "Prompt=") {
+			return strings.TrimSpace(strings.TrimPrefix(trimmed, "Prompt="))
+		}
 	}
+	return ""
+}
 
-	// Check for all releases (including non-LTS)
-	cmd := exec.Command("do-release-upgrade", "--check-dist-upgrade-only", "-d")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", false
-	}
+// Changes or adds the Prompt= rule to the desired mode (e.g. "lts").
+func updateReleaseUpgradesPrompt(content, prompt string) string {
+	lines := strings.Split(content, "\n")
+	found := false
 
-	outputStr := string(output)
-	// Look for "New release 'XX.XX' available" pattern
-	if strings.Contains(outputStr, "New release") {
-		version := extractVersionFromOutput(outputStr)
-		if version != "" {
-			return version, true
+	for i, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if strings.HasPrefix(trimmed, "Prompt=") {
+			lines[i] = "Prompt=" + prompt
+			found = true
+			break
 		}
 	}
 
-	return "", false
+	if !found {
+		lines = append(lines, "Prompt="+prompt)
+	}
+
+	return strings.Join(lines, "\n")
 }
 
 func extractVersionFromOutput(output string) string {
@@ -580,4 +612,32 @@ email_host = localhost
 	logServiceChange("yum-cron", "started")
 
 	return nil
+}
+
+func readOSRelease() (map[string]string, error) {
+	file, err := os.Open("/etc/os-release")
+	if err != nil {
+		return nil, err
+	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			log.Printf("failed to close file: %v", err)
+		}
+	}(file)
+
+	result := make(map[string]string)
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "=") {
+			parts := strings.SplitN(line, "=", 2)
+			key := parts[0]
+			val := strings.Trim(parts[1], `"`)
+			result[key] = val
+		}
+	}
+
+	return result, scanner.Err()
 }

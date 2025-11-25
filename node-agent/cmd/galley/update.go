@@ -27,10 +27,6 @@ func init() {
 
 func runUpdate(cmd *cobra.Command, args []string) error {
 	// Check if running as root
-	if os.Geteuid() != 0 {
-		return fmt.Errorf("update command requires root privileges to replace the binary in /usr/local/bin/galley\nPlease run with sudo:\n  sudo galley update")
-	}
-
 	if flagDryRun {
 		fmt.Println("[DRY RUN] Would update galley binary")
 		return nil

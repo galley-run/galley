@@ -40,11 +40,6 @@ func init() {
 }
 
 func runNodePrepare(cmd *cobra.Command, args []string) error {
-	// Check for root privileges
-	if os.Geteuid() != 0 {
-		return fmt.Errorf("node prepare command requires root privileges\nPlease run with sudo:\n  sudo galley node prepare")
-	}
-
 	logAction("Starting node preparation", nil)
 
 	// Load progress to check what's already done
@@ -858,33 +853,38 @@ func restartSSHService() error {
 	services := []string{"sshd", "ssh"}
 
 	for _, service := range services {
-		// Check if service exists
-		checkCmd := exec.Command("systemctl", "list-units", "--full", "-all", service+".service")
-		if err := checkCmd.Run(); err == nil {
-			// Service exists, try to reload first (less disruptive)
-			reloadCmd := exec.Command("systemctl", "reload", service)
-			reloadCmd.Stdout = os.Stdout
-			reloadCmd.Stderr = os.Stderr
+		// Check if service exists using systemctl status (returns exit code 4 if not found)
+		checkCmd := exec.Command("systemctl", "status", service)
+		output, err := checkCmd.CombinedOutput()
 
-			if err := reloadCmd.Run(); err != nil {
-				// If reload fails, try restart
-				fmt.Printf("⚠️  Reload failed, trying restart...\n")
-				restartCmd := exec.Command("systemctl", "restart", service)
-				restartCmd.Stdout = os.Stdout
-				restartCmd.Stderr = os.Stderr
-
-				if err := restartCmd.Run(); err != nil {
-					// Get more details about the failure
-					statusCmd := exec.Command("systemctl", "status", service)
-					statusOutput, _ := statusCmd.CombinedOutput()
-					return fmt.Errorf("failed to restart %s: %w\nStatus output:\n%s", service, err, string(statusOutput))
-				}
-				logServiceChange(service, "restarted")
-			} else {
-				logServiceChange(service, "reloaded")
-			}
-			return nil
+		// If service exists (even if inactive), systemctl status won't return "not found"
+		if err != nil && strings.Contains(string(output), "not be found") {
+			continue // Try next service name
 		}
+
+		// Service exists, try to reload first (less disruptive)
+		reloadCmd := exec.Command("systemctl", "reload", service)
+		reloadCmd.Stdout = os.Stdout
+		reloadCmd.Stderr = os.Stderr
+
+		if err := reloadCmd.Run(); err != nil {
+			// If reload fails, try restart
+			fmt.Printf("⚠️  Reload failed, trying restart...\n")
+			restartCmd := exec.Command("systemctl", "restart", service)
+			restartCmd.Stdout = os.Stdout
+			restartCmd.Stderr = os.Stderr
+
+			if err := restartCmd.Run(); err != nil {
+				// Get more details about the failure
+				statusCmd := exec.Command("systemctl", "status", service)
+				statusOutput, _ := statusCmd.CombinedOutput()
+				return fmt.Errorf("failed to restart %s: %w\nStatus output:\n%s", service, err, string(statusOutput))
+			}
+			logServiceChange(service, "restarted")
+		} else {
+			logServiceChange(service, "reloaded")
+		}
+		return nil
 	}
 
 	return fmt.Errorf("SSH service not found (tried: %s)", strings.Join(services, ", "))

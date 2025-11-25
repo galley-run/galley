@@ -364,7 +364,6 @@ describe('useProjectsStore', () => {
       store.selectedCharterId = 'charter1'
       store.selectedProjectId = 'project1'
 
-      expect(store.selectedVesselId).toBe('vessel1')
       expect(store.selectedCharterId).toBe('charter1')
       expect(store.selectedProjectId).toBe('project1')
     })

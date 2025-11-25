@@ -69,6 +69,7 @@ import run.galley.cloud.ws.EventBusAgentRequestCodec
 import run.galley.cloud.ws.EventBusAgentResponse
 import run.galley.cloud.ws.EventBusAgentResponseCodec
 import run.galley.cloud.ws.VesselEngineAgentTunnel
+import java.util.UUID
 
 class MainVerticle : CoroutineVerticle() {
   private val logger = LoggerFactory.getLogger(this::class.java)
@@ -118,7 +119,6 @@ class MainVerticle : CoroutineVerticle() {
           .create(
             "webroot",
           ).setCachingEnabled(false)
-          .setDirectoryListing(false)
           .setIncludeHidden(false),
       )
       errorHandler(404) { ctx ->
@@ -139,14 +139,21 @@ class MainVerticle : CoroutineVerticle() {
     val getAppRouter = Router.router(vertx)
     getAppRouter.run {
       route(
-        "/*",
+        "/",
       ).handler(
         StaticHandler
           .create(
             "getroot",
-          ).setCachingEnabled(false)
-          .setDirectoryListing(false)
-          .setIncludeHidden(false),
+          ).setIndexPage("install.sh"),
+      )
+      route(
+        "/bin/*",
+      ).handler(
+        StaticHandler
+          .create(
+            "getroot/bin",
+          ).setDirectoryListing(true)
+          .setCachingEnabled(false),
       )
       errorHandler(404) { ctx ->
         val req = ctx.request()
@@ -183,8 +190,12 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(LicenseVerticle(), deploymentOptions).coAwait()
 
     // Initialize WebSocket server
-    val agentWebSocketServer = AgentWebSocketServer(vertx)
+    val agentWebSocketServer = AgentWebSocketServer(vertx, config.getJsonObject("_outboundAgent"))
     VesselEngineAgentTunnel(vertx, agentWebSocketServer, coroutineContext)
+    // For development purpose only
+    config.getJsonObject("_outboundAgent")?.forEach {
+      agentWebSocketServer.createOutboundConnection(UUID.fromString(it.key))
+    }
 
     // Setup Postgres DB Pool and deploy all data verticles
     vertx.deployVerticle(SessionDataVerticle(), deploymentOptions).coAwait()

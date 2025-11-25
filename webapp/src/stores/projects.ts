@@ -31,30 +31,39 @@ interface CharterResponse {
 export const useProjectsStore = defineStore('projects', {
   state: (): {
     charters: Charter[]
-    selectedVesselId?: string
     selectedCharterId?: string
     selectedProjectId?: string
-    _schemaVersion: 1,
+    _schemaVersion: 1
   } => ({
     charters: [],
-    selectedVesselId: undefined,
     selectedCharterId: undefined,
     selectedProjectId: undefined,
     _schemaVersion: 1,
   }),
   getters: {
+    selectedVesselId: (state) => {
+      return (
+        state.selectedCharterId &&
+        state.charters.find((charter) => charter != null && charter.id === state.selectedCharterId)
+          ?.vesselId
+      )
+    },
     chartersForDropdown: (state) => {
-      return state.charters.map(charter => ({
+      return state.charters.map((charter) => ({
         label: charter.name,
-        value: charter.id
+        value: charter.id,
       }))
     },
     projectsForDropdown: (state) => {
-      return state.charters.find(charter => charter.id === state.selectedCharterId)?.projects.map(project => ({
-        label: project.name,
-        value: project.id
-      })) ?? []
-    }
+      return (
+        state.charters
+          .find((charter) => charter.id === state.selectedCharterId)
+          ?.projects.map((project) => ({
+            label: project.name,
+            value: project.id,
+          })) ?? []
+      )
+    },
   },
   actions: {
     async fetchCharters(vesselIds: string[]) {
@@ -63,7 +72,9 @@ export const useProjectsStore = defineStore('projects', {
       for (const vesselId of vesselIds) {
         const charters = (await axios.get(`/vessels/${vesselId}/charters`)) as CharterResponse[]
         for (const charter of charters) {
-          const projects = (await axios.get(`/vessels/${vesselId}/charters/${charter.id}/projects`)) as ProjectResponse[]
+          const projects = (await axios.get(
+            `/vessels/${vesselId}/charters/${charter.id}/projects`,
+          )) as ProjectResponse[]
           data.push({
             id: charter.id,
             vesselId: charter.attributes.vesselId,
@@ -79,9 +90,12 @@ export const useProjectsStore = defineStore('projects', {
         }
       }
       this.charters = data
-      this.selectedVesselId = data.length > 0 ? data[0]?.vesselId : undefined
-      this.selectedCharterId = data.length > 0 ? data[0]?.id : undefined
-      this.selectedProjectId = data.length > 0 ? data[0]?.projects?.[0]?.id : undefined
+      if (!this.selectedCharterId) {
+        this.selectedCharterId = data.length > 0 ? data[0]?.id : undefined
+      }
+      if (!this.selectedProjectId) {
+        this.selectedProjectId = data.length > 0 ? data[0]?.projects?.[0]?.id : undefined
+      }
     },
   },
 })
@@ -108,7 +122,6 @@ export function initProjectsStore() {
         // alleen velden bewaren die je nodig hebt
         const toPersist = {
           charters: state.charters,
-          selectedVesselId: state.selectedVesselId,
           selectedCharterId: state.selectedCharterId,
           selectedProjectId: state.selectedProjectId,
           _schemaVersion: 1,

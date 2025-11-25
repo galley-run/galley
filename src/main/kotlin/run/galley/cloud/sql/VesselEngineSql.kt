@@ -11,6 +11,7 @@ import nl.clicqo.ext.keysToSnakeCase
 import org.jooq.Condition
 import org.jooq.Query
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.model.factory.VesselEngineFactory
 import java.util.UUID
 
 object VesselEngineSql {
@@ -23,9 +24,21 @@ object VesselEngineSql {
         mapOf(
           VESSEL_ENGINES.NAME.name to payload.getString(VESSEL_ENGINES.NAME.name),
           VESSEL_ENGINES.VESSEL_ID.name to payload.getUUID(VESSEL_ENGINES.VESSEL_ID.name),
-          VESSEL_ENGINES.MODE.name to EngineMode.managed_engine,
+          VESSEL_ENGINES.MODE.name to EngineMode.controlled_engine,
         ),
       ).returning()
+  }
+
+  fun patch(request: EventBusCmdDataRequest): Query {
+    val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
+    val identifier = request.identifier
+
+    return Jooq.postgres
+      .update(VESSEL_ENGINES)
+      .set(
+        VesselEngineFactory.toRecord(payload),
+      ).where(VESSEL_ENGINES.ID.eq(identifier))
+      .returning()
   }
 
   fun getByVesselId(request: EventBusQueryDataRequest): Query {

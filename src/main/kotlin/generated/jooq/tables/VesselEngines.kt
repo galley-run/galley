@@ -9,13 +9,12 @@ import generated.jooq.enums.AgentConnectionStatus
 import generated.jooq.enums.EngineMode
 import generated.jooq.indexes.IDX_ENGINES_VESSEL
 import generated.jooq.indexes.IDX_VESSEL_ENGINES_CONNECTION_STATUS
+import generated.jooq.indexes.IDX_VESSEL_ENGINES_LAST_CONNECTION_AT
 import generated.jooq.keys.UQ_ENGINES_VESSEL_NAME
 import generated.jooq.keys.VESSEL_ENGINES_PKEY
 import generated.jooq.keys.VESSEL_ENGINES__FK_ENGINES_VESSEL
 import generated.jooq.keys.VESSEL_ENGINE_NODES__FK_NODES_ENGINE
-import generated.jooq.keys.VESSEL_ENGINE_REGIONS__FK_REGIONS_ENGINE
 import generated.jooq.tables.VesselEngineNodes.VesselEngineNodesPath
-import generated.jooq.tables.VesselEngineRegions.VesselEngineRegionsPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.VesselEnginesRecord
 
@@ -121,6 +120,11 @@ open class VesselEngines(
      */
     val LAST_CONNECTION_ERROR: TableField<VesselEnginesRecord, String?> = createField(DSL.name("last_connection_error"), SQLDataType.CLOB, this, "")
 
+    /**
+     * The column <code>public.vessel_engines.last_agent_connection_at</code>.
+     */
+    val LAST_AGENT_CONNECTION_AT: TableField<VesselEnginesRecord, OffsetDateTime?> = createField(DSL.name("last_agent_connection_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "")
+
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<VesselEnginesRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -153,7 +157,7 @@ open class VesselEngines(
         override fun `as`(alias: Table<*>): VesselEnginesPath = VesselEnginesPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_ENGINES_VESSEL, IDX_VESSEL_ENGINES_CONNECTION_STATUS)
+    override fun getIndexes(): List<Index> = listOf(IDX_ENGINES_VESSEL, IDX_VESSEL_ENGINES_CONNECTION_STATUS, IDX_VESSEL_ENGINES_LAST_CONNECTION_AT)
     override fun getPrimaryKey(): UniqueKey<VesselEnginesRecord> = VESSEL_ENGINES_PKEY
     override fun getUniqueKeys(): List<UniqueKey<VesselEnginesRecord>> = listOf(UQ_ENGINES_VESSEL_NAME)
     override fun getReferences(): List<ForeignKey<VesselEnginesRecord, *>> = listOf(VESSEL_ENGINES__FK_ENGINES_VESSEL)
@@ -179,22 +183,6 @@ open class VesselEngines(
 
     val vesselEngineNodes: VesselEngineNodesPath
         get(): VesselEngineNodesPath = vesselEngineNodes()
-
-    private lateinit var _vesselEngineRegions: VesselEngineRegionsPath
-
-    /**
-     * Get the implicit to-many join path to the
-     * <code>public.vessel_engine_regions</code> table
-     */
-    fun vesselEngineRegions(): VesselEngineRegionsPath {
-        if (!this::_vesselEngineRegions.isInitialized)
-            _vesselEngineRegions = VesselEngineRegionsPath(this, null, VESSEL_ENGINE_REGIONS__FK_REGIONS_ENGINE.inverseKey)
-
-        return _vesselEngineRegions;
-    }
-
-    val vesselEngineRegions: VesselEngineRegionsPath
-        get(): VesselEngineRegionsPath = vesselEngineRegions()
     override fun `as`(alias: String): VesselEngines = VesselEngines(DSL.name(alias), this)
     override fun `as`(alias: Name): VesselEngines = VesselEngines(alias, this)
     override fun `as`(alias: Table<*>): VesselEngines = VesselEngines(alias.qualifiedName, this)

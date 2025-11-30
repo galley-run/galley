@@ -16,7 +16,7 @@ import type { IconProps } from '@solar-icons/vue/lib'
 
 type Item = {
   label: string
-  value: string
+  value?: string
   disabled?: boolean
   link?: 'external' | boolean
   variant?: 'destructive' | undefined
@@ -321,13 +321,14 @@ watch(
     <select
       ref="selectRef"
       v-bind="$attrs"
+      tabindex="1000"
       :value="modelValue ?? ''"
-      class="sr-only hidden"
+      class="sr-only hidden outline-none"
     >
       <option value="" disabled hidden></option>
       <option
         v-for="opt in items"
-        :key="opt.value"
+        :key="opt.value || opt.label"
         :value="opt.value"
         :disabled="opt.disabled"
       >
@@ -346,7 +347,7 @@ watch(
         :style="menuStyle"
         @keydown="onKeydownList"
       >
-        <template v-for="(item, idx) in items" :key="item.value">
+        <template v-for="(item, idx) in items" :key="item.value || idx">
           <div
             :id="`dd-opt-${idx}`"
             role="option"

@@ -1,13 +1,18 @@
 package run.galley.cloud.ws
 
+import generated.jooq.enums.AgentConnectionStatus
+import generated.jooq.tables.references.VESSEL_ENGINES
 import io.vertx.core.Vertx
 import io.vertx.core.http.WebSocket
 import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.Json
 import io.vertx.core.json.JsonObject
+import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.ext.fromBase64
 import nl.clicqo.ext.getUUID
+import run.galley.cloud.data.VesselEngineDataVerticle
 import run.galley.cloud.ws.AgentWebSocketServer.ConnectionStatus
+import java.time.OffsetDateTime
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -31,6 +36,8 @@ data class AgentConnection(
     val obj = JsonObject(text)
     val msgType = obj.getString("type")
     logger.info("[WS] Received from vesselEngineId=$vesselEngineId, connectionId=$connectionId: type=$msgType")
+
+    updateConnectionStatus(vesselEngineId)
 
     when (msgType) {
       "agent.hello" -> {
@@ -98,5 +105,19 @@ data class AgentConnection(
     if (drained > 0) {
       logger.info("[WS] Drained $drained messages to connectionId=$connectionId (credits left: ${this.credits})")
     }
+  }
+
+  private fun updateConnectionStatus(vesselEngineId: UUID) {
+    val vesselEngineRequest =
+      EventBusCmdDataRequest(
+        payload =
+          JsonObject()
+            .put(VESSEL_ENGINES.AGENT_CONNECTION_STATUS.name, AgentConnectionStatus.connected.toString())
+            .put(VESSEL_ENGINES.LAST_AGENT_CONNECTION_AT.name, OffsetDateTime.now().toString()),
+        identifier = vesselEngineId,
+      )
+    vertx
+      .eventBus()
+      .send(VesselEngineDataVerticle.PATCH, vesselEngineRequest)
   }
 }

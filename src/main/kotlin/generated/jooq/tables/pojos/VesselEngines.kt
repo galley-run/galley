@@ -25,7 +25,8 @@ data class VesselEngines(
     var mode: EngineMode? = null,
     var createdAt: OffsetDateTime? = null,
     var agentConnectionStatus: AgentConnectionStatus? = null,
-    var lastConnectionError: String? = null
+    var lastConnectionError: String? = null,
+    var lastAgentConnectionAt: OffsetDateTime? = null
 ): BaseModel, Serializable {
 
 
@@ -79,6 +80,12 @@ data class VesselEngines(
         }
         else if (this.lastConnectionError != o.lastConnectionError)
             return false
+        if (this.lastAgentConnectionAt == null) {
+            if (o.lastAgentConnectionAt != null)
+                return false
+        }
+        else if (this.lastAgentConnectionAt != o.lastAgentConnectionAt)
+            return false
         return true
     }
 
@@ -92,6 +99,7 @@ data class VesselEngines(
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.agentConnectionStatus == null) 0 else this.agentConnectionStatus.hashCode())
         result = prime * result + (if (this.lastConnectionError == null) 0 else this.lastConnectionError.hashCode())
+        result = prime * result + (if (this.lastAgentConnectionAt == null) 0 else this.lastAgentConnectionAt.hashCode())
         return result
     }
 
@@ -105,6 +113,7 @@ data class VesselEngines(
         sb.append(", ").append(createdAt)
         sb.append(", ").append(agentConnectionStatus)
         sb.append(", ").append(lastConnectionError)
+        sb.append(", ").append(lastAgentConnectionAt)
 
         sb.append(")")
         return sb.toString()

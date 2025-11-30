@@ -28,33 +28,29 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
         set(value): Unit = set(1, value)
         get(): UUID? = get(1) as UUID?
 
-    open var vesselEngineId: UUID?
-        set(value): Unit = set(2, value)
-        get(): UUID? = get(2) as UUID?
-
     open var name: String?
+        set(value): Unit = set(2, value)
+        get(): String? = get(2) as String?
+
+    open var providerName: String?
         set(value): Unit = set(3, value)
         get(): String? = get(3) as String?
 
-    open var providerName: String?
-        set(value): Unit = set(4, value)
-        get(): String? = get(4) as String?
-
     open var geoRegion: GeoRegion?
-        set(value): Unit = set(5, value)
-        get(): GeoRegion? = get(5) as GeoRegion?
+        set(value): Unit = set(4, value)
+        get(): GeoRegion? = get(4) as GeoRegion?
 
     open var createdAt: OffsetDateTime?
-        set(value): Unit = set(6, value)
-        get(): OffsetDateTime? = get(6) as OffsetDateTime?
+        set(value): Unit = set(5, value)
+        get(): OffsetDateTime? = get(5) as OffsetDateTime?
 
     open var locationCity: String?
-        set(value): Unit = set(7, value)
-        get(): String? = get(7) as String?
+        set(value): Unit = set(6, value)
+        get(): String? = get(6) as String?
 
     open var locationCountry: String?
-        set(value): Unit = set(8, value)
-        get(): String? = get(8) as String?
+        set(value): Unit = set(7, value)
+        get(): String? = get(7) as String?
 
     // -------------------------------------------------------------------------
     // Primary key information
@@ -65,10 +61,9 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
     /**
      * Create a detached, initialised VesselEngineRegionsRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, vesselEngineId: UUID? = null, name: String? = null, providerName: String? = null, geoRegion: GeoRegion? = null, createdAt: OffsetDateTime? = null, locationCity: String? = null, locationCountry: String? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, name: String? = null, providerName: String? = null, geoRegion: GeoRegion? = null, createdAt: OffsetDateTime? = null, locationCity: String? = null, locationCountry: String? = null): this() {
         this.id = id
         this.vesselId = vesselId
-        this.vesselEngineId = vesselEngineId
         this.name = name
         this.providerName = providerName
         this.geoRegion = geoRegion
@@ -85,7 +80,6 @@ open class VesselEngineRegionsRecord() : UpdatableRecordImpl<VesselEngineRegions
         if (value != null) {
             this.id = value.id
             this.vesselId = value.vesselId
-            this.vesselEngineId = value.vesselEngineId
             this.name = value.name
             this.providerName = value.providerName
             this.geoRegion = value.geoRegion

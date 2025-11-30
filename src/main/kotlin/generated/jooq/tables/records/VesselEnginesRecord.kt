@@ -49,6 +49,10 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
         set(value): Unit = set(6, value)
         get(): String? = get(6) as String?
 
+    open var lastAgentConnectionAt: OffsetDateTime?
+        set(value): Unit = set(7, value)
+        get(): OffsetDateTime? = get(7) as OffsetDateTime?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -58,7 +62,7 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
     /**
      * Create a detached, initialised VesselEnginesRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, name: String? = null, mode: EngineMode? = null, createdAt: OffsetDateTime? = null, agentConnectionStatus: AgentConnectionStatus? = null, lastConnectionError: String? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, name: String? = null, mode: EngineMode? = null, createdAt: OffsetDateTime? = null, agentConnectionStatus: AgentConnectionStatus? = null, lastConnectionError: String? = null, lastAgentConnectionAt: OffsetDateTime? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.name = name
@@ -66,6 +70,7 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
         this.createdAt = createdAt
         this.agentConnectionStatus = agentConnectionStatus
         this.lastConnectionError = lastConnectionError
+        this.lastAgentConnectionAt = lastAgentConnectionAt
         resetTouchedOnNotNull()
     }
 
@@ -81,6 +86,7 @@ open class VesselEnginesRecord() : UpdatableRecordImpl<VesselEnginesRecord>(Vess
             this.createdAt = value.createdAt
             this.agentConnectionStatus = value.agentConnectionStatus
             this.lastConnectionError = value.lastConnectionError
+            this.lastAgentConnectionAt = value.lastAgentConnectionAt
             resetTouchedOnNotNull()
         }
     }

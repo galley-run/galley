@@ -1,6 +1,8 @@
 <template>
   <form @submit.prevent="onSubmit" class="flex flex-col gap-8" ref="formRef" novalidate>
     <div class="card">
+      <EngineNodeTabBar />
+
       <h1>Node Details & Setup</h1>
       <p class="mb-6">
         This configuration can be used to bind applications and/or databases to. You can change
@@ -32,11 +34,25 @@
           </label>
         </UIFormField>
         <UIFormField>
-          <UILabel required for="region">Region</UILabel>
+          <div class="flex justify-between">
+            <UILabel required for="region">Region</UILabel>
+            <UIButton
+              ghost
+              small
+              inline
+              :trailing-addon="AddCircle"
+              title="Add node"
+              :onclick="() => (showRegionCreate = true)"
+              >Add region</UIButton
+            >
+          </div>
           <UIDropDown select-first :items="regions" :disabled="isRegionsLoading" v-model="region">
             <template #leadingAddon="slotProps">
               <span v-if="slotProps?.item">
-                <FlagIcon :code="slotProps?.item?.metadata?.country" />
+                <FlagIcon
+                  :code="slotProps?.item?.metadata?.country"
+                  v-if="slotProps?.item?.metadata?.country"
+                />
               </span>
             </template>
             <template #trailingAddon="slotProps">
@@ -50,15 +66,14 @@
           </label>
         </UIFormField>
       </div>
-
       <div class="grid xl:grid-cols-2 gap-8">
-        <UIFormField :aria-disabled="!!nodeId">
+        <UIFormField :aria-disabled="engineNode?.attributes?.provisioningStatus === 'ready'">
           <UILabel required for="nodeType">Node type</UILabel>
           <div>
             <UIRadioButton
               required
               id="nodeType"
-              :disabled="!!nodeId"
+              :disabled="engineNode?.attributes?.provisioningStatus === 'ready'"
               value="controller"
               v-model="nodeType"
               label="Controller"
@@ -67,7 +82,7 @@
             <UIRadioButton
               required
               id="nodeType"
-              :disabled="!!nodeId"
+              :disabled="engineNode?.attributes?.provisioningStatus === 'ready'"
               value="controller-worker"
               v-model="nodeType"
               label="Controller & Worker"
@@ -76,7 +91,7 @@
             <UIRadioButton
               required
               id="nodeType"
-              :disabled="!!nodeId || isFirstNode"
+              :disabled="engineNode?.attributes?.provisioningStatus === 'ready' || isFirstNode"
               value="worker"
               v-model="nodeType"
               label="Worker"
@@ -173,10 +188,16 @@
           >All executions below need to be run via sudo to make server-wide changes.</UICodeLine
         >
         <UICodeLine empty />
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>First, run this on your controller node:</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'">sudo galley worker invite</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment
+          >First, run this on your controller node:</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'"
+          >sudo galley worker invite</UICodeLine
+        >
         <UICodeLine empty />
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>Run the rest of the commands on your worker node:</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment
+          >Run the rest of the commands on your worker node:</UICodeLine
+        >
         <UICodeLine>curl -sSf {{ getUrl }} | sudo sh</UICodeLine>
         <UICodeLine empty />
         <UICodeLine comment
@@ -184,13 +205,27 @@
         >
         <UICodeLine> sudo galley node prepare </UICodeLine>
         <UICodeLine empty />
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'" comment>Mark this node as controller in your cluster</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'">sudo galley controller join {{ engineNode.attributes.token }}</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'" comment>Mark this node as single-node cluster</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'">sudo galley controller join {{ engineNode.attributes.token }} --single</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment>Mark this node as worker in your cluster</UICodeLine>
-        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'">sudo galley worker join</UICodeLine>
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'" comment
+          >Mark this node as controller in your cluster</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller'"
+          >sudo galley controller join {{ engineNode.attributes.token }}</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'" comment
+          >Mark this node as single-node cluster</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'controller+worker'"
+          >sudo galley controller join {{ engineNode.attributes.token }} --single</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'" comment
+          >Mark this node as worker in your cluster</UICodeLine
+        >
+        <UICodeLine v-if="engineNode.attributes.nodeType === 'worker'"
+          >sudo galley worker join</UICodeLine
+        >
       </UICodeBlock>
+
+      TODO: If status is imported and deployMode and region will be set, set the status to ready.
 
       <div class="card__footer form-footer">
         <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/vessel/engine"
@@ -210,6 +245,12 @@
       </div>
     </div>
   </form>
+
+  <RegionCreateDrawer
+    :show="showRegionCreate"
+    @close="() => (showRegionCreate = false)"
+    @select="selectRegion"
+  />
 </template>
 <script setup lang="ts">
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
@@ -217,7 +258,7 @@ import UILabel from '@/components/FormField/UILabel.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import { useQuery } from '@tanstack/vue-query'
 import axios from 'axios'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
@@ -226,13 +267,15 @@ import type { ApiResponse } from '@/types/api'
 import type { EngineNodeSummary, EngineRegionSummary } from '@/types/api/engine'
 import UIButton from '@/components/UIButton.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
-import { ArrowLeft, Key, DoubleAltArrowRight } from '@solar-icons/vue'
+import { AddCircle, ArrowLeft, DoubleAltArrowRight, Key } from '@solar-icons/vue'
 import UIRadioButton from '@/components/FormField/UIRadioButton.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
 import UIToggle from '@/components/FormField/UIToggle.vue'
 import UICodeBlock from '@/components/CodeBlock/UICodeBlock.vue'
 import UICodeLine from '@/components/CodeBlock/UICodeLine.vue'
 import { useRoute } from 'vue-router'
+import EngineNodeTabBar from '@/router/views/Engine/Node/EngineNodeTabBar.vue'
+import RegionCreateDrawer from '@/components/Drawer/RegionCreateDrawer.vue'
 
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
@@ -244,7 +287,11 @@ const { nodeId } = route.params
 
 const getUrl = import.meta.env.VITE_GET_URL
 
-const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
+const {
+  isLoading: isRegionsLoading,
+  data: engineRegions,
+  refetch: refetchRegions,
+} = useQuery({
   enabled: !!selectedVesselId?.value,
   queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
   queryFn: () =>
@@ -266,56 +313,75 @@ const {
     ),
 })
 
-useMutation({
-  mutationFn: (nodeId, data) => {
-    if (!nodeId) {
-      return axios.post(`/vessels/${selectedVesselId?.value}/engine/nodes`, data)
-    }
+// useMutation({
+//   mutationFn: (nodeId, data) => {
+//     if (!nodeId) {
+//       return axios.post(`/vessels/${selectedVesselId?.value}/engine/nodes`, data)
+//     }
+//
+//     return axios.patch(`/vessels/${selectedVesselId?.value}/engine/nodes/${nodeId}`, data)
+//   },
+// })
 
-    return axios.patch(`/vessels/${selectedVesselId?.value}/engine/nodes/${nodeId}`, data)
-  },
+const regions = computed(() => {
+  const items = engineRegions.value?.map((region: ApiResponse<EngineRegionSummary>) => ({
+    label: region.attributes.name,
+    value: region.id,
+    metadata: {
+      providerName: region.attributes.providerName,
+      country: region.attributes.locationCountry,
+    },
+  }))
+
+  if (!items || items.length === 0) {
+    return [{ label: 'No regions registered.', disabled: true }]
+  }
+
+  return items
 })
 
-const regions = computed(
-  () =>
-    engineRegions.value?.map((region: ApiResponse<EngineRegionSummary>) => ({
-      label: region.attributes.name,
-      value: region.id,
-      metadata: {
-        providerName: region.attributes.providerName,
-        country: region.attributes.locationCountry,
-      },
-    })) ?? [],
-)
-
+const showRegionCreate = ref(false)
 const name = ref('')
 const ipAddress = ref('')
 const nodeType = ref('controller')
 const deploy = ref('')
 const sshKey = ref('')
-const region = ref(computed(() => regions.value?.[0]?.value))
+const region = ref('')
 const provisioning = ref(true)
 
 let refreshNodeTimeout: NodeJS.Timeout
-watch(engineNode, (value) => {
-  if (value) {
-    name.value = value.attributes.name
-    ipAddress.value = value.attributes.ipAddress
-    nodeType.value = value.attributes.nodeType
-    deploy.value = value.attributes.deployMode
-    provisioning.value = value.attributes.provisioning
-    // region.value = value.attributes.vesselEngineRegionId
+watch(
+  engineNode,
+  (value) => {
+    if (value) {
+      name.value = value.attributes.name
+      ipAddress.value = value.attributes.ipAddress
+      nodeType.value = value.attributes.nodeType
+      deploy.value = value.attributes.deployMode
+      provisioning.value = value.attributes.provisioning
+      region.value = value.attributes.vesselEngineRegionId
 
-    if (refreshNodeTimeout) {
-      clearTimeout(refreshNodeTimeout)
-    }
+      if (refreshNodeTimeout) {
+        clearTimeout(refreshNodeTimeout)
+      }
 
-    if (value.attributes.provisioningStatus === 'open') {
-      refreshNodeTimeout = setTimeout(async () => {
-        await refetchNode()
-      }, 30000)
+      if (value.attributes.provisioningStatus === 'open') {
+        refreshNodeTimeout = setTimeout(async () => {
+          await refetchNode()
+        }, 30000)
+      }
     }
-  }
+  },
+  { immediate: true },
+)
+
+const { data: engineNodes } = useQuery({
+  enabled: computed(() => !!selectedVesselId?.value),
+  queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'nodes']),
+  queryFn: () =>
+    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(
+      `/vessels/${selectedVesselId?.value}/engine/nodes`,
+    ),
 })
 
 onBeforeUnmount(() => {
@@ -339,7 +405,16 @@ watch(sshKey, (value) => {
   }
 })
 
-const isFirstNode = ref(true)
+async function selectRegion(regionId: string) {
+  await refetchRegions()
+  region.value = regionId
+}
+
+const isFirstNode = computed(
+  () =>
+    engineNodes?.value?.length === 1 &&
+    engineNodes?.value?.[0]?.attributes.provisioningStatus === 'ready',
+)
 
 const isPending = ref(false)
 

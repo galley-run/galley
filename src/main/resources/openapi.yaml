@@ -322,6 +322,38 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Create a region within the engine
+      operationId: vessel.engine.region.cmd.create
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/RegionCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Region'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/charters:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -966,6 +998,11 @@ components:
                   description: Show connection with agent.
                   examples:
                     - disconnected
+                lastAgentConnectionAt:
+                  type:
+                    - string
+                    - 'null'
+                  format: date-time
                 lastConnectionError:
                   type:
                     - string
@@ -1220,7 +1257,9 @@ components:
                   type: string
                   default: worker
                 vesselEngineRegionId:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   format: uuid
                 vesselEngineId:
                   type: string
@@ -1245,6 +1284,7 @@ components:
                   enum:
                     - open
                     - ready
+                    - imported
                 deployTarget:
                   enum:
                     - applications
@@ -1305,17 +1345,17 @@ components:
               type: object
               required:
                 - name
-                - locationCity
                 - locationCountry
                 - geoRegion
-                - providerName
               properties:
                 name:
                   type: string
                   examples:
                     - AMS1
                 locationCity:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   examples:
                     - Amsterdam
                 locationCountry:
@@ -1333,6 +1373,79 @@ components:
                     - na
                   examples:
                     - eu
+                providerName:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - mijn.host
+    RegionCreate:
+      type: object
+      required:
+        - name
+        - locationCountry
+        - geoRegion
+      properties:
+        name:
+          type: string
+        locationCity:
+          type:
+            - string
+            - 'null'
+        locationCountry:
+          type: string
+        geoRegion:
+          type: string
+        providerName:
+          type:
+            - string
+            - 'null'
+      description: Data transfer object for creating a new Region.
+    Region:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Region, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - VesselEngineRegion
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - locationCountry
+                - geoRegion
+                - providerName
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - AMS1
+                geoRegion:
+                  type: string
+                  examples:
+                    - eu
+                locationCity:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - Amsterdam
+                locationCountry:
+                  type: string
+                  examples:
+                    - nl
+                  description: ISO 3166 formatted country code
                 providerName:
                   type: string
                   examples:

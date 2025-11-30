@@ -20,7 +20,6 @@ import run.galley.cloud.model.BaseModel
 data class VesselEngineRegions(
     var id: UUID? = null,
     var vesselId: UUID? = null,
-    var vesselEngineId: UUID? = null,
     var name: String? = null,
     var providerName: String? = null,
     var geoRegion: GeoRegion? = null,
@@ -49,12 +48,6 @@ data class VesselEngineRegions(
                 return false
         }
         else if (this.vesselId != o.vesselId)
-            return false
-        if (this.vesselEngineId == null) {
-            if (o.vesselEngineId != null)
-                return false
-        }
-        else if (this.vesselEngineId != o.vesselEngineId)
             return false
         if (this.name == null) {
             if (o.name != null)
@@ -100,7 +93,6 @@ data class VesselEngineRegions(
         var result = 1
         result = prime * result + (if (this.id == null) 0 else this.id.hashCode())
         result = prime * result + (if (this.vesselId == null) 0 else this.vesselId.hashCode())
-        result = prime * result + (if (this.vesselEngineId == null) 0 else this.vesselEngineId.hashCode())
         result = prime * result + (if (this.name == null) 0 else this.name.hashCode())
         result = prime * result + (if (this.providerName == null) 0 else this.providerName.hashCode())
         result = prime * result + (if (this.geoRegion == null) 0 else this.geoRegion.hashCode())
@@ -115,7 +107,6 @@ data class VesselEngineRegions(
 
         sb.append(id)
         sb.append(", ").append(vesselId)
-        sb.append(", ").append(vesselEngineId)
         sb.append(", ").append(name)
         sb.append(", ").append(providerName)
         sb.append(", ").append(geoRegion)

@@ -17,7 +17,8 @@ import org.jooq.Schema
 @Suppress("warnings")
 enum class NodeProvisioningStatus(@get:JvmName("literal") public val literal: String) : EnumType {
     `open`("open"),
-    ready("ready");
+    ready("ready"),
+    imported("imported");
     override fun getCatalog(): Catalog? = schema.catalog
     override fun getSchema(): Schema = Public.PUBLIC
     override fun getName(): String = "node_provisioning_status"

@@ -4,7 +4,6 @@ import generated.jooq.tables.pojos.VesselEngines
 import generated.jooq.tables.references.VESSEL_ENGINES
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.coAwait
-import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataResponse
@@ -12,7 +11,6 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
-import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.VesselEngineDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
 

@@ -31,6 +31,8 @@ class AgentWebSocketServer(
       return null
     }
 
+    logger.info("Creating outbound connection to $vesselEngineId")
+
     val ws =
       try {
         vertx

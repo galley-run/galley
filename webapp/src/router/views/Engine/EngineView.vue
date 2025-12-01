@@ -213,6 +213,7 @@
     :show="!!confirmDelete"
     @close="confirmDelete = null"
     @confirm="onDelete"
+    :region-id="confirmDelete"
   />
 </template>
 <script setup lang="ts">
@@ -334,11 +335,7 @@ const connectionStatus = computed(() => {
 })
 
 async function onDelete() {
-  if (!confirmDelete.value) return
-
-  await deleteRegion(confirmDelete.value)
   await refetchEngineRegions()
   confirmDelete.value = null
-
 }
 </script>

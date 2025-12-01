@@ -93,6 +93,8 @@
     :show="confirmDelete"
     @close="confirmDelete = false"
     @confirm="onDelete"
+    v-if="!!regionId"
+    :region-id="regionId"
   />
 </template>
 <script setup lang="ts">
@@ -142,9 +144,6 @@ async function onSubmit() {
 }
 
 async function onDelete() {
-  if (!regionId || typeof regionId !== 'string') return
-
-  await deleteRegion(regionId)
   await router.push('/vessel/engine')
 }
 </script>

@@ -1,18 +1,21 @@
 <template>
-  <UIDialog :show="show" @close="$emit('close')">
+  <UIDialog :show="show" @close="onClose">
     <div class="dialog__header">
       <ShieldCross class="text-red-500" />
       <h3 class="text-red-700">Delete this region</h3>
-      <UIButton @click="$emit('close')" ghost variant="neutral" :trailing-addon="CloseCircle" />
+      <UIButton @click="onClose" ghost variant="neutral" :trailing-addon="CloseCircle" />
     </div>
     <div class="dialog__body">
+      <div v-if="error" class="alert alert--error">
+        {{ error }}
+      </div>
       <p>Are you sure you want to delete this region? This action cannot be undone.</p>
     </div>
     <div class="dialog__footer">
-      <UIButton ghost variant="neutral" :leading-addon="UndoLeftRound" @click="$emit('close')"
+      <UIButton ghost variant="neutral" :leading-addon="UndoLeftRound" @click="onClose"
         >Cancel & Close
       </UIButton>
-      <UIButton @click="$emit('confirm')" :trailing-addon="MapPointRemove" variant="destructive"
+      <UIButton @click="onDelete" :trailing-addon="MapPointRemove" variant="destructive"
         >Delete region
       </UIButton>
     </div>
@@ -23,7 +26,31 @@
 import UIDialog from '@/components/Dialog/UIDialog.vue'
 import { CloseCircle, MapPointRemove, ShieldCross, UndoLeftRound } from '@solar-icons/vue'
 import UIButton from '@/components/UIButton.vue'
+import { useRegionForm } from '@/composables/useRegionForm.ts'
+import { ref } from 'vue'
 
-const { show } = defineProps<{ show: boolean }>()
-defineEmits<{ (e: 'close'): void; (e: 'confirm'): void }>()
+const { show, regionId } = defineProps<{ show: boolean; regionId: string | null }>()
+const emit = defineEmits<{ (e: 'close'): void, (e: 'confirm'): void }>()
+
+const error = ref<string | null>(null)
+
+const { deleteRegion } = useRegionForm()
+
+async function onClose() {
+  error.value = null
+  emit('close')
+}
+
+async function onDelete() {
+  error.value = null
+
+  if (!regionId) return
+
+  try {
+    await deleteRegion(regionId)
+    emit('confirm')
+  } catch (e) {
+    error.value = e.message || 'Something went wrong. Please try again later.'
+  }
+}
 </script>

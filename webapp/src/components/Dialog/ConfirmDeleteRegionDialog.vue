@@ -28,9 +28,10 @@ import { CloseCircle, MapPointRemove, ShieldCross, UndoLeftRound } from '@solar-
 import UIButton from '@/components/UIButton.vue'
 import { useRegionForm } from '@/composables/useRegionForm.ts'
 import { ref } from 'vue'
+import type { ApiError } from '@/utils/registerAxios.ts'
 
 const { show, regionId } = defineProps<{ show: boolean; regionId: string | null }>()
-const emit = defineEmits<{ (e: 'close'): void, (e: 'confirm'): void }>()
+const emit = defineEmits<{ (e: 'close'): void; (e: 'confirm'): void }>()
 
 const error = ref<string | null>(null)
 
@@ -50,7 +51,8 @@ async function onDelete() {
     await deleteRegion(regionId)
     emit('confirm')
   } catch (e) {
-    error.value = e.message || 'Something went wrong. Please try again later.'
+    const apiError = e as ApiError
+    error.value = apiError?.message || 'Something went wrong. Please try again later.'
   }
 }
 </script>

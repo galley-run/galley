@@ -540,7 +540,7 @@
     @apply outline rounded-xl outline-tides-300 px-4 py-4 flex items-center gap-4 mb-4;
   }
 
-  .alert--error {
+  .alert--destructive {
     @apply outline-red-100 bg-red-100/75 text-red-900;
 
     h1, h2, h3, h4, h5, h6 {

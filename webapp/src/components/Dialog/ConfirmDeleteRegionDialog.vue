@@ -6,7 +6,7 @@
       <UIButton @click="onClose" ghost variant="neutral" :trailing-addon="CloseCircle" />
     </div>
     <div class="dialog__body">
-      <div v-if="error" class="alert alert--error">
+      <div v-if="error" class="alert alert--destructive">
         {{ error }}
       </div>
       <p>Are you sure you want to delete this region? This action cannot be undone.</p>

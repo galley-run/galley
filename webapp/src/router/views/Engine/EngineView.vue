@@ -74,7 +74,7 @@
               ghost
               :leading-addon="AddCircle"
               title="Add node"
-              to="/vessel/engine/node/add"
+              :to="`/vessel/${selectedVesselId}/engine/node/add`"
             />
           </div>
         </div>
@@ -102,7 +102,7 @@
                 RAM
               </p>
               <RouterLink
-                :to="`/vessel/engine/node/${node.id}/server-info`"
+                :to="`/vessel/${selectedVesselId}/engine/node/${node.id}`"
                 class="absolute inset-0"
               ></RouterLink>
             </div>
@@ -119,7 +119,16 @@
             <div>
               <UIDropDown
                 :items="[
-                  { label: 'Edit this node', value: `/vessel/engine/node/${node.id}`, link: true },
+                  {
+                    label: 'Edit this node',
+                    value: `/vessel/${selectedVesselId}/engine/node/${node.id}`,
+                    link: true,
+                  },
+                  {
+                    label: 'Server information',
+                    value: `/vessel/${selectedVesselId}/engine/node/${node.id}/server-info`,
+                    link: true,
+                  },
                   {
                     label: 'Delete this node',
                     value: '/delete',
@@ -140,16 +149,21 @@
         <div class="card__header">
           <h2>Regions</h2>
           <div>
-            <UIButton ghost disabled :leading-addon="AddCircle" title="Add region" />
+            <UIButton
+              ghost
+              :leading-addon="AddCircle"
+              title="Add region"
+              :to="`/vessel/${selectedVesselId}/engine/region/add`"
+            />
           </div>
         </div>
         <div class="stacked-list">
           <div
-            class="stacked-list__item grid-cols-[1fr_1fr_0fr]"
+            class="stacked-list__item grid-cols-[1fr_0fr_0fr]"
             v-for="region in engineRegionsSorted"
             :key="region.id"
           >
-            <div>
+            <div class="relative">
               <div class="flex items-center gap-2">
                 <FlagIcon :code="region.attributes.locationCountry as CountryCode" :size="16" />
                 <div>{{ region.attributes.name }}</div>
@@ -159,13 +173,32 @@
                 {{ region.attributes.locationCity }},
                 {{ countries[region.attributes.locationCountry]?.name }}
               </p>
+              <RouterLink
+                :to="`/vessel/${selectedVesselId}/engine/region/${region.id}`"
+                class="absolute inset-0"
+              ></RouterLink>
             </div>
             <div class="text-end">
               <p class="text-tides-700">{{ region.attributes.providerName }}</p>
             </div>
             <div>
               <UIDropDown
-                :items="[{ label: 'Edit region', value: '/edit', link: true }]"
+                :items="[
+                  {
+                    label: 'Edit region',
+                    value: `/vessel/${selectedVesselId}/engine/region/${region.id}`,
+                    link: true,
+                  },
+                  {
+                    label: 'Delete region',
+                    value: `/vessel/${selectedVesselId}/engine/region/${region.id}/delete`,
+                    onClick: () => {
+                      confirmDelete = region.id
+                      return
+                    },
+                    variant: 'destructive',
+                  },
+                ]"
                 :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
@@ -176,6 +209,11 @@
       </div>
     </div>
   </div>
+  <ConfirmDeleteRegionDialog
+    :show="!!confirmDelete"
+    @close="confirmDelete = null"
+    @confirm="onDelete"
+  />
 </template>
 <script setup lang="ts">
 import { AddCircle, CheckCircle, DocumentsMinimalistic, MenuDots } from '@solar-icons/vue'
@@ -187,18 +225,25 @@ import { useQuery } from '@tanstack/vue-query'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useBytes } from '@/utils/bytes.ts'
 import type { ApiResponse } from '@/types/api'
 import type { EngineNodeSummary, EngineRegionSummary, EngineSummary } from '@/types/api/engine'
 import dayjs from 'dayjs'
 import getNodeType from '@/utils/getNodeType.ts'
-import { CountryCode } from 'vue3-flag-icons/types'
+import type { CountryCode } from 'vue3-flag-icons/types'
 import countries from '@/utils/countries.ts'
+import { useRegionForm } from '@/composables/useRegionForm.ts'
+import ConfirmDeleteRegionDialog from '@/components/Dialog/ConfirmDeleteRegionDialog.vue'
+import { useRouter } from 'vue-router'
 
 const { formatBytes, sumByteSizes, format } = useBytes()
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
+
+const router = useRouter()
+const confirmDelete = ref<null | string>(null)
+const { deleteRegion } = useRegionForm()
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),
@@ -218,7 +263,7 @@ const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
     ),
 })
 
-const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
+const { data: engineRegions, refetch: refetchEngineRegions } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),
   queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'regions']),
   queryFn: () =>
@@ -229,15 +274,11 @@ const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
 
 const nodeRegions = computed(() =>
   (engineNodes.value ?? []).reduce<Record<string, string>>((acc, node) => {
-    const region = engineRegions.value?.find(
-      (r) => r.id === node.attributes.vesselEngineRegionId,
-    )
+    const region = engineRegions.value?.find((r) => r.id === node.attributes.vesselEngineRegionId)
     acc[node.id] = region?.attributes.locationCountry ?? ''
     return acc
   }, {}),
 )
-
-console.log(nodeRegions.value)
 
 const engineRegionsSorted = computed(() => {
   if (!engineRegions.value) return []
@@ -291,4 +332,13 @@ const connectionStatus = computed(() => {
 
   return 'Connected'
 })
+
+async function onDelete() {
+  if (!confirmDelete.value) return
+
+  await deleteRegion(confirmDelete.value)
+  await refetchEngineRegions()
+  confirmDelete.value = null
+
+}
 </script>

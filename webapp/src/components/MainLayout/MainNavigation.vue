@@ -118,7 +118,7 @@ const vesselSections = [
     items: [
       { icon: Settings, label: 'Settings', href: '/vessel/settings', disabled: true, },
       { icon: WalletMoney, label: 'Billing', href: '/vessel/billing', disabled: true, },
-      { icon: ServerPath, label: 'Engine', href: '/vessel/engine' },
+      { icon: ServerPath, label: 'Engine', href: `/vessel/engine` },
     ],
   },
 ]

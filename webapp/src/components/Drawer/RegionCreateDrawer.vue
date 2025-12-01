@@ -1,5 +1,5 @@
 <template>
-  <Drawer :show="show" @close="pristine && $emit('close')">
+  <UIDrawer :show="show" @close="pristine && $emit('close')">
     <form @submit.prevent="onSubmit" ref="formRef" novalidate>
       <div class="drawer__header">
         <MapPointWave />
@@ -22,10 +22,6 @@
             />
           </UIFormField>
           <UIFormField>
-            <UILabel for="city">City</UILabel>
-            <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="city" />
-          </UIFormField>
-          <UIFormField class="col-span-2">
             <UILabel required for="geoRegion">Continent</UILabel>
             <UIDropDown
               placeholder="Select a continent..."
@@ -35,10 +31,14 @@
             />
           </UIFormField>
           <UIFormField class="col-span-2">
+            <UILabel for="city">City</UILabel>
+            <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="city" />
+          </UIFormField>
+          <UIFormField>
             <UILabel for="name" required>Name</UILabel>
             <UITextInput required id="name" placeholder="e.g. AMS1" v-model="name" />
           </UIFormField>
-          <UIFormField class="col-span-2">
+          <UIFormField>
             <UILabel for="provider">Provider</UILabel>
             <UIAutoComplete
               id="provider"
@@ -55,132 +55,32 @@
         </UIButton>
         <UIButton type="submit" :trailing-addon="MapPointAdd"
           >Add region
-          <LoadingIndicator v-if="createRegionMutation.isPending.value" />
+          <LoadingIndicator v-if="saveRegionMutation.isPending.value" />
         </UIButton>
       </div>
     </form>
-  </Drawer>
+  </UIDrawer>
 </template>
 <script setup lang="ts">
 import { CloseCircle, MapPointAdd, MapPointWave, UndoLeftRound } from '@solar-icons/vue'
-import Drawer from '@/components/Drawer/Drawer.vue'
+import UIDrawer from '@/components/Drawer/UIDrawer.vue'
 import UIButton from '@/components/UIButton.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
-import countriesObj from '@/utils/countries.ts'
-import getCityHub from '@/utils/getCityHub.ts'
 import UIAutoComplete from '@/components/FormField/UIAutoComplete.vue'
-import providersList from '@/utils/providers.ts'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
-import { useMutation, useQuery } from '@tanstack/vue-query'
-import axios, { type AxiosResponse } from 'axios'
-import type { ApiResponse } from '@/types/api'
-import type { EngineRegionSummary } from '@/types/api/engine'
-import { useProjectsStore } from '@/stores/projects.ts'
-import { storeToRefs } from 'pinia'
-
-const countries = Object.entries(countriesObj).map(([countryCode, country]) => {
-  return { value: countryCode, label: country.name }
-})
-
-const providers = providersList.map((provider) => {
-  return { value: provider, label: provider }
-})
+import { useRegionForm, geoRegions, countries, providers } from '@/composables/useRegionForm'
 
 const { show } = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void; (e: 'select', regionId: string): void }>()
 
-const geoRegions = [
-  {
-    value: 'eu',
-    label: 'Europe',
-  },
-  {
-    value: 'usa',
-    label: 'United States',
-  },
-  {
-    value: 'na',
-    label: 'North America',
-  },
-  {
-    value: 'latam',
-    label: 'Latin America',
-  },
-  {
-    value: 'apac',
-    label: 'Asia-Pacific',
-  },
-  {
-    value: 'africa',
-    label: 'Africa',
-  },
-]
-
-const name = ref('')
-const provider = ref('')
-const geoRegion = ref('')
-const city = ref('')
-const country = ref('')
+const { name, provider, geoRegion, city, country, pristine, saveRegion, saveRegionMutation } =
+  useRegionForm()
 
 const formRef = ref<HTMLFormElement | null>(null)
-const pristine = ref(true)
-
-watch([name, provider, geoRegion, city, country], (values) => {
-  pristine.value = values.filter(Boolean).length === 0
-})
-
-watch(city, (newCity) => {
-  const hub = getCityHub(newCity)
-  let sequence = 1
-
-  if (engineRegions?.value?.length && hub && engineRegions?.value?.length > 0) {
-    const regions = engineRegions.value.filter((region) => region?.attributes?.name?.startsWith(hub))
-
-    if (regions.length > 0) {
-      sequence = regions.reduce((acc, region) => Math.max(acc, parseInt(region.attributes?.name?.slice(-1))), 0) + 1
-    }
-  }
-
-  if (hub && !name.value) {
-    name.value = hub + sequence
-  }
-})
-
-watch(country, (newCountry) => {
-  if (newCountry && countriesObj[newCountry]) {
-    geoRegion.value = countriesObj[newCountry].region
-  }
-})
-
-const projectsStore = useProjectsStore()
-const { selectedVesselId } = storeToRefs(projectsStore)
-
-const { data: engineRegions } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
-  queryFn: () =>
-    axios.get<ApiResponse<EngineRegionSummary>[], ApiResponse<EngineRegionSummary>[]>(
-      `/vessels/${selectedVesselId?.value}/engine/regions`,
-    ),
-})
-
-const createRegionMutation = useMutation({
-  mutationFn: (data: {
-    name: string
-    locationCity: string
-    locationCountry: string
-    geoRegion: string
-    providerName: string
-  }) => axios.post<AxiosResponse<EngineRegionSummary>, AxiosResponse<EngineRegionSummary>>(`/vessels/${selectedVesselId.value}/engine/regions`, data),
-  onSuccess: (data) => {
-    emit('select', data.id)
-    emit('close')
-  },
-})
 
 async function onSubmit() {
   const form = formRef.value!
@@ -191,12 +91,8 @@ async function onSubmit() {
     return
   }
 
-  await createRegionMutation.mutateAsync({
-    name: name.value,
-    locationCity: city.value,
-    locationCountry: country.value,
-    geoRegion: geoRegion.value,
-    providerName: provider.value,
-  })
+  const result = await saveRegion()
+  emit('select', result.id)
+  emit('close')
 }
 </script>

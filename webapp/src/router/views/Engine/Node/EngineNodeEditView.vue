@@ -277,13 +277,10 @@ import { useRoute } from 'vue-router'
 import EngineNodeTabBar from '@/router/views/Engine/Node/EngineNodeTabBar.vue'
 import RegionCreateDrawer from '@/components/Drawer/RegionCreateDrawer.vue'
 
-const projectsStore = useProjectsStore()
-const { selectedVesselId } = storeToRefs(projectsStore)
-
 const formRef = ref<HTMLFormElement | null>(null)
 
 const route = useRoute()
-const { nodeId } = route.params
+const { nodeId, vesselId } = route.params
 
 const getUrl = import.meta.env.VITE_GET_URL
 
@@ -292,11 +289,11 @@ const {
   data: engineRegions,
   refetch: refetchRegions,
 } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'regions'],
+  enabled: !!vesselId,
+  queryKey: ['vessel', vesselId, 'engine', 'regions'],
   queryFn: () =>
     axios.get<ApiResponse<EngineRegionSummary>[], ApiResponse<EngineRegionSummary>[]>(
-      `/vessels/${selectedVesselId?.value}/engine/regions`,
+      `/vessels/${vesselId}/engine/regions`,
     ),
 })
 
@@ -305,21 +302,21 @@ const {
   data: engineNode,
   refetch: refetchNode,
 } = useQuery({
-  enabled: !!selectedVesselId?.value && !!nodeId,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes', nodeId],
+  enabled: !!vesselId && !!nodeId,
+  queryKey: ['vessel', vesselId, 'engine', 'nodes', nodeId],
   queryFn: () =>
     axios.get<ApiResponse<EngineNodeSummary>, ApiResponse<EngineNodeSummary>>(
-      `/vessels/${selectedVesselId?.value}/engine/nodes/${nodeId}`,
+      `/vessels/${vesselId}/engine/nodes/${nodeId}`,
     ),
 })
 
 // useMutation({
 //   mutationFn: (nodeId, data) => {
 //     if (!nodeId) {
-//       return axios.post(`/vessels/${selectedVesselId?.value}/engine/nodes`, data)
+//       return axios.post(`/vessels/${vesselId}/engine/nodes`, data)
 //     }
 //
-//     return axios.patch(`/vessels/${selectedVesselId?.value}/engine/nodes/${nodeId}`, data)
+//     return axios.patch(`/vessels/${vesselId}/engine/nodes/${nodeId}`, data)
 //   },
 // })
 
@@ -359,7 +356,7 @@ watch(
       nodeType.value = value.attributes.nodeType
       deploy.value = value.attributes.deployMode
       provisioning.value = value.attributes.provisioning
-      region.value = value.attributes.vesselEngineRegionId
+      region.value = value.attributes.vesselEngineRegionId ?? ''
 
       if (refreshNodeTimeout) {
         clearTimeout(refreshNodeTimeout)
@@ -376,11 +373,11 @@ watch(
 )
 
 const { data: engineNodes } = useQuery({
-  enabled: computed(() => !!selectedVesselId?.value),
-  queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'nodes']),
+  enabled: computed(() => !!vesselId),
+  queryKey: computed(() => ['vessel', vesselId, 'engine', 'nodes']),
   queryFn: () =>
     axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(
-      `/vessels/${selectedVesselId?.value}/engine/nodes`,
+      `/vessels/${vesselId}/engine/nodes`,
     ),
 })
 

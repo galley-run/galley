@@ -66,4 +66,9 @@ object ApiStatus {
 
   val VESSEL_ENGINE_NODE_ID_INCORRECT = ApiStatus(2300, "The Vessel engine node id is incorrect")
   val VESSEL_ENGINE_NODE_NOT_FOUND = ApiStatus(2301, "The Vessel engine node is not found", HttpStatus.NotFound)
+
+  val VESSEL_REGION_ID_INCORRECT = ApiStatus(2400, "The vessel region id is incorrect")
+  val VESSEL_REGION_NOT_FOUND = ApiStatus(2401, "The vessel region is not found", HttpStatus.NotFound)
+  val VESSEL_REGION_DELETE_FAILURE_ACTIVE_NODES =
+    ApiStatus(1404, "The region could not be deleted, due to active nodes", HttpStatus.Conflict)
 }

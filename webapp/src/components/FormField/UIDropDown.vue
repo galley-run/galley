@@ -18,6 +18,7 @@ type Item = {
   label: string
   value?: string
   disabled?: boolean
+  onClick?: () => Promise<void> | void
   link?: 'external' | boolean
   variant?: 'destructive' | undefined
 }
@@ -137,17 +138,23 @@ function toggleKey(e: KeyboardEvent) {
   }
 }
 
-function selectAt(index: number) {
+async function selectAt(index: number) {
   const item = items[index]
 
   if (!item || item.disabled) return
 
-  if (item.link) {
+  if (item.link && item.value) {
     if (item.value.startsWith('http')) {
       window.open(item.value, item.link === 'external' ? '_blank' : '_self')
     } else {
-      router.push(item.value)
+      await router.push(item.value)
     }
+    close()
+    return
+  }
+
+  if (item.onClick) {
+    await item.onClick()
     close()
     return
   }
@@ -357,9 +364,9 @@ watch(
               'px-4 py-2.5 grid grid-cols-[auto_1fr_0fr] gap-2.5 items-center',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               !item.variant && idx === activeIndex && 'bg-navy-50',
-              item.variant === 'destructive' && idx === activeIndex && 'bg-coral-100',
+              item.variant === 'destructive' && idx === activeIndex && 'bg-coral-50',
               item.variant === 'destructive' &&
-                'bg-coral-50 text-coral-500 hover:bg-coral-100 aria-selected:bg-coral-100 aria-selected:text-coral-600',
+                'text-coral-500 hover:bg-coral-50 aria-selected:bg-coral-50 aria-selected:text-coral-600',
               !item.variant &&
                 'hover:bg-navy-50 aria-selected:bg-navy-600 aria-selected:text-white',
             ]"

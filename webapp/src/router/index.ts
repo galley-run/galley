@@ -15,6 +15,7 @@ import LoginLayout from '@/router/layouts/LoginLayout.vue'
 import LoginView from '@/router/views/Login/LoginView.vue'
 import LogoutView from '@/router/views/Login/LogoutView.vue'
 import EngineNodeEditView from '@/router/views/Engine/Node/EngineNodeEditView.vue'
+import EngineRegionEditView from '@/router/views/Engine/Node/EngineRegionEditView.vue'
 import EngineNodeInfoView from '@/router/views/Engine/Node/EngineNodeInfoView.vue'
 import EngineNodeFirstControllerView from '@/router/views/Engine/Node/EngineNodeFirstControllerView.vue'
 
@@ -51,10 +52,12 @@ const routes = [
       { path: '', component: DashboardView },
       { path: '/charter/compute-plans', component: ComputePlansView },
       { path: '/vessel/engine', component: EngineView },
-      { path: '/vessel/engine/node/controller', component: EngineNodeFirstControllerView },
-      { path: '/vessel/engine/node/add', component: EngineNodeEditView },
-      { path: '/vessel/engine/node/:nodeId/server-info', component: EngineNodeInfoView },
-      { path: '/vessel/engine/node/:nodeId', component: EngineNodeEditView },
+      { path: '/vessel/:vesselId/engine/node/controller', component: EngineNodeFirstControllerView },
+      { path: '/vessel/:vesselId/engine/node/add', component: EngineNodeEditView },
+      { path: '/vessel/:vesselId/engine/node/:nodeId/server-info', component: EngineNodeInfoView },
+      { path: '/vessel/:vesselId/engine/node/:nodeId', component: EngineNodeEditView },
+      { path: '/vessel/:vesselId/engine/region/add', component: EngineRegionEditView },
+      { path: '/vessel/:vesselId/engine/region/:regionId', component: EngineRegionEditView },
     ],
   },
 ]

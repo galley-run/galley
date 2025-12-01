@@ -62,12 +62,35 @@ object VesselEngineNodeSql {
     filters
       .mapNotNull { (field, values) ->
         when (field) {
-          VESSEL_ENGINE_NODES.VESSEL_ID.name -> VESSEL_ENGINE_NODES.VESSEL_ID.`in`(values.map { UUID.fromString(it) })
-          VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.name -> VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.`in`(values.map { UUID.fromString(it) })
-          VESSEL_ENGINE_NODES.PROVISIONING_STATUS.name -> VESSEL_ENGINE_NODES.PROVISIONING_STATUS.`in`(values)
-          VESSEL_ENGINE_NODES.IP_ADDRESS.name -> VESSEL_ENGINE_NODES.IP_ADDRESS.eq(values.first())
-          VESSEL_ENGINE_NODES.NAME.name -> VESSEL_ENGINE_NODES.NAME.eq(values.first())
-          else -> null
+          VESSEL_ENGINE_NODES.VESSEL_ID.name -> {
+            VESSEL_ENGINE_NODES.VESSEL_ID.`in`(values.map { UUID.fromString(it) })
+          }
+
+          VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID.name -> {
+            VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID.`in`(
+              values.map { UUID.fromString(it) },
+            )
+          }
+
+          VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.name -> {
+            VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.`in`(values.map { UUID.fromString(it) })
+          }
+
+          VESSEL_ENGINE_NODES.PROVISIONING_STATUS.name -> {
+            VESSEL_ENGINE_NODES.PROVISIONING_STATUS.`in`(values)
+          }
+
+          VESSEL_ENGINE_NODES.IP_ADDRESS.name -> {
+            VESSEL_ENGINE_NODES.IP_ADDRESS.eq(values.first())
+          }
+
+          VESSEL_ENGINE_NODES.NAME.name -> {
+            VESSEL_ENGINE_NODES.NAME.eq(values.first())
+          }
+
+          else -> {
+            null
+          }
         }
       }.toTypedArray()
 }

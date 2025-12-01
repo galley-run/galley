@@ -126,7 +126,6 @@ const {
   country,
   saveRegion,
   saveRegionMutation,
-  deleteRegion,
   deleteRegionMutation,
 } = useRegionForm()
 

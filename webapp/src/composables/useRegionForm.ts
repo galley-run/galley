@@ -154,7 +154,6 @@ export function useRegionForm() {
   })
 
   const deleteRegion = async (targetRegionId: string) => {
-    // TODO: Show error message if delete fails
     return await deleteRegionMutation.mutateAsync(targetRegionId)
   }
 

@@ -234,17 +234,13 @@ import dayjs from 'dayjs'
 import getNodeType from '@/utils/getNodeType.ts'
 import type { CountryCode } from 'vue3-flag-icons/types'
 import countries from '@/utils/countries.ts'
-import { useRegionForm } from '@/composables/useRegionForm.ts'
 import ConfirmDeleteRegionDialog from '@/components/Dialog/ConfirmDeleteRegionDialog.vue'
-import { useRouter } from 'vue-router'
 
 const { formatBytes, sumByteSizes, format } = useBytes()
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
 
-const router = useRouter()
 const confirmDelete = ref<null | string>(null)
-const { deleteRegion } = useRegionForm()
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),

@@ -53,9 +53,9 @@
       <DashboardCard title="Nodes" :loading="isNodesLoading">{{
         engineNodes?.length ?? 0
       }}</DashboardCard>
-      <DashboardCard title="Active Regions" :loading="isRegionsLoading">{{
-        engineRegions?.length ?? 0
-      }}</DashboardCard>
+      <DashboardCard title="Connection status" class="">
+        {{ connectionStatus }}
+      </DashboardCard>
       <DashboardCard title="Total CPU">{{ totalCpu }}</DashboardCard>
       <DashboardCard title="Total Memory">{{ totalMemory }}</DashboardCard>
     </div>
@@ -74,7 +74,7 @@
               ghost
               :leading-addon="AddCircle"
               title="Add node"
-              to="/vessel/engine/node/add"
+              :to="`/vessel/${selectedVesselId}/engine/node/add`"
             />
           </div>
         </div>
@@ -84,28 +84,51 @@
             v-for="node in engineNodes"
             :key="node.id"
           >
-            <div>
+            <div class="relative">
               <div class="flex items-center gap-2">
-                <FlagIcon code="nl" :size="16" />
+                <FlagIcon v-if="nodeRegions?.[node.id]" :code="nodeRegions?.[node.id]" :size="16" />
                 <div>{{ node.attributes.name }}</div>
-                <div class="badge badge--cliona badge--small" v-if="node.attributes.provisioningStatus === 'open'">Setup required</div>
+                <div
+                  class="badge badge--cliona badge--small"
+                  v-if="node.attributes.provisioningStatus === 'open'"
+                >
+                  Setup required
+                </div>
               </div>
               <p>
-                {{ node.attributes.nodeType }} &bullet; {{ node.attributes.cpu }} CPU &bullet;
-                {{ node.attributes.memory }} RAM
+                {{ getNodeType(node.attributes.nodeType) }} &bullet; {{ node.attributes.cpu }} CPU
+                &bullet;
+                {{ node.attributes.memory ? format(node.attributes.memory) : '--' }}
+                RAM
               </p>
+              <RouterLink
+                :to="`/vessel/${selectedVesselId}/engine/node/${node.id}`"
+                class="absolute inset-0"
+              ></RouterLink>
             </div>
             <div class="text-end">
               <p>{{ node.attributes.ipAddress }}</p>
               <p class="text-tides-700" v-if="regions">
                 <!--                AMS1-->
-                {{ regions[node.attributes.vesselEngineRegionId].name }}
+                {{
+                  node.attributes.vesselEngineRegionId &&
+                  regions[node.attributes.vesselEngineRegionId].name
+                }}
               </p>
             </div>
             <div>
               <UIDropDown
                 :items="[
-                  { label: 'Edit this node', value: `/vessel/engine/node/${node.id}`, link: true },
+                  {
+                    label: 'Edit this node',
+                    value: `/vessel/${selectedVesselId}/engine/node/${node.id}`,
+                    link: true,
+                  },
+                  {
+                    label: 'Server information',
+                    value: `/vessel/${selectedVesselId}/engine/node/${node.id}/server-info`,
+                    link: true,
+                  },
                   {
                     label: 'Delete this node',
                     value: '/delete',
@@ -126,30 +149,56 @@
         <div class="card__header">
           <h2>Regions</h2>
           <div>
-            <UIButton ghost disabled :leading-addon="AddCircle" title="Add region" />
+            <UIButton
+              ghost
+              :leading-addon="AddCircle"
+              title="Add region"
+              :to="`/vessel/${selectedVesselId}/engine/region/add`"
+            />
           </div>
         </div>
         <div class="stacked-list">
           <div
-            class="stacked-list__item grid-cols-[1fr_1fr_0fr]"
-            v-for="region in engineRegions"
+            class="stacked-list__item grid-cols-[1fr_0fr_0fr]"
+            v-for="region in engineRegionsSorted"
             :key="region.id"
           >
-            <div>
+            <div class="relative">
               <div class="flex items-center gap-2">
-                <FlagIcon :code="region.attributes.locationCountry" :size="16" />
-                <!--                FIX COUNTRY FLAG WITH LOCATION NAME IN THE FUTURE, FOR NOW USE COUNTRY CODE AS FLAG-->
+                <FlagIcon :code="region.attributes.locationCountry as CountryCode" :size="16" />
                 <div>{{ region.attributes.name }}</div>
                 <div class="badge badge--small badge--navy">{{ region.attributes.geoRegion }}</div>
               </div>
-              <p>{{ region.attributes.locationCity }}, {{ region.attributes.locationCountry }}</p>
+              <p>
+                {{ region.attributes.locationCity }},
+                {{ countries[region.attributes.locationCountry]?.name }}
+              </p>
+              <RouterLink
+                :to="`/vessel/${selectedVesselId}/engine/region/${region.id}`"
+                class="absolute inset-0"
+              ></RouterLink>
             </div>
             <div class="text-end">
               <p class="text-tides-700">{{ region.attributes.providerName }}</p>
             </div>
             <div>
               <UIDropDown
-                :items="[{ label: 'Edit region', value: '/edit', link: true }]"
+                :items="[
+                  {
+                    label: 'Edit region',
+                    value: `/vessel/${selectedVesselId}/engine/region/${region.id}`,
+                    link: true,
+                  },
+                  {
+                    label: 'Delete region',
+                    value: `/vessel/${selectedVesselId}/engine/region/${region.id}/delete`,
+                    onClick: () => {
+                      confirmDelete = region.id
+                      return
+                    },
+                    variant: 'destructive',
+                  },
+                ]"
                 :icon="MenuDots"
                 variant="icon"
                 menu-position="right"
@@ -160,6 +209,12 @@
       </div>
     </div>
   </div>
+  <ConfirmDeleteRegionDialog
+    :show="!!confirmDelete"
+    @close="confirmDelete = null"
+    @confirm="onDelete"
+    :region-id="confirmDelete"
+  />
 </template>
 <script setup lang="ts">
 import { AddCircle, CheckCircle, DocumentsMinimalistic, MenuDots } from '@solar-icons/vue'
@@ -171,35 +226,78 @@ import { useQuery } from '@tanstack/vue-query'
 import { useProjectsStore } from '@/stores/projects.ts'
 import { storeToRefs } from 'pinia'
 import axios from 'axios'
-import { computed } from 'vue'
-import { formatBytes, sumByteSizes } from '@/utils/bytes.ts'
+import { computed, ref } from 'vue'
+import { useBytes } from '@/utils/bytes.ts'
 import type { ApiResponse } from '@/types/api'
 import type { EngineNodeSummary, EngineRegionSummary, EngineSummary } from '@/types/api/engine'
+import dayjs from 'dayjs'
+import getNodeType from '@/utils/getNodeType.ts'
+import type { CountryCode } from 'vue3-flag-icons/types'
+import countries from '@/utils/countries.ts'
+import ConfirmDeleteRegionDialog from '@/components/Dialog/ConfirmDeleteRegionDialog.vue'
 
+const { formatBytes, sumByteSizes, format } = useBytes()
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
+
+const confirmDelete = ref<null | string>(null)
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),
   queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine']),
   queryFn: () =>
-    axios.get<ApiResponse<EngineSummary>[], ApiResponse<EngineSummary>[]>(`/vessels/${selectedVesselId?.value}/engine`),
+    axios.get<ApiResponse<EngineSummary>[], ApiResponse<EngineSummary>[]>(
+      `/vessels/${selectedVesselId?.value}/engine`,
+    ),
 })
 
 const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
-  enabled: computed(() =>!!selectedVesselId?.value),
-  queryKey: computed(() =>['vessel', selectedVesselId?.value, 'engine', 'nodes']),
+  enabled: computed(() => !!selectedVesselId?.value),
+  queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'nodes']),
   queryFn: () =>
-    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
+    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(
+      `/vessels/${selectedVesselId?.value}/engine/nodes`,
+    ),
 })
 
-const { isLoading: isRegionsLoading, data: engineRegions } = useQuery({
-  enabled: computed(() =>!!selectedVesselId?.value),
-  queryKey: computed(() =>['vessel', selectedVesselId?.value, 'engine', 'regions']),
+const { data: engineRegions, refetch: refetchEngineRegions } = useQuery({
+  enabled: computed(() => !!selectedVesselId?.value),
+  queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'regions']),
   queryFn: () =>
     axios.get<ApiResponse<EngineRegionSummary>[], ApiResponse<EngineRegionSummary>[]>(
       `/vessels/${selectedVesselId?.value}/engine/regions`,
     ),
+})
+
+const nodeRegions = computed(() =>
+  (engineNodes.value ?? []).reduce<Record<string, string>>((acc, node) => {
+    const region = engineRegions.value?.find((r) => r.id === node.attributes.vesselEngineRegionId)
+    acc[node.id] = region?.attributes.locationCountry ?? ''
+    return acc
+  }, {}),
+)
+
+const engineRegionsSorted = computed(() => {
+  if (!engineRegions.value) return []
+
+  return [...engineRegions.value].sort((a, b) => {
+    const geoA = a.attributes.geoRegion ?? ''
+    const geoB = b.attributes.geoRegion ?? ''
+    if (geoA !== geoB) {
+      return geoA.localeCompare(geoB)
+    }
+
+    const countryA = a.attributes.locationCountry ?? ''
+    const countryB = b.attributes.locationCountry ?? ''
+    if (countryA !== countryB) {
+      return countryA.localeCompare(countryB)
+    }
+
+    const nameA = a.attributes.name ?? ''
+    const nameB = b.attributes.name ?? ''
+
+    return nameA.localeCompare(nameB)
+  })
 })
 
 const mode = computed(() => engine.value?.[0]?.attributes?.mode)
@@ -218,4 +316,22 @@ const totalMemoryBytes = computed(() =>
 const totalMemory = computed(() =>
   formatBytes(totalMemoryBytes.value, { iec: false, decimals: 1, unit: 'GB' }),
 ) // "MB/GB"
+
+const connectionStatus = computed(() => {
+  if (engine?.value?.[0]?.attributes?.agentConnectionStatus !== 'connected') return 'Disconnected'
+  if (
+    dayjs(engine?.value?.[0]?.attributes?.lastAgentConnectionAt).isBefore(
+      dayjs().subtract(1, 'hour'),
+    )
+  ) {
+    return 'Last connected more than an hour ago'
+  }
+
+  return 'Connected'
+})
+
+async function onDelete() {
+  await refetchEngineRegions()
+  confirmDelete.value = null
+}
 </script>

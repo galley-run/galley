@@ -9,6 +9,7 @@ import generated.jooq.tables.references.VESSEL_ENGINE_NODES
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Row
 import nl.clicqo.ext.applyIfPresent
+import nl.clicqo.ext.getUUID
 
 object VesselEngineNodeFactory {
   fun from(row: Row) =
@@ -35,6 +36,10 @@ object VesselEngineNodeFactory {
   fun toRecord(payload: JsonObject) =
     VesselEngineNodesRecord().apply {
       payload.applyIfPresent(VESSEL_ENGINE_NODES.NAME, JsonObject::getString) { value -> name = value }
+      payload.applyIfPresent(VESSEL_ENGINE_NODES.VESSEL_ID, JsonObject::getUUID) { value -> vesselId = value }
+      payload.applyIfPresent(VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID, JsonObject::getUUID) { value -> vesselEngineId = value }
+      payload.applyIfPresent(VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID, JsonObject::getUUID) { value -> vesselEngineRegionId = value }
+      payload.applyIfPresent(VESSEL_ENGINE_NODES.NODE_TYPE, JsonObject::getString) { value -> nodeType = NodeType.valueOf(value) }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.DEPLOY_MODE, JsonObject::getString) { value -> deployMode = NodeDeployMode.valueOf(value) }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.IP_ADDRESS, JsonObject::getString) { value -> ipAddress = value }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.CPU, JsonObject::getString) { value -> cpu = value }

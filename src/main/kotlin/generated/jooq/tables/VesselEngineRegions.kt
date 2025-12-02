@@ -6,16 +6,13 @@ package generated.jooq.tables
 
 import generated.jooq.Public
 import generated.jooq.enums.GeoRegion
-import generated.jooq.indexes.IDX_REGIONS_ENGINE
 import generated.jooq.indexes.IDX_REGIONS_GEO
 import generated.jooq.indexes.IDX_REGIONS_VESSEL
-import generated.jooq.keys.UQ_REGIONS_ENGINE_NAME
+import generated.jooq.keys.UQ_REGIONS_VESSEL_NAME
 import generated.jooq.keys.VESSEL_ENGINE_NODES__FK_NODES_REGION
 import generated.jooq.keys.VESSEL_ENGINE_REGIONS_PKEY
-import generated.jooq.keys.VESSEL_ENGINE_REGIONS__FK_REGIONS_ENGINE
 import generated.jooq.keys.VESSEL_ENGINE_REGIONS__FK_REGIONS_VESSEL
 import generated.jooq.tables.VesselEngineNodes.VesselEngineNodesPath
-import generated.jooq.tables.VesselEngines.VesselEnginesPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.VesselEngineRegionsRecord
 
@@ -97,11 +94,6 @@ open class VesselEngineRegions(
     val VESSEL_ID: TableField<VesselEngineRegionsRecord, UUID?> = createField(DSL.name("vessel_id"), SQLDataType.UUID.nullable(false), this, "")
 
     /**
-     * The column <code>public.vessel_engine_regions.vessel_engine_id</code>.
-     */
-    val VESSEL_ENGINE_ID: TableField<VesselEngineRegionsRecord, UUID?> = createField(DSL.name("vessel_engine_id"), SQLDataType.UUID.nullable(false), this, "")
-
-    /**
      * The column <code>public.vessel_engine_regions.name</code>.
      */
     val NAME: TableField<VesselEngineRegionsRecord, String?> = createField(DSL.name("name"), SQLDataType.CLOB.nullable(false), this, "")
@@ -165,17 +157,10 @@ open class VesselEngineRegions(
         override fun `as`(alias: Table<*>): VesselEngineRegionsPath = VesselEngineRegionsPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_REGIONS_ENGINE, IDX_REGIONS_GEO, IDX_REGIONS_VESSEL)
+    override fun getIndexes(): List<Index> = listOf(IDX_REGIONS_GEO, IDX_REGIONS_VESSEL)
     override fun getPrimaryKey(): UniqueKey<VesselEngineRegionsRecord> = VESSEL_ENGINE_REGIONS_PKEY
-    override fun getUniqueKeys(): List<UniqueKey<VesselEngineRegionsRecord>> = listOf(UQ_REGIONS_ENGINE_NAME)
-    override fun getReferences(): List<ForeignKey<VesselEngineRegionsRecord, *>> = listOf(VESSEL_ENGINE_REGIONS__FK_REGIONS_ENGINE, VESSEL_ENGINE_REGIONS__FK_REGIONS_VESSEL)
-
-    /**
-     * Get the implicit join path to the <code>public.vessel_engines</code>
-     * table.
-     */
-    fun vesselEngines(): VesselEnginesPath = vesselEngines
-    val vesselEngines: VesselEnginesPath by lazy { VesselEnginesPath(this, VESSEL_ENGINE_REGIONS__FK_REGIONS_ENGINE, null) }
+    override fun getUniqueKeys(): List<UniqueKey<VesselEngineRegionsRecord>> = listOf(UQ_REGIONS_VESSEL_NAME)
+    override fun getReferences(): List<ForeignKey<VesselEngineRegionsRecord, *>> = listOf(VESSEL_ENGINE_REGIONS__FK_REGIONS_VESSEL)
 
     /**
      * Get the implicit join path to the <code>public.vessels</code> table.

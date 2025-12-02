@@ -4,6 +4,8 @@ import io.vertx.core.json.JsonObject
 import nl.clicqo.api.ApiStatus
 import nl.clicqo.api.Pagination
 import org.jooq.Condition
+import org.jooq.DeleteConditionStep
+import org.jooq.DeleteWhereStep
 import org.jooq.Record
 import org.jooq.SelectConditionStep
 import org.jooq.SelectWhereStep
@@ -118,6 +120,29 @@ fun <R : Record?> UpdateConditionStep<R>.applyConditions(
   return this
 }
 
+fun <R : Record?> DeleteWhereStep<R>.applyConditions(
+  requiredConditions: List<TableField<R, *>>? = null,
+  vararg conditions: Condition,
+): DeleteConditionStep<R> {
+  checkRequiredConditions(requiredConditions, *conditions)
+  if (conditions.isEmpty()) {
+    return this.where()
+  }
+
+  return this.where(*conditions)
+}
+
+fun <R : Record?> DeleteConditionStep<R>.applyConditions(
+  requiredConditions: List<TableField<R, *>>? = null,
+  vararg conditions: Condition,
+): DeleteConditionStep<R> {
+  checkRequiredConditions(requiredConditions, *conditions)
+  conditions.forEach {
+    this.and(it)
+  }
+  return this
+}
+
 // Overload for type-safe JOOQ Condition objects
 fun <R : Record?> SelectWhereStep<R>.applyConditions(
   requiredConditions: List<TableField<R, *>>? = null,
@@ -139,6 +164,12 @@ fun <R : Record?> UpdateWhereStep<R>.applyConditions(vararg conditions: Conditio
   this.applyConditions(null, *conditions)
 
 fun <R : Record?> UpdateConditionStep<R>.applyConditions(vararg conditions: Condition): UpdateConditionStep<R> =
+  this.applyConditions(null, *conditions)
+
+fun <R : Record?> DeleteWhereStep<R>.applyConditions(vararg conditions: Condition): DeleteConditionStep<R> =
+  this.applyConditions(null, *conditions)
+
+fun <R : Record?> DeleteConditionStep<R>.applyConditions(vararg conditions: Condition): DeleteConditionStep<R> =
   this.applyConditions(null, *conditions)
 
 // Apply sorting with type-safe JOOQ SortField objects
@@ -204,13 +235,17 @@ fun convertValue(
 ): Any? =
   when {
     // Direct assignment if types match
-    targetType.isInstance(value) -> value
+    targetType.isInstance(value) -> {
+      value
+    }
 
     // UUID conversion
-    targetType == UUID::class.java && value is String -> UUID.fromString(value)
+    targetType == UUID::class.java && value is String -> {
+      UUID.fromString(value)
+    }
 
     // OffsetDateTime conversion
-    targetType == OffsetDateTime::class.java ->
+    targetType == OffsetDateTime::class.java -> {
       when (value) {
         is String -> {
           try {
@@ -220,9 +255,15 @@ fun convertValue(
           }
         }
 
-        is Instant -> value.atOffset(ZoneOffset.UTC)
-        else -> null
+        is Instant -> {
+          value.atOffset(ZoneOffset.UTC)
+        }
+
+        else -> {
+          null
+        }
       }
+    }
 
     // Enum conversion
     targetType.isEnum -> {
@@ -232,34 +273,40 @@ fun convertValue(
     }
 
     // Number conversions
-    targetType == Integer::class.java || targetType == Int::class.java ->
+    targetType == Integer::class.java || targetType == Int::class.java -> {
       when (value) {
         is Number -> value.toInt()
         is String -> value.toIntOrNull()
         else -> null
       }
+    }
 
-    targetType == java.lang.Long::class.java || targetType == Long::class.java ->
+    targetType == java.lang.Long::class.java || targetType == Long::class.java -> {
       when (value) {
         is Number -> value.toLong()
         is String -> value.toLongOrNull()
         else -> null
       }
+    }
 
-    targetType == java.lang.Double::class.java || targetType == Double::class.java ->
+    targetType == java.lang.Double::class.java || targetType == Double::class.java -> {
       when (value) {
         is Number -> value.toDouble()
         is String -> value.toDoubleOrNull()
         else -> null
       }
+    }
 
-    targetType == java.lang.Boolean::class.java || targetType == Boolean::class.java ->
+    targetType == java.lang.Boolean::class.java || targetType == Boolean::class.java -> {
       when (value) {
         is Boolean -> value
         is String -> value.toBooleanStrictOrNull()
         else -> null
       }
+    }
 
     // Default: try direct assignment
-    else -> value
+    else -> {
+      value
+    }
   }

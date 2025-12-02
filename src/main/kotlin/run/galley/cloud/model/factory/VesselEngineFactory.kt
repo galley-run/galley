@@ -8,6 +8,7 @@ import generated.jooq.tables.references.VESSEL_ENGINES
 import io.vertx.core.json.JsonObject
 import io.vertx.sqlclient.Row
 import nl.clicqo.ext.applyIfPresent
+import java.time.OffsetDateTime
 
 object VesselEngineFactory {
   fun from(row: Row) =
@@ -21,6 +22,7 @@ object VesselEngineFactory {
           .getString(VESSEL_ENGINES.AGENT_CONNECTION_STATUS.name)
           ?.let(AgentConnectionStatus::valueOf),
       lastConnectionError = row.getString(VESSEL_ENGINES.LAST_CONNECTION_ERROR.name),
+      lastAgentConnectionAt = row.getOffsetDateTime(VESSEL_ENGINES.LAST_AGENT_CONNECTION_AT.name),
     )
 
   fun toRecord(payload: JsonObject) =
@@ -37,5 +39,9 @@ object VesselEngineFactory {
         VESSEL_ENGINES.LAST_CONNECTION_ERROR,
         JsonObject::getString,
       ) { value -> lastConnectionError = value }
+      payload.applyIfPresent(
+        VESSEL_ENGINES.LAST_AGENT_CONNECTION_AT,
+        JsonObject::getString,
+      ) { value -> lastAgentConnectionAt = OffsetDateTime.parse(value) }
     }
 }

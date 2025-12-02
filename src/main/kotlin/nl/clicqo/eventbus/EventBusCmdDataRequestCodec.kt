@@ -5,7 +5,6 @@ import io.vertx.core.eventbus.MessageCodec
 import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import nl.clicqo.ext.getUUID
-import nl.clicqo.ext.keysToSnakeCase
 
 class EventBusCmdDataRequestCodec : MessageCodec<EventBusCmdDataRequest, EventBusCmdDataRequest> {
   override fun encodeToWire(

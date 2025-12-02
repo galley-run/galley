@@ -1,6 +1,8 @@
 export interface EngineSummary {
   name: string
   mode: string
+  agentConnectionStatus: string
+  lastAgentConnectionAt: string
 }
 
 export interface EngineNodeSummary {
@@ -8,13 +10,24 @@ export interface EngineNodeSummary {
   ipAddress: string
   nodeType: string
   deployMode: string
-  cpu: string
-  memory: string
-  storage: string
-  vesselEngineRegionId: string
+  cpu?: string
+  memory?: string
+  storage?: string
+  vesselEngineRegionId?: string
   provisioning: boolean
-  osMetadata: object
+  osMetadata: EngineNodeOSMetadata
   provisioningStatus: string
+  token?: string
+}
+
+export interface EngineNodeOSMetadata {
+    os?: string
+    arch?: string
+    distro?: string
+    cpuUsed?: string
+    version?: string
+    memoryUsed?: string
+    storageUsed?: string
 }
 
 export interface EngineRegionSummary {

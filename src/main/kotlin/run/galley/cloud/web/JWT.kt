@@ -4,10 +4,8 @@ import io.vertx.core.Vertx
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.auth.JWTOptions
 import io.vertx.ext.auth.KeyStoreOptions
-import io.vertx.ext.auth.User
 import io.vertx.ext.auth.jwt.JWTAuth
 import io.vertx.ext.auth.jwt.JWTAuthOptions
-import nl.clicqo.ext.getUUID
 import nl.clicqo.system.Debug
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CrewAccess

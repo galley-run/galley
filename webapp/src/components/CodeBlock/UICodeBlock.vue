@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-navy-900 text-white rounded-2xl p-8">
+  <div class="bg-navy-900 dark:bg-tides-200 text-white dark:text-black rounded-2xl p-8">
     <div class="flex gap-2 items-center mb-4">
       <RoundDoubleAltArrowRight />
 
@@ -7,7 +7,7 @@
         {{ title }}
       </h3>
     </div>
-    <div class="font-mono text-sm font-medium leading-relaxed text-navy-100">
+    <div class="font-mono text-sm font-medium leading-relaxed text-navy-100 dark:text-black">
       <slot />
     </div>
   </div>

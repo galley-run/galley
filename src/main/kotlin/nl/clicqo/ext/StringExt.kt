@@ -34,13 +34,17 @@ fun String.isValidEmail(): Boolean = this.matches(Regex("^[\\w\\-.+]+@([\\w-]+\\
 
 fun String.toSingular(): String =
   when (this) {
-    "crew" -> "crew"
-    else ->
+    "crew" -> {
+      "crew"
+    }
+
+    else -> {
       when {
         endsWith("ies") -> dropLast(3) + "y"
         endsWith("s") && !endsWith("ss") -> dropLast(1)
         else -> this
       }
+    }
   }
 
 fun String.toBase64() = Base64.encode(this.encodeToByteArray())
@@ -55,3 +59,33 @@ fun String.fromBase64(): String {
   val bytes = if (isUrlSafe) Base64.UrlSafe.decode(padded) else Base64.decode(padded)
   return bytes.decodeToString() // UTF-8
 }
+
+enum class ByteUnit(
+  val suffix: String,
+  val factor: Long,
+) {
+  B("B", 1L),
+  KI("Ki", 1024L),
+  MI("Mi", 1024L * 1024),
+  GI("Gi", 1024L * 1024 * 1024),
+  TI("Ti", 1024L * 1024 * 1024 * 1024),
+  ;
+
+  companion object {
+    fun from(value: String): ByteUnit =
+      entries.firstOrNull { value.endsWith(it.suffix, ignoreCase = true) }
+        ?: B
+  }
+}
+
+fun String.toBytes(): Long {
+  val unit = ByteUnit.from(this)
+  val numberPart = this.removeSuffix(unit.suffix).trim()
+  return numberPart.toLong() * unit.factor
+}
+
+fun Long.toHumanKi(): String = "${this / 1024}Ki"
+
+fun Long.toHumanMi(): String = "${this / (1024 * 1024)}Mi"
+
+fun Long.toHumanGi(): String = "${this / (1024L * 1024 * 1024)}Gi"

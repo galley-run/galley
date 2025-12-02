@@ -1,7 +1,6 @@
 package nl.clicqo.eventbus
 
 import org.jooq.Field
-import java.util.UUID
 
 class EventBusQueryFilterBuilder {
   private val map = mutableMapOf<String, List<String>>()

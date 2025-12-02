@@ -20,6 +20,7 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
   companion object {
     const val CREATE = "data.vessel.engine.cmd.create"
     const val PATCH = "data.vessel.engine.cmd.patch"
+    const val GET = "data.vessel.engine.query.get"
     const val LIST_BY_VESSEL_ID = "data.vessel.engine.query.list_by_vessel_id"
   }
 
@@ -29,6 +30,7 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
     coroutineEventBus {
       vertx.eventBus().coConsumer(CREATE, handler = ::create)
       vertx.eventBus().coConsumer(PATCH, handler = ::patch)
+      vertx.eventBus().coConsumer(GET, handler = ::get)
       vertx.eventBus().coConsumer(LIST_BY_VESSEL_ID, handler = ::listByVesselId)
     }
   }
@@ -160,6 +162,17 @@ class VesselEngineDataVerticle : PostgresDataVerticle() {
   private suspend fun patch(message: Message<EventBusCmdDataRequest>) {
     val request = message.body()
     val results = pool.execute(VesselEngineSql.patch(request))
+
+    val vesselEngine =
+      results?.firstOrNull()?.let(VesselEngineFactory::from)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+
+    message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
+  }
+
+  private suspend fun get(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val results = pool.execute(VesselEngineSql.get(request))
 
     val vesselEngine =
       results?.firstOrNull()?.let(VesselEngineFactory::from)

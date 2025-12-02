@@ -7,22 +7,21 @@ import { useQuery } from '@tanstack/vue-query'
 import axios from 'axios'
 import type { ApiResponse } from '@/types/api'
 import type { EngineNodeSummary } from '@/types/api/engine'
-import { useProjectsStore } from '@/stores/projects.ts'
-import { storeToRefs } from 'pinia'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { watch } from 'vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 
-const projectsStore = useProjectsStore()
-const { selectedVesselId } = storeToRefs(projectsStore)
-
+const route = useRoute()
+const { vesselId } = route.params
 const router = useRouter()
 
 const { isLoading, data } = useQuery({
-  enabled: !!selectedVesselId?.value,
-  queryKey: ['vessel', selectedVesselId?.value, 'engine', 'nodes'],
+  enabled: !!vesselId,
+  queryKey: ['vessel', vesselId, 'engine', 'nodes'],
   queryFn: () =>
-    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(`/vessels/${selectedVesselId?.value}/engine/nodes`),
+    axios.get<ApiResponse<EngineNodeSummary>[], ApiResponse<EngineNodeSummary>[]>(
+      `/vessels/${vesselId}/engine/nodes`,
+    ),
 })
 
 watch(data, (nodes) => {

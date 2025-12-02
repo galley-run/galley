@@ -117,7 +117,7 @@ open class VesselEngineNodes(
      * The column
      * <code>public.vessel_engine_nodes.vessel_engine_region_id</code>.
      */
-    val VESSEL_ENGINE_REGION_ID: TableField<VesselEngineNodesRecord, UUID?> = createField(DSL.name("vessel_engine_region_id"), SQLDataType.UUID.nullable(false), this, "")
+    val VESSEL_ENGINE_REGION_ID: TableField<VesselEngineNodesRecord, UUID?> = createField(DSL.name("vessel_engine_region_id"), SQLDataType.UUID, this, "")
 
     /**
      * The column <code>public.vessel_engine_nodes.node_type</code>.

@@ -9,20 +9,25 @@ const UNIT_RE = /^([0-9]*\.?[0-9]+)\s*([KMGTPEZY]?i?B?|[KMGTPEZY])$/i;
 type ParsedUnit = { base: number; exp: number }; // expliciet type
 
 function parseUnit(unitRaw: string | undefined): ParsedUnit {
-  let unit = (unitRaw ?? 'B').trim().toUpperCase();
-  if (!unit) unit = 'B';
+  let unit = (unitRaw ?? 'B').trim().toUpperCase()
+  if (!unit) unit = 'B'
 
   // Normalize shorthand like "M" → "MB"
   if (unit.length === 1 && unit !== 'B' && LETTER_INDEX[unit] !== undefined) {
-    unit = unit + 'B';
+    unit = unit + 'B'
   }
 
-  const isIec = unit.includes('I') && unit !== 'B';
-  const letter = unit[0] ?? 'B';
-  const exp = LETTER_INDEX[letter] ?? 0;
-  const base = isIec ? 1024 : 1000;
+  // Normalize "Ki" → "KiB", "Mi" → "MiB", etc.
+  if (unit.length === 2 && unit.endsWith('I') && unit[0] && LETTER_INDEX[unit[0]] !== undefined) {
+    unit = unit + 'B'
+  }
 
-  return { base, exp };
+  const isIec = unit.includes('I') && unit !== 'B'
+  const letter = unit[0] ?? 'B'
+  const exp = LETTER_INDEX[letter] ?? 0
+  const base = isIec ? 1024 : 1000
+
+  return { base, exp }
 }
 
 export function toBytes(value: ByteSizeInput): number {
@@ -87,7 +92,13 @@ export function formatBytes(bytes: number, opts: FormatOptions = {}): string {
   return `${value.toFixed(decimals)} ${UNITS[i]}`;
 }
 
+function format(input: string, opts: FormatOptions = { iec: false }): string {
+  const bytes = toBytes(input)
+  return formatBytes(bytes, opts)
+}
+
+
 // Optional Vue composable wrapper (tree-shakable)
 export function useBytes() {
-  return { toBytes, sumByteSizes, formatBytes };
+  return { toBytes, sumByteSizes, formatBytes, format }
 }

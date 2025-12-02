@@ -16,8 +16,9 @@ import type { IconProps } from '@solar-icons/vue/lib'
 
 type Item = {
   label: string
-  value: string
+  value?: string
   disabled?: boolean
+  onClick?: () => Promise<void> | void
   link?: 'external' | boolean
   variant?: 'destructive' | undefined
 }
@@ -137,17 +138,23 @@ function toggleKey(e: KeyboardEvent) {
   }
 }
 
-function selectAt(index: number) {
+async function selectAt(index: number) {
   const item = items[index]
 
   if (!item || item.disabled) return
 
-  if (item.link) {
+  if (item.link && item.value) {
     if (item.value.startsWith('http')) {
       window.open(item.value, item.link === 'external' ? '_blank' : '_self')
     } else {
-      router.push(item.value)
+      await router.push(item.value)
     }
+    close()
+    return
+  }
+
+  if (item.onClick) {
+    await item.onClick()
     close()
     return
   }
@@ -321,13 +328,14 @@ watch(
     <select
       ref="selectRef"
       v-bind="$attrs"
+      tabindex="1000"
       :value="modelValue ?? ''"
-      class="sr-only hidden"
+      class="sr-only hidden outline-none"
     >
       <option value="" disabled hidden></option>
       <option
         v-for="opt in items"
-        :key="opt.value"
+        :key="opt.value || opt.label"
         :value="opt.value"
         :disabled="opt.disabled"
       >
@@ -346,7 +354,7 @@ watch(
         :style="menuStyle"
         @keydown="onKeydownList"
       >
-        <template v-for="(item, idx) in items" :key="item.value">
+        <template v-for="(item, idx) in items" :key="item.value || idx">
           <div
             :id="`dd-opt-${idx}`"
             role="option"
@@ -356,9 +364,9 @@ watch(
               'px-4 py-2.5 grid grid-cols-[auto_1fr_0fr] gap-2.5 items-center',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
               !item.variant && idx === activeIndex && 'bg-navy-50',
-              item.variant === 'destructive' && idx === activeIndex && 'bg-coral-100',
+              item.variant === 'destructive' && idx === activeIndex && 'bg-coral-50',
               item.variant === 'destructive' &&
-                'bg-coral-50 text-coral-500 hover:bg-coral-100 aria-selected:bg-coral-100 aria-selected:text-coral-600',
+                'text-coral-500 hover:bg-coral-50 aria-selected:bg-coral-50 aria-selected:text-coral-600',
               !item.variant &&
                 'hover:bg-navy-50 aria-selected:bg-navy-600 aria-selected:text-white',
             ]"

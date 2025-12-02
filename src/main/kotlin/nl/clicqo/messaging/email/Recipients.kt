@@ -1,7 +1,6 @@
 package nl.clicqo.messaging.email
 
 import io.vertx.core.json.JsonArray
-import io.vertx.core.json.JsonObject
 
 data class Recipients(
   private val value: List<String>,

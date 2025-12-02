@@ -322,6 +322,122 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Create a region within the engine
+      operationId: vessel.engine.region.cmd.create
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/RegionCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Region'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/engine/regions/{regionId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/regionId'
+    get:
+      summary: Get single region within the engine
+      operationId: vessel.engine.region.query.get
+      description: Returns a record of type Region.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Region'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      summary: Update a region within the engine
+      operationId: vessel.engine.region.cmd.patch
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/RegionPartialUpdate'
+      responses:
+        '200':
+          description: The request was successful, and the resource was updated.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Region'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Delete a region from the engine, may be refused if there are still nodes running in the region
+      operationId: vessel.engine.region.cmd.delete
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/charters:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -966,6 +1082,11 @@ components:
                   description: Show connection with agent.
                   examples:
                     - disconnected
+                lastAgentConnectionAt:
+                  type:
+                    - string
+                    - 'null'
+                  format: date-time
                 lastConnectionError:
                   type:
                     - string
@@ -1220,7 +1341,9 @@ components:
                   type: string
                   default: worker
                 vesselEngineRegionId:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   format: uuid
                 vesselEngineId:
                   type: string
@@ -1245,6 +1368,7 @@ components:
                   enum:
                     - open
                     - ready
+                    - imported
                 deployTarget:
                   enum:
                     - applications
@@ -1305,17 +1429,17 @@ components:
               type: object
               required:
                 - name
-                - locationCity
                 - locationCountry
                 - geoRegion
-                - providerName
               properties:
                 name:
                   type: string
                   examples:
                     - AMS1
                 locationCity:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   examples:
                     - Amsterdam
                 locationCountry:
@@ -1334,9 +1458,100 @@ components:
                   examples:
                     - eu
                 providerName:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - mijn.host
+    RegionCreate:
+      type: object
+      required:
+        - name
+        - locationCountry
+        - geoRegion
+      properties:
+        name:
+          type: string
+        locationCity:
+          type:
+            - string
+            - 'null'
+        locationCountry:
+          type: string
+        geoRegion:
+          type: string
+        providerName:
+          type:
+            - string
+            - 'null'
+      description: Data transfer object for creating a new Region.
+    Region:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Region, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - VesselEngineRegion
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - locationCountry
+                - geoRegion
+                - providerName
+              properties:
+                name:
+                  type: string
+                  examples:
+                    - AMS1
+                geoRegion:
+                  type: string
+                  examples:
+                    - eu
+                locationCity:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - Amsterdam
+                locationCountry:
+                  type: string
+                  examples:
+                    - nl
+                  description: ISO 3166 formatted country code
+                providerName:
                   type: string
                   examples:
                     - mijn.host
+    RegionPartialUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        locationCity:
+          type:
+            - string
+            - 'null'
+        locationCountry:
+          type: string
+        geoRegion:
+          type: string
+        providerName:
+          type:
+            - string
+            - 'null'
+      description: Data transfer object for partially updating an existing Region (PATCH operation).
     CharterSummary:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'
@@ -1839,6 +2054,8 @@ components:
                       type: string
                     title:
                       type: string
+    NoContent:
+      description: The server has successfully fulfilled the request and there is no additional content to send in the response payload body.
     UnsupportedMediaType:
       description: The request could not be completed due to a conflict with the content type of the request body.
       content:
@@ -1860,8 +2077,6 @@ components:
                       type: string
                     title:
                       type: string
-    NoContent:
-      description: The server has successfully fulfilled the request and there is no additional content to send in the response payload body.
   parameters:
     vesselId:
       name: vesselId
@@ -1875,6 +2090,13 @@ components:
       in: path
       required: true
       description: Unique identifier of the node
+      schema:
+        type: string
+        format: uuid
+    regionId:
+      name: regionId
+      in: path
+      required: true
       schema:
         type: string
         format: uuid

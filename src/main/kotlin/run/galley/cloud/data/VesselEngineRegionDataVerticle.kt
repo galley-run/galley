@@ -1,6 +1,5 @@
 package run.galley.cloud.data
 
-import generated.jooq.tables.pojos.CharterProjects
 import generated.jooq.tables.pojos.VesselEngineRegions
 import io.vertx.core.eventbus.Message
 import nl.clicqo.api.ApiStatusReplyException

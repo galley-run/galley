@@ -1,6 +1,5 @@
 package run.galley.cloud.sql
 
-import generated.jooq.tables.references.VESSEL_ENGINE_NODES
 import generated.jooq.tables.references.VESSEL_ENGINE_REGIONS
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusCmdDataRequest
@@ -11,7 +10,6 @@ import nl.clicqo.ext.toUUID
 import org.jooq.Condition
 import org.jooq.Query
 import run.galley.cloud.ApiStatus
-import run.galley.cloud.model.factory.VesselEngineNodeFactory
 import run.galley.cloud.model.factory.VesselEngineRegionFactory
 import java.util.UUID
 

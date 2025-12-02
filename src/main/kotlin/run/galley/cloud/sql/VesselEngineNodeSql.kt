@@ -1,14 +1,10 @@
 package run.galley.cloud.sql
 
-import generated.jooq.enums.NodeDeployMode
-import generated.jooq.enums.NodeProvisioningStatus
-import generated.jooq.enums.NodeType
 import generated.jooq.tables.references.VESSEL_ENGINE_NODES
 import nl.clicqo.data.Jooq
 import nl.clicqo.eventbus.EventBusCmdDataRequest
 import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.applyConditions
-import nl.clicqo.ext.getUUID
 import nl.clicqo.ext.keysToSnakeCase
 import nl.clicqo.ext.toUUID
 import org.jooq.Condition

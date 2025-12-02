@@ -12,7 +12,7 @@ import { watch } from 'vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 
 const route = useRoute()
-const { vesselId } = route.params
+const { vesselId } = route.params as { vesselId: string | null }
 const router = useRouter()
 
 const { isLoading, data } = useQuery({

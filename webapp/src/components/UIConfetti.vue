@@ -30,13 +30,12 @@ const P = {
 
 function resize() {
   if (!canvas.value) return
-  // pixel ratio aware
   const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1))
   const rect = canvas.value.getBoundingClientRect()
   canvas.value.width = Math.round(rect.width * dpr)
   canvas.value.height = Math.round(rect.height * dpr)
-  ;(canvas.value.style as any).imageRendering = 'pixelated'
-  ctx?.setTransform(dpr, 0, 0, dpr, 0, 0) // render op CSS pixels
+  canvas.value.style.imageRendering = 'pixelated'
+  ctx?.setTransform(dpr, 0, 0, dpr, 0, 0)
 }
 
 type Particle = {

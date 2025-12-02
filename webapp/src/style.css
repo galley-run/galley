@@ -331,7 +331,7 @@
   }
 
   .form-footer {
-    @apply flex justify-between items-end xl:items-center xl:flex-row flex-col gap-4;
+    @apply flex items-end lg:items-center flex-row gap-4;
 
     p {
       @apply text-tides-700 text-sm;
@@ -537,7 +537,7 @@
   }
 
   .alert {
-    @apply outline rounded-xl outline-tides-300 px-4 py-4 flex items-center gap-4 mb-4;
+    @apply outline rounded-xl outline-tides-300 px-4 py-4 flex items-center gap-3;
   }
 
   .alert--destructive {
@@ -546,6 +546,10 @@
     h1, h2, h3, h4, h5, h6 {
       @apply text-red-900;
     }
+  }
+
+  footer {
+    @apply bg-tides-100 text-tides-800 text-center space-y-1 border border-tides-400 p-6 rounded-lg my-8;
   }
 }
 

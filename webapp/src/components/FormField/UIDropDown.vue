@@ -17,6 +17,7 @@ import type { IconProps } from '@solar-icons/vue/lib'
 type Item = {
   label: string
   value?: string
+  title?: string
   disabled?: boolean
   onClick?: () => Promise<void> | void
   link?: 'external' | boolean
@@ -60,24 +61,18 @@ const lastLetter = ref<string | null>(null)
 const lastLetterCount = ref<number | null>(null)
 
 const triggerNode = computed<HTMLElement | null>(() => {
-  const raw = triggerEl.value as any
+  const raw = triggerEl.value as HTMLElement & { $el?: HTMLElement }
   return raw?.$el ?? raw ?? null
 })
 
 const triggerRect = computed<DOMRect>(() => {
-  if (!isOpen.value) return
-  const el = triggerNode.value as any
-  return el && typeof el.getBoundingClientRect === 'function'
-    ? el.getBoundingClientRect()
-    : new DOMRect(0, 0, 0, 0)
+  if (!isOpen.value) return new DOMRect(0, 0, 0, 0)
+  return triggerNode.value?.getBoundingClientRect() ?? new DOMRect(0, 0, 0, 0)
 })
 
 const listRect = computed<DOMRect>(() => {
-  if (!isOpen.value) return
-  const el = listEl.value as any
-  return el && typeof el.getBoundingClientRect === 'function'
-    ? el.getBoundingClientRect()
-    : new DOMRect(0, 0, 0, 0)
+  if (!isOpen.value) return new DOMRect(0, 0, 0, 0)
+  return listEl.value?.getBoundingClientRect() ?? new DOMRect(0, 0, 0, 0)
 })
 
 const menuStyle = computed(() => {
@@ -241,9 +236,9 @@ function ensureActiveVisible() {
 function onClickOutside(ev: Event) {
   const t = ev.target as Node | null
   if (!isOpen.value) return
-  const triggerNode = (triggerEl.value as any)?.$el ?? triggerEl.value
+  const triggerNode = (triggerEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? triggerEl.value
   if (triggerNode instanceof Node && t && triggerNode.contains(t)) return
-  const listNode = (listEl.value as any)?.$el ?? listEl.value
+  const listNode = (listEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? listEl.value
   if (listNode instanceof Node && t && listNode.contains(t)) return
   close()
 }
@@ -360,6 +355,7 @@ watch(
             role="option"
             :aria-selected="item.value === modelValue"
             :data-index="idx"
+            :title="item.title"
             :class="[
               'px-4 py-2.5 grid grid-cols-[auto_1fr_0fr] gap-2.5 items-center',
               item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',

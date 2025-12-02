@@ -20,7 +20,7 @@
                 required
                 placeholder="Select country..."
                 id="country"
-                v-model="country"
+                v-model="locationCountry"
                 :items="countries"
               />
             </UIFormField>
@@ -35,7 +35,7 @@
             </UIFormField>
             <UIFormField class="col-span-2">
               <UILabel for="city">City</UILabel>
-              <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="city" />
+              <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="locationCity" />
             </UIFormField>
           </div>
         </div>
@@ -54,7 +54,7 @@
                 id="provider"
                 :items="providers"
                 placeholder="e.g. Hetzner"
-                v-model="provider"
+                v-model="providerName"
               />
             </UIFormField>
           </div>
@@ -64,25 +64,21 @@
               >Back to engine
             </UIButton>
             <UIButton
-              :disabled="saveRegionMutation.isPending.value || deleteRegionMutation.isPending.value"
+              :disabled="saveIsPending || deleteIsPending"
               ghost
               variant="destructive"
               v-if="regionId"
               @click="confirmDelete = true"
               >Delete this region
-              <LoadingIndicator v-if="deleteRegionMutation.isPending.value" />
+              <LoadingIndicator v-if="deleteIsPending" />
             </UIButton>
-            <UIButton :disabled="saveRegionMutation.isPending.value" type="submit" v-if="regionId"
+            <UIButton :disabled="saveIsPending" type="submit" v-if="regionId"
               >Save this region
-              <LoadingIndicator v-if="saveRegionMutation.isPending.value" />
+              <LoadingIndicator v-if="saveIsPending" />
             </UIButton>
-            <UIButton
-              :disabled="saveRegionMutation.isPending.value"
-              type="submit"
-              v-else
-              :trailing-addon="MapPointAdd"
+            <UIButton :disabled="saveIsPending" type="submit" v-else :trailing-addon="MapPointAdd"
               >Create region
-              <LoadingIndicator v-if="saveRegionMutation.isPending.value" />
+              <LoadingIndicator v-if="saveIsPending" />
             </UIButton>
           </div>
         </div>
@@ -108,7 +104,14 @@ import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 import { ArrowLeft, MapPointAdd } from '@solar-icons/vue'
 import { useRoute, useRouter } from 'vue-router'
 import UIAutoComplete from '@/components/FormField/UIAutoComplete.vue'
-import { countries, geoRegions, providers, useRegionForm } from '@/composables/useRegionForm'
+import {
+  countries,
+  geoRegions,
+  providers,
+  useDeleteRegion,
+  useRegionFormHelpers,
+  useSaveRegion,
+} from '@/composables/useEngineRegion.ts'
 import ConfirmDeleteRegionDialog from '@/components/Dialog/ConfirmDeleteRegionDialog.vue'
 
 const formRef = ref<HTMLFormElement | null>(null)
@@ -116,18 +119,12 @@ const confirmDelete = ref(false)
 
 const route = useRoute()
 const router = useRouter()
-const { regionId } = route.params
+const { regionId } = route.params as { regionId: string | null }
 
-const {
-  name,
-  provider,
-  geoRegion,
-  city,
-  country,
-  saveRegion,
-  saveRegionMutation,
-  deleteRegionMutation,
-} = useRegionForm()
+const { name, providerName, geoRegion, locationCity, locationCountry, saveRegion } =
+  useRegionFormHelpers()
+const { isPending: saveIsPending } = useSaveRegion()
+const { isPending: deleteIsPending } = useDeleteRegion()
 
 async function onSubmit() {
   const form = formRef.value!
@@ -138,7 +135,7 @@ async function onSubmit() {
     return
   }
 
-  await saveRegion(regionId as string | undefined)
+  await saveRegion()
   await router.push('/vessel/engine')
 }
 

@@ -36,6 +36,17 @@ object VesselEngineNodeSql {
       .returning()
   }
 
+  fun delete(request: EventBusCmdDataRequest): Query {
+    val identifier = request.identifier
+    val conditions = buildConditions(request.filters)
+
+    return Jooq.postgres
+      .deleteFrom(VESSEL_ENGINE_NODES)
+      .where(VESSEL_ENGINE_NODES.ID.eq(identifier))
+      .applyConditions(*conditions)
+      .returning()
+  }
+
   fun find(request: EventBusQueryDataRequest): Query {
     val conditions = buildConditions(request.filters)
 

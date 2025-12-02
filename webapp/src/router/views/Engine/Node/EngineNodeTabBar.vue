@@ -25,5 +25,5 @@
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const { nodeId, vesselId } = route.params
+const { nodeId, vesselId } = route.params as { vesselId: string | null, nodeId: string | null }
 </script>

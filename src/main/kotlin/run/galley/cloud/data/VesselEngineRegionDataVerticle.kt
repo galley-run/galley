@@ -49,7 +49,7 @@ class VesselEngineRegionDataVerticle : PostgresDataVerticle() {
 
     val region =
       results?.firstOrNull()?.let(VesselEngineRegionFactory::from)
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_REGION_NOT_FOUND)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(region)))
   }
@@ -60,7 +60,7 @@ class VesselEngineRegionDataVerticle : PostgresDataVerticle() {
 
     val vesselEngine =
       results?.firstOrNull()?.let(VesselEngineRegionFactory::from)
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }
@@ -71,7 +71,7 @@ class VesselEngineRegionDataVerticle : PostgresDataVerticle() {
 
     val vesselEngine =
       results?.firstOrNull()?.let(VesselEngineRegionFactory::from)
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngine)))
   }
@@ -81,7 +81,7 @@ class VesselEngineRegionDataVerticle : PostgresDataVerticle() {
     val updated = pool.execute(VesselEngineRegionSql.delete(request))
 
     if (updated?.rowCount() == 0) {
-      throw ApiStatusReplyException(ApiStatus.VESSEL_REGION_NOT_FOUND)
+      throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_DELETION_FAILED)
     }
 
     message.reply(EventBusDataResponse.noContent<VesselEngineRegions>())

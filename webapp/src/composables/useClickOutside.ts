@@ -16,7 +16,7 @@ function handler(ev: Event) {
     const targetsRaw = entry.getTargets()
     const targets = Array.isArray(targetsRaw) ? targetsRaw : [targetsRaw]
     const isInside = targets.some(raw => {
-      const el = (raw as any)?.$el ?? raw
+      const el = (raw as { $el?: Node })?.$el ?? raw
       return el instanceof Node && (t ? el.contains(t) : false)
     })
     if (!isInside) entry.onOutside(ev)
@@ -36,7 +36,7 @@ export function useClickOutside(getTargets: TargetGetter, onOutside: (ev: Event)
   onBeforeUnmount(() => {
     entries.delete(entry)
     if (attached && entries.size === 0) {
-      document.removeEventListener('pointerdown', handler, { capture: true } as any)
+      document.removeEventListener('pointerdown', handler, { capture: true })
       attached = false
     }
   })

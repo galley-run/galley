@@ -31,7 +31,7 @@ describe('useAuthStore', () => {
   let store: ReturnType<typeof useAuthStore>
 
   // Helper functie om een JWT token te maken
-  const createJWT = (payload: Record<string, any>, expMinutes = 60) => {
+  const createJWT = (payload: Record<string, unknown>, expMinutes = 60) => {
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
     const exp = Math.floor(Date.now() / 1000) + expMinutes * 60
     const body = btoa(JSON.stringify({ ...payload, exp }))
@@ -160,7 +160,7 @@ describe('useAuthStore', () => {
     })
 
     it('stops access token timer', async () => {
-      store.accessTokenTimeout = 123 as any
+      store.accessTokenTimeout = 123 as NodeJS.Timeout
       const stopSpy = vi.spyOn(store, 'stopAccessTokenTimer')
       vi.mocked(axios.delete).mockResolvedValue({})
 
@@ -243,7 +243,7 @@ describe('useAuthStore', () => {
 
   describe('stopAccessTokenTimer', () => {
     it('clears the timeout', () => {
-      store.accessTokenTimeout = 123 as any
+      store.accessTokenTimeout = 123 as NodeJS.Timeout
 
       store.stopAccessTokenTimer()
 

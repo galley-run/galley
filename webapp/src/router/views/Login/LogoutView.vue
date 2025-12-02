@@ -7,7 +7,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 import { onMounted } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import { useAuthStore } from '@/stores/auth.ts'

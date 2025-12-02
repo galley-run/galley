@@ -4,6 +4,7 @@ import generated.jooq.tables.pojos.Vessels
 import generated.jooq.tables.references.VESSELS
 import io.vertx.core.eventbus.Message
 import io.vertx.kotlin.coroutines.coAwait
+import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.eventbus.EventBusApiRequest
 import nl.clicqo.eventbus.EventBusApiResponse
 import nl.clicqo.eventbus.EventBusDataResponse
@@ -33,7 +34,7 @@ class VesselControllerVerticle :
 
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = getApiRequest(message)
-    val vesselIds = apiRequest.user?.getVessels() ?: throw ApiStatus.VESSEL_ID_INCORRECT
+    val vesselIds = apiRequest.user?.getVessels() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ID_INCORRECT)
 
     val dataRequest =
       EventBusQueryDataRequest(

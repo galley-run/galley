@@ -1,11 +1,150 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { useRegionForm, geoRegions, countries, providers } from '../useRegionForm'
+import {
+  geoRegions,
+  countries,
+  providers,
+  useRegions,
+  useRegion,
+  useSaveRegion,
+  useDeleteRegion,
+} from '../useEngineRegion.ts'
 import { createPinia } from 'pinia'
 import { useProjectsStore } from '@/stores/projects'
 import axios from 'axios'
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
+import countriesObj from '@/utils/countries'
+import getCityHub from '@/utils/getCityHub'
+import { useRoute } from 'vue-router'
+
+// Recreate the old useRegionForm API for testing
+function useRegionForm() {
+  const route = useRoute()
+  const { vesselId, regionId } = route.params
+  const projectsStore = useProjectsStore()
+
+  const selectedVesselId = computed(() =>
+    projectsStore.charters.find(c => c.id === projectsStore.selectedCharterId)?.vesselId
+  )
+
+  const name = ref('')
+  const provider = ref('')
+  const geoRegion = ref('')
+  const city = ref('')
+  const country = ref('')
+
+  const { regions: engineRegions } = useRegions(vesselId as string || selectedVesselId.value)
+  const { region: engineRegion } = useRegion(regionId as string, vesselId as string || selectedVesselId.value)
+  const {
+    saveRegion: saveRegionFn,
+    isPending: saveIsPending,
+    error: saveError,
+  } = useSaveRegion(regionId as string, vesselId as string || selectedVesselId.value)
+  const {
+    deleteRegion: deleteRegionFn,
+    isPending: deleteIsPending,
+    error: deleteError,
+  } = useDeleteRegion(vesselId as string || selectedVesselId.value)
+
+  watch(
+    engineRegion,
+    (region) => {
+      if (region) {
+        name.value = region.attributes.name
+        provider.value = region.attributes.providerName
+        geoRegion.value = region.attributes.geoRegion
+        city.value = region.attributes.locationCity
+        country.value = region.attributes.locationCountry
+      }
+    },
+    { immediate: true },
+  )
+
+  // Auto-set region name based on city
+  watch(city, (newCity) => {
+    const hub = getCityHub(newCity)
+    let sequence = 1
+
+    if (engineRegions?.value?.length && hub && engineRegions?.value?.length > 0) {
+      const regions = engineRegions.value.filter((region) =>
+        region?.attributes?.name?.startsWith(hub),
+      )
+
+      if (regions.length > 0) {
+        sequence =
+          regions.reduce(
+            (acc, region) => Math.max(acc, parseInt(region.attributes?.name?.slice(-1)) || 0),
+            0,
+          ) + 1
+      }
+    }
+
+    if (hub && !name.value) {
+      name.value = hub + sequence
+    }
+  })
+
+  // Auto-set geo region based on country
+  watch(country, (newCountry) => {
+    if (newCountry && countriesObj[newCountry]) {
+      geoRegion.value = countriesObj[newCountry].region
+    }
+  })
+
+  const pristine = ref(true)
+  watch([name, provider, geoRegion, city, country], (values) => {
+    pristine.value = values.filter(Boolean).length === 0
+  })
+
+  const saveRegion = async (targetRegionId?: string) => {
+    const data = {
+      name: name.value,
+      locationCity: city.value,
+      locationCountry: country.value,
+      geoRegion: geoRegion.value,
+      providerName: provider.value,
+    }
+
+    // If targetRegionId is provided, use patch, otherwise use the normal save
+    if (targetRegionId) {
+      return await axios.patch(
+        `/vessels/${vesselId || selectedVesselId.value}/engine/regions/${targetRegionId}`,
+        data
+      )
+    }
+
+    return await saveRegionFn(data)
+  }
+
+  const deleteRegion = async (targetRegionId: string) => {
+    return await deleteRegionFn(targetRegionId)
+  }
+
+  return {
+    name,
+    provider,
+    geoRegion,
+    city,
+    country,
+    pristine,
+    engineRegions,
+    saveRegion,
+    saveRegionMutation: {
+      mutateAsync: saveRegionFn,
+      isPending: saveIsPending,
+      isError: computed(() => !!saveError.value),
+      isSuccess: computed(() => !saveIsPending.value && !saveError.value),
+    },
+    deleteRegion,
+    deleteRegionMutation: {
+      mutateAsync: deleteRegionFn,
+      isPending: deleteIsPending,
+      isError: computed(() => !!deleteError.value),
+      isSuccess: computed(() => !deleteIsPending.value && !deleteError.value),
+    },
+  }
+}
 
 vi.mock('axios')
 
@@ -21,8 +160,8 @@ vi.mock('vue-router', () => ({
 }))
 
 // Helper function to create a wrapper component for testing composables
-function withSetup(composable: () => any) {
-  let result: any
+function withSetup<T>(composable: () => T) {
+  let result: T
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {

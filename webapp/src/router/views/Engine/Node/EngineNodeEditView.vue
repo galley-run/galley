@@ -247,8 +247,6 @@
         >
       </UICodeBlock>
 
-      TODO: If status is imported and deployMode and region will be set, set the status to ready.
-
       <div v-if="error" class="alert alert--destructive">
         <Danger />
 

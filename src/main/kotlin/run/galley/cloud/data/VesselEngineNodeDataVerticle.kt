@@ -95,7 +95,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     if (vesselEngineNode.provisioningStatus == NodeProvisioningStatus.imported &&
       vesselEngineNode.name != null && vesselEngineNode.name?.isNotBlank() == true &&
       vesselEngineNode.vesselEngineRegionId != null &&
-      vesselEngineNode.deployMode != null
+      (vesselEngineNode.deployMode != null || vesselEngineNode.nodeType == NodeType.controller)
     ) {
       val markReadyRequest =
         EventBusCmdDataRequest(
@@ -135,7 +135,6 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
       if (result != null && result.size() > 0) {
         pool.execute(VesselEngineNodeSql.patch(request))
       } else {
-//        request.payload?.put(VESSEL_ENGINE_NODES.VESSEL_ID.name, vesselId)
         request.payload?.put(VESSEL_ENGINE_NODES.NODE_TYPE.name, NodeType.worker)
         request.payload?.put(VESSEL_ENGINE_NODES.PROVISIONING_STATUS.name, NodeProvisioningStatus.imported)
         pool.execute(VesselEngineNodeSql.create(request))

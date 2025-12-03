@@ -17,7 +17,7 @@
               required
               placeholder="Select country..."
               id="country"
-              v-model="country"
+              v-model="locationCountry"
               :items="countries"
             />
           </UIFormField>
@@ -32,7 +32,7 @@
           </UIFormField>
           <UIFormField class="col-span-2">
             <UILabel for="city">City</UILabel>
-            <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="city" />
+            <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="locationCity" />
           </UIFormField>
           <UIFormField>
             <UILabel for="name" required>Name</UILabel>
@@ -44,7 +44,7 @@
               id="provider"
               :items="providers"
               placeholder="e.g. Hetzner"
-              v-model="provider"
+              v-model="providerName"
             />
           </UIFormField>
         </div>
@@ -55,7 +55,7 @@
         </UIButton>
         <UIButton type="submit" :trailing-addon="MapPointAdd"
           >Add region
-          <LoadingIndicator v-if="saveRegionMutation.isPending.value" />
+          <LoadingIndicator v-if="isPending" />
         </UIButton>
       </div>
     </form>
@@ -72,13 +72,19 @@ import { ref } from 'vue'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UIAutoComplete from '@/components/FormField/UIAutoComplete.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
-import { useRegionForm, geoRegions, countries, providers } from '@/composables/useRegionForm'
+import {
+  countries,
+  geoRegions,
+  providers,
+  useRegionFormHelpers,
+  useSaveRegion,
+} from '@/composables/useEngineRegion.ts'
 
 const { show } = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void; (e: 'select', regionId: string): void }>()
 
-const { name, provider, geoRegion, city, country, pristine, saveRegion, saveRegionMutation } =
-  useRegionForm()
+const { name, providerName, geoRegion, locationCity, locationCountry, saveRegion, pristine } = useRegionFormHelpers()
+const { isPending } = useSaveRegion()
 
 const formRef = ref<HTMLFormElement | null>(null)
 

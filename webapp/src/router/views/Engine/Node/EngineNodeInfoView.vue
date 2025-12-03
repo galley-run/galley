@@ -69,7 +69,7 @@ import getNodeType from '@/utils/getNodeType.ts'
 const { format } = useBytes()
 
 const route = useRoute()
-const { nodeId, vesselId } = route.params
+const { nodeId, vesselId } = route.params as { nodeId: string | null, vesselId: string | null }
 
 const { isLoading, data } = useQuery({
   enabled: !!vesselId && !!nodeId,

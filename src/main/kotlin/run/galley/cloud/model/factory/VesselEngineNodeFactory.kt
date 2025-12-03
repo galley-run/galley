@@ -40,7 +40,10 @@ object VesselEngineNodeFactory {
       payload.applyIfPresent(VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID, JsonObject::getUUID) { value -> vesselEngineId = value }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID, JsonObject::getUUID) { value -> vesselEngineRegionId = value }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.NODE_TYPE, JsonObject::getString) { value -> nodeType = NodeType.valueOf(value) }
-      payload.applyIfPresent(VESSEL_ENGINE_NODES.DEPLOY_MODE, JsonObject::getString) { value -> deployMode = NodeDeployMode.valueOf(value) }
+      payload.applyIfPresent(VESSEL_ENGINE_NODES.DEPLOY_MODE, JsonObject::getString) { value ->
+        deployMode =
+          value?.let(NodeDeployMode::valueOf)
+      }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.IP_ADDRESS, JsonObject::getString) { value -> ipAddress = value }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.CPU, JsonObject::getString) { value -> cpu = value }
       payload.applyIfPresent(VESSEL_ENGINE_NODES.MEMORY, JsonObject::getString) { value -> memory = value }

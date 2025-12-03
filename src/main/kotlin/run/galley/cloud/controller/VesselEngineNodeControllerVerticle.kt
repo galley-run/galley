@@ -19,6 +19,7 @@ import nl.clicqo.eventbus.filters
 import nl.clicqo.ext.CoroutineEventBusSupport
 import nl.clicqo.ext.coroutineEventBus
 import nl.clicqo.ext.toUUID
+import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.VesselEngineDataVerticle
 import run.galley.cloud.data.VesselEngineNodeDataVerticle
@@ -34,6 +35,9 @@ class VesselEngineNodeControllerVerticle :
     const val NODE_AGENT_PATCH = "nodeAgent.vessel.engine.node.query.patch"
     const val LIST = "vessel.engine.node.query.list"
     const val GET = "vessel.engine.node.query.get"
+    const val CREATE = "vessel.engine.node.cmd.create"
+    const val PATCH = "vessel.engine.node.cmd.patch"
+    const val DELETE = "vessel.engine.node.cmd.delete"
   }
 
   override suspend fun start() {
@@ -44,6 +48,9 @@ class VesselEngineNodeControllerVerticle :
       vertx.eventBus().coConsumer(GET, handler = ::get)
       vertx.eventBus().coConsumer(NODE_AGENT_GET, handler = ::getForNodeAgent)
       vertx.eventBus().coConsumer(NODE_AGENT_PATCH, handler = ::patchByNodeAgent)
+      vertx.eventBus().coConsumer(CREATE, handler = ::create)
+      vertx.eventBus().coConsumer(PATCH, handler = ::patch)
+      vertx.eventBus().coConsumer(DELETE, handler = ::delete)
     }
   }
 
@@ -95,7 +102,7 @@ class VesselEngineNodeControllerVerticle :
 
   private suspend fun getForNodeAgent(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val nodeId = apiRequest.user?.subject() ?: throw ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT
+    val nodeId = apiRequest.user?.subject() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT)
 
     val dataRequest =
       EventBusQueryDataRequest(
@@ -130,7 +137,8 @@ class VesselEngineNodeControllerVerticle :
 
   private suspend fun patchByNodeAgent(message: Message<EventBusApiRequest>) {
     val apiRequest = message.body()
-    val nodeId = apiRequest.user?.subject()?.toUUID() ?: throw ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT
+    val nodeId =
+      apiRequest.user?.subject()?.toUUID() ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_ID_INCORRECT)
 
     val dataRequest =
       EventBusCmdDataRequest(
@@ -173,6 +181,87 @@ class VesselEngineNodeControllerVerticle :
     )
   }
 
+  private suspend fun create(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val vesselId = apiRequest.vesselId
+
+    val vesselEngine =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<VesselEngines>>(
+          VesselEngineDataVerticle.LIST_BY_VESSEL_ID,
+          EventBusQueryDataRequest(
+            filters =
+              filters {
+                VESSEL_ENGINES.VESSEL_ID eq vesselId
+              },
+          ),
+        ).coAwait()
+        .body()
+        ?.payload
+        ?.toMany()
+        ?.firstOrNull()
+
+    val vesselEngineId = vesselEngine?.id ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_ID_INCORRECT)
+    val node = apiRequest.body ?: throw ApiStatusReplyException(ApiStatus.REQUEST_BODY_MISSING)
+    node.put(VESSEL_ENGINE_NODES.VESSEL_ID.name, vesselId.toString())
+    node.put(VESSEL_ENGINE_NODES.VESSEL_ENGINE_ID.name, vesselEngineId.toString())
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        payload = node,
+      )
+
+    val response =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<VesselEngineNodes>>(VesselEngineNodeDataVerticle.CREATE, dataRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject()
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+
+    message.reply(
+      EventBusApiResponse(
+        response,
+        httpStatus = HttpStatus.Created,
+      ),
+    )
+  }
+
+  private suspend fun patch(message: Message<EventBusApiRequest>) {
+    val apiRequest = message.body()
+    val vesselId = apiRequest.vesselId
+    val nodeId = apiRequest.nodeId
+
+    val node = apiRequest.body ?: throw ApiStatusReplyException(ApiStatus.REQUEST_BODY_MISSING)
+
+    val dataRequest =
+      EventBusCmdDataRequest(
+        payload = node,
+        identifier = nodeId,
+        filters =
+          filters {
+            VESSEL_ENGINE_NODES.VESSEL_ID eq vesselId
+          },
+      )
+
+    val response =
+      vertx
+        .eventBus()
+        .request<EventBusDataResponse<VesselEngineNodes>>(VesselEngineNodeDataVerticle.PATCH, dataRequest)
+        .coAwait()
+        .body()
+        .payload
+        ?.toOne()
+        ?.toJsonAPIResourceObject()
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+
+    message.reply(EventBusApiResponse(response))
+  }
+
   private suspend fun list(message: Message<EventBusApiRequest>) {
     val apiRequest = getApiRequest(message)
     val vesselId = apiRequest.vesselId
@@ -196,5 +285,31 @@ class VesselEngineNodeControllerVerticle :
         ?.toJsonAPIResourceObject()
 
     message.reply(EventBusApiResponse(dataResponse))
+  }
+
+  private suspend fun delete(message: Message<EventBusApiRequest>) {
+    val apiRequest = getApiRequest(message)
+    val vesselId = apiRequest.vesselId
+    val nodeId = apiRequest.nodeId
+
+    // TODO: Currently you can only delete nodes with provisioning_status set to Open. we may want to change that in the
+    //  future, but then we need to check other prerequisites before we may delete this node.
+
+    val deleteRequest =
+      EventBusCmdDataRequest(
+        identifier = nodeId,
+        filters =
+          filters {
+            VESSEL_ENGINE_NODES.VESSEL_ID eq vesselId
+            VESSEL_ENGINE_NODES.PROVISIONING_STATUS eq NodeProvisioningStatus.open
+          },
+      )
+
+    vertx
+      .eventBus()
+      .request<EventBusDataResponse<VesselEngineNodes>>(VesselEngineNodeDataVerticle.DELETE, deleteRequest)
+      .coAwait()
+
+    message.reply(EventBusApiResponse())
   }
 }

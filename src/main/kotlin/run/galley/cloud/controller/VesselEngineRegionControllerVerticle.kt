@@ -181,7 +181,7 @@ class VesselEngineRegionControllerVerticle :
         .payload
         ?.toMany()
     if (activeNodes != null && activeNodes.isNotEmpty()) {
-      throw ApiStatusReplyException(ApiStatus.VESSEL_REGION_DELETE_FAILURE_ACTIVE_NODES)
+      throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_DELETE_FAILURE_ACTIVE_NODES)
     }
 
     val deleteRequest =

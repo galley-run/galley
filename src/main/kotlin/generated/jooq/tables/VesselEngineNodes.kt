@@ -15,7 +15,7 @@ import generated.jooq.indexes.IDX_NODES_PROVISIONING_TIME
 import generated.jooq.indexes.IDX_NODES_REGION
 import generated.jooq.indexes.IDX_NODES_TYPE_MODE
 import generated.jooq.indexes.IDX_NODES_VESSEL
-import generated.jooq.indexes.UQ_NODES_IP
+import generated.jooq.indexes.UQ_NODES_ENGINE_IP
 import generated.jooq.keys.VESSEL_ENGINE_NODES_PKEY
 import generated.jooq.keys.VESSEL_ENGINE_NODES__FK_NODES_ENGINE
 import generated.jooq.keys.VESSEL_ENGINE_NODES__FK_NODES_PROVISIONING_LOCKER
@@ -127,7 +127,7 @@ open class VesselEngineNodes(
     /**
      * The column <code>public.vessel_engine_nodes.deploy_mode</code>.
      */
-    val DEPLOY_MODE: TableField<VesselEngineNodesRecord, NodeDeployMode?> = createField(DSL.name("deploy_mode"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'applications_databases'::node_deploy_mode"), SQLDataType.VARCHAR)).asEnumDataType(NodeDeployMode::class.java), this, "")
+    val DEPLOY_MODE: TableField<VesselEngineNodesRecord, NodeDeployMode?> = createField(DSL.name("deploy_mode"), SQLDataType.VARCHAR.defaultValue(DSL.field(DSL.raw("'applications_databases'::node_deploy_mode"), SQLDataType.VARCHAR)).asEnumDataType(NodeDeployMode::class.java), this, "")
 
     /**
      * The column <code>public.vessel_engine_nodes.name</code>.
@@ -224,7 +224,7 @@ open class VesselEngineNodes(
         override fun `as`(alias: Table<*>): VesselEngineNodesPath = VesselEngineNodesPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_NODES_ENGINE, IDX_NODES_OS_METADATA_GIN, IDX_NODES_PROVISIONING_STATUS, IDX_NODES_PROVISIONING_TIME, IDX_NODES_REGION, IDX_NODES_TYPE_MODE, IDX_NODES_VESSEL, UQ_NODES_IP)
+    override fun getIndexes(): List<Index> = listOf(IDX_NODES_ENGINE, IDX_NODES_OS_METADATA_GIN, IDX_NODES_PROVISIONING_STATUS, IDX_NODES_PROVISIONING_TIME, IDX_NODES_REGION, IDX_NODES_TYPE_MODE, IDX_NODES_VESSEL, UQ_NODES_ENGINE_IP)
     override fun getPrimaryKey(): UniqueKey<VesselEngineNodesRecord> = VESSEL_ENGINE_NODES_PKEY
     override fun getReferences(): List<ForeignKey<VesselEngineNodesRecord, *>> = listOf(VESSEL_ENGINE_NODES__FK_NODES_ENGINE, VESSEL_ENGINE_NODES__FK_NODES_PROVISIONING_LOCKER, VESSEL_ENGINE_NODES__FK_NODES_REGION, VESSEL_ENGINE_NODES__FK_NODES_VESSEL)
 

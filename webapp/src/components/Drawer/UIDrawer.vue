@@ -22,7 +22,7 @@ function onClickOutside(ev: Event) {
   if(t?.parentNode?.parentElement?.role === 'listbox') return
   if(t?.parentElement?.role === 'listbox') return
 
-  const triggerNode = (drawerEl.value as any)?.$el ?? drawerEl.value
+  const triggerNode = (drawerEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? drawerEl.value
   if (triggerNode instanceof Node && t && triggerNode.contains(t)) return
   emit('close')
 }

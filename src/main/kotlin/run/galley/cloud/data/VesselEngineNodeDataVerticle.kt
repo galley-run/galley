@@ -4,6 +4,7 @@ import generated.jooq.enums.AgentConnectionStatus
 import generated.jooq.enums.NodeProvisioningStatus
 import generated.jooq.enums.NodeType
 import generated.jooq.tables.pojos.VesselEngineNodes
+import generated.jooq.tables.pojos.VesselEngineRegions
 import generated.jooq.tables.pojos.VesselEngines
 import generated.jooq.tables.references.VESSEL_ENGINES
 import generated.jooq.tables.references.VESSEL_ENGINE_NODES
@@ -34,6 +35,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
     const val LIST_BY_VESSEL_ID = "data.vessel.engine.node.query.list_by_vessel_id"
     const val SYNC_NODES = "data.vessel.engine.node.cmd.sync_nodes"
     const val APPLIED = "data.vessel.engine.node.cmd.applied"
+    const val DELETE = "data.vessel.engine.node.cmd.delete"
   }
 
   override suspend fun start() {
@@ -47,6 +49,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
       vertx.eventBus().coConsumer(GET, handler = ::get)
       vertx.eventBus().coConsumer(SYNC_NODES, handler = ::syncNodes)
       vertx.eventBus().coConsumer(APPLIED, handler = ::applied)
+      vertx.eventBus().coConsumer(DELETE, handler = ::delete)
     }
   }
 
@@ -76,7 +79,7 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
 
     val vesselEngineNode =
       results?.firstOrNull()?.let(VesselEngineNodeFactory::from)
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngineNode)))
   }
@@ -87,9 +90,35 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
 
     val vesselEngineNode =
       results?.firstOrNull()?.let(VesselEngineNodeFactory::from)
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NOT_FOUND)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_NOT_FOUND)
+
+    if (vesselEngineNode.provisioningStatus == NodeProvisioningStatus.imported &&
+      vesselEngineNode.name != null && vesselEngineNode.name?.isNotBlank() == true &&
+      vesselEngineNode.vesselEngineRegionId != null &&
+      (vesselEngineNode.deployMode != null || vesselEngineNode.nodeType == NodeType.controller)
+    ) {
+      val markReadyRequest =
+        EventBusCmdDataRequest(
+          payload =
+            JsonObject()
+              .put(VESSEL_ENGINE_NODES.PROVISIONING_STATUS.name, NodeProvisioningStatus.ready.name),
+          identifier = vesselEngineNode.id,
+        )
+      pool.execute(VesselEngineNodeSql.patch(markReadyRequest))
+    }
 
     message.reply(EventBusDataResponse(DataPayload.one(vesselEngineNode)))
+  }
+
+  private suspend fun delete(message: Message<EventBusCmdDataRequest>) {
+    val request = message.body()
+    val updated = pool.execute(VesselEngineNodeSql.delete(request))
+
+    if (updated?.rowCount() == 0) {
+      throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_NODE_DELETION_FAILED)
+    }
+
+    message.reply(EventBusDataResponse.noContent<VesselEngineRegions>())
   }
 
   private suspend fun patchFromCluster(message: Message<EventBusCmdDataRequest>) {
@@ -106,7 +135,6 @@ class VesselEngineNodeDataVerticle : PostgresDataVerticle() {
       if (result != null && result.size() > 0) {
         pool.execute(VesselEngineNodeSql.patch(request))
       } else {
-//        request.payload?.put(VESSEL_ENGINE_NODES.VESSEL_ID.name, vesselId)
         request.payload?.put(VESSEL_ENGINE_NODES.NODE_TYPE.name, NodeType.worker)
         request.payload?.put(VESSEL_ENGINE_NODES.PROVISIONING_STATUS.name, NodeProvisioningStatus.imported)
         pool.execute(VesselEngineNodeSql.create(request))

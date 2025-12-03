@@ -49,5 +49,5 @@ open class ControllerVerticle : CoroutineVerticle() {
         ?.get("regionId")
         ?.string
         ?.toUUID()
-        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_REGION_ID_INCORRECT)
+        ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_ID_INCORRECT)
 }

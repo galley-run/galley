@@ -86,7 +86,7 @@
           >
             <div class="relative">
               <div class="flex items-center gap-2">
-                <FlagIcon v-if="nodeRegions?.[node.id]" :code="nodeRegions?.[node.id]" :size="16" />
+                <FlagIcon v-if="nodeRegions?.[node.id]" :code="nodeRegions?.[node.id] as CountryCode" :size="16" />
                 <div>{{ node.attributes.name }}</div>
                 <div
                   class="badge badge--cliona badge--small"
@@ -109,10 +109,9 @@
             <div class="text-end">
               <p>{{ node.attributes.ipAddress }}</p>
               <p class="text-tides-700" v-if="regions">
-                <!--                AMS1-->
                 {{
                   node.attributes.vesselEngineRegionId &&
-                  regions[node.attributes.vesselEngineRegionId].name
+                  regions?.[node.attributes?.vesselEngineRegionId]?.name
                 }}
               </p>
             </div>
@@ -131,8 +130,12 @@
                   },
                   {
                     label: 'Delete this node',
-                    value: '/delete',
-                    link: true,
+                    disabled: node.attributes.provisioningStatus !== 'open',
+                    title: node.attributes.provisioningStatus !== 'open' ? 'Nodes can only be removed while they\'re being provisioned' : undefined,
+                    onClick: () => {
+                      confirmDeleteNodeDialog = node.id
+                      return
+                    },
                     variant: 'destructive',
                   },
                 ]"
@@ -193,7 +196,7 @@
                     label: 'Delete region',
                     value: `/vessel/${selectedVesselId}/engine/region/${region.id}/delete`,
                     onClick: () => {
-                      confirmDelete = region.id
+                      confirmDeleteRegionDialog = region.id
                       return
                     },
                     variant: 'destructive',
@@ -210,10 +213,16 @@
     </div>
   </div>
   <ConfirmDeleteRegionDialog
-    :show="!!confirmDelete"
-    @close="confirmDelete = null"
-    @confirm="onDelete"
-    :region-id="confirmDelete"
+    :show="!!confirmDeleteRegionDialog"
+    @close="confirmDeleteRegionDialog = null"
+    @confirm="onDeleteRegion"
+    :region-id="confirmDeleteRegionDialog"
+  />
+  <ConfirmDeleteNodeDialog
+    :show="!!confirmDeleteNodeDialog"
+    @close="confirmDeleteNodeDialog = null"
+    @confirm="onDeleteNode"
+    :node-id="confirmDeleteNodeDialog"
   />
 </template>
 <script setup lang="ts">
@@ -235,12 +244,14 @@ import getNodeType from '@/utils/getNodeType.ts'
 import type { CountryCode } from 'vue3-flag-icons/types'
 import countries from '@/utils/countries.ts'
 import ConfirmDeleteRegionDialog from '@/components/Dialog/ConfirmDeleteRegionDialog.vue'
+import ConfirmDeleteNodeDialog from '@/components/Dialog/ConfirmDeleteNodeDialog.vue'
 
 const { formatBytes, sumByteSizes, format } = useBytes()
 const projectsStore = useProjectsStore()
 const { selectedVesselId } = storeToRefs(projectsStore)
 
-const confirmDelete = ref<null | string>(null)
+const confirmDeleteRegionDialog = ref<null | string>(null)
+const confirmDeleteNodeDialog = ref<null | string>(null)
 
 const { isLoading: isEngineLoading, data: engine } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),
@@ -260,7 +271,7 @@ const { isLoading: isNodesLoading, data: engineNodes } = useQuery({
     ),
 })
 
-const { data: engineRegions, refetch: refetchEngineRegions } = useQuery({
+const { data: engineRegions } = useQuery({
   enabled: computed(() => !!selectedVesselId?.value),
   queryKey: computed(() => ['vessel', selectedVesselId?.value, 'engine', 'regions']),
   queryFn: () =>
@@ -308,10 +319,10 @@ const regions = computed(() => {
   }, {})
 })
 const totalCpu = computed(() =>
-  engineNodes.value?.reduce((acc, node) => acc + Number(node.attributes.cpu ?? 0), 0),
+  engineNodes.value?.reduce((acc, node) => acc + Number(node.attributes?.cpu ?? 0), 0),
 )
 const totalMemoryBytes = computed(() =>
-  sumByteSizes(engineNodes.value?.map((node) => node.attributes.memory) ?? []),
+  sumByteSizes(engineNodes.value?.map((node) => node.attributes?.memory ?? 0) ?? []),
 )
 const totalMemory = computed(() =>
   formatBytes(totalMemoryBytes.value, { iec: false, decimals: 1, unit: 'GB' }),
@@ -324,14 +335,17 @@ const connectionStatus = computed(() => {
       dayjs().subtract(1, 'hour'),
     )
   ) {
-    return 'Last connected more than an hour ago'
+    return 'Reconnecting...'
   }
 
   return 'Connected'
 })
 
-async function onDelete() {
-  await refetchEngineRegions()
-  confirmDelete.value = null
+async function onDeleteRegion() {
+  confirmDeleteRegionDialog.value = null
+}
+
+async function onDeleteNode() {
+  confirmDeleteNodeDialog.value = null
 }
 </script>

@@ -200,6 +200,44 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: Create a node within the engine
+      operationId: vessel.engine.node.cmd.create
+      description: Creates a new record of type Node.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        description: Node information to create
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/NodeCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /vessels/{vesselId}/engine/nodes/{nodeId}:
     parameters:
       - $ref: '#/components/parameters/vesselId'
@@ -225,6 +263,64 @@ paths:
                     $ref: '#/components/schemas/Node'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      summary: Update a node within the engine
+      operationId: vessel.engine.node.cmd.patch
+      description: Partially updates a record of type Node.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        description: Updated node information
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/NodePartialUpdate'
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Node'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: Delete a node within the engine, may be refused if there are still applications and/or databases running on the node
+      operationId: vessel.engine.node.cmd.delete
+      description: Deletes a record of type Node.
+      tags:
+        - vessel/engine
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1319,17 +1415,22 @@ components:
                   examples:
                     - app1.cloud.clicqo.nl
                 cpu:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   examples:
                     - '1'
                 memory:
-                  type: string
+                  type:
+                    - string
+                    - 'null'
                   examples:
                     - 1GB
                 storage:
                   type:
                     - number
                     - string
+                    - 'null'
                   examples:
                     - 30G
                     - 30000000000
@@ -1369,17 +1470,109 @@ components:
                     - open
                     - ready
                     - imported
-                deployTarget:
+                deployMode:
                   enum:
                     - applications
                     - databases
-                    - any
-                  type: string
-                  default: any
+                    - applications_databases
+                    - null
+                  type:
+                    - string
+                    - 'null'
+                  default: applications_databases
                 scheduledUpdates:
                   type: array
                   items:
                     $ref: '#/components/schemas/ScheduledUpdate'
+    NodeCreate:
+      type: object
+      required:
+        - name
+        - nodeType
+        - vesselEngineRegionId
+        - deployMode
+      properties:
+        ipAddress:
+          type: string
+          examples:
+            - 5.254.32.75
+        name:
+          type: string
+          examples:
+            - app1.cloud.clicqo.nl
+        nodeType:
+          enum:
+            - controller
+            - worker
+            - controller_worker
+          type: string
+          default: worker
+        vesselEngineRegionId:
+          type:
+            - string
+            - 'null'
+          format: uuid
+        provisioning:
+          type: boolean
+          default: Controlled
+          description: |-
+            When provisioning is enabled, Galley is allowed to fully manage and provision the node.
+            When provisioning is disabled, Galley is only allowed to control the node by deploying onto the cluster
+        deployMode:
+          enum:
+            - applications
+            - databases
+            - applications_databases
+            - null
+          type:
+            - string
+            - 'null'
+          default: applications_databases
+      description: Data transfer object for partially updating an existing Node (PATCH operation).
+    NodePartialUpdate:
+      type: object
+      properties:
+        ipAddress:
+          type: string
+          examples:
+            - 5.254.32.75
+        name:
+          type: string
+          examples:
+            - app1.cloud.clicqo.nl
+        nodeType:
+          enum:
+            - controller
+            - worker
+            - controller_worker
+          type: string
+          default: worker
+        vesselEngineRegionId:
+          type:
+            - string
+            - 'null'
+          format: uuid
+        provisioning:
+          type: boolean
+          default: Controlled
+          description: |-
+            When provisioning is enabled, Galley is allowed to fully manage and provision the node.
+            When provisioning is disabled, Galley is only allowed to control the node by deploying onto the cluster
+        deployMode:
+          enum:
+            - applications
+            - databases
+            - applications_databases
+            - null
+          type:
+            - string
+            - 'null'
+          default: applications_databases
+        scheduledUpdates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduledUpdate'
+      description: Data transfer object for partially updating an existing Node (PATCH operation).
     NodeAgentPartialUpdate:
       description: Data transfer object for partially updating an existing Node by the Galley Node Agent (PATCH operation).
       type: object

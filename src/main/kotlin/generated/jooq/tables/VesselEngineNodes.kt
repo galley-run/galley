@@ -127,7 +127,7 @@ open class VesselEngineNodes(
     /**
      * The column <code>public.vessel_engine_nodes.deploy_mode</code>.
      */
-    val DEPLOY_MODE: TableField<VesselEngineNodesRecord, NodeDeployMode?> = createField(DSL.name("deploy_mode"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'applications_databases'::node_deploy_mode"), SQLDataType.VARCHAR)).asEnumDataType(NodeDeployMode::class.java), this, "")
+    val DEPLOY_MODE: TableField<VesselEngineNodesRecord, NodeDeployMode?> = createField(DSL.name("deploy_mode"), SQLDataType.VARCHAR.defaultValue(DSL.field(DSL.raw("'applications_databases'::node_deploy_mode"), SQLDataType.VARCHAR)).asEnumDataType(NodeDeployMode::class.java), this, "")
 
     /**
      * The column <code>public.vessel_engine_nodes.name</code>.

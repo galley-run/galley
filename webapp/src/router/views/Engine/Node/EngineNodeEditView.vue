@@ -413,7 +413,7 @@ const featureProvisioningEnabled = ref(false)
 
 watch(nodeType, (value) => {
   if (value === 'controller') {
-    deployMode.value = ''
+    deployMode.value = undefined
   }
 })
 
@@ -425,6 +425,7 @@ async function selectRegion(regionId: string) {
 const isFirstNode = computed(() => nodes?.value?.length === 0)
 
 async function onSubmit() {
+  error.value = null
   const form = formRef.value!
 
   form.reportValidity()

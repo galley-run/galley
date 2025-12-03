@@ -31,7 +31,7 @@ export type NodeUpdateData = {
   nodeType?: 'controller' | 'worker' | 'controller_worker'
   vesselEngineRegionId?: string | null
   provisioning?: boolean
-  deployMode?: 'applications' | 'databases' | 'applications_databases' | ''
+  deployMode?: 'applications' | 'databases' | 'applications_databases' | null
   scheduledUpdates?: any[]
 }
 
@@ -88,8 +88,8 @@ export function useNodeFormHelpers(vesselId?: MaybeRefOrGetter<string | undefine
   const nodeType = ref<'controller' | 'worker' | 'controller_worker'>('worker')
   const vesselEngineRegionId = ref<string | null | undefined>(null)
   const provisioning = ref(true)
-  const deployMode = ref<'applications' | 'databases' | 'applications_databases' | ''>(
-    '',
+  const deployMode = ref<'applications' | 'databases' | 'applications_databases' | undefined>(
+    undefined,
   )
 
   const { saveNode } = useSaveNode()
@@ -125,7 +125,7 @@ export function useNodeFormHelpers(vesselId?: MaybeRefOrGetter<string | undefine
         nodeType: nodeType.value,
         vesselEngineRegionId: vesselEngineRegionId.value,
         provisioning: provisioning.value,
-        deployMode: deployMode.value,
+        deployMode: deployMode.value ?? null,
       }),
     name,
     ipAddress,

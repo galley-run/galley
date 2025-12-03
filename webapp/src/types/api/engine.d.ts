@@ -9,7 +9,7 @@ export interface EngineNodeSummary {
   name: string
   ipAddress: string
   nodeType: 'controller' | 'worker' | 'controller_worker'
-  deployMode: 'applications' | 'databases' | 'applications_databases'
+  deployMode: 'applications' | 'databases' | 'applications_databases' | null
   cpu?: string
   memory?: string
   storage?: string

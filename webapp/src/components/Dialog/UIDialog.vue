@@ -1,8 +1,8 @@
 <template>
   <Teleport to="body">
-    <Transition name="dialog-from-bottom">
+    <Transition :name="asDrawer ? 'dialog-from-right' : 'dialog-from-bottom'">
       <div class="overlay" v-if="show">
-        <div class="dialog" role="dialog" ref="dialogEl">
+        <div class="dialog" :class="[asDrawer && 'dialog--drawer']" role="dialog" ref="dialogEl">
           <slot />
         </div>
       </div>
@@ -14,7 +14,7 @@ import { ref } from 'vue'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
 
 const dialogEl = ref<HTMLElement | null>(null)
-const { show } = defineProps<{ show: boolean }>()
+const { show, asDrawer } = defineProps<{ show: boolean, asDrawer?: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 function onClickOutside(ev: Event) {

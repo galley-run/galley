@@ -1,7 +1,7 @@
 <template>
-  <UIDrawer :show="show" @close="pristine && $emit('close')">
+  <UIDialog as-drawer :show="show" @close="pristine && $emit('close')">
     <form @submit.prevent="onSubmit" ref="formRef" novalidate>
-      <div class="drawer__header">
+      <div class="dialog__header">
         <MapPointWave />
         <div>
           <h3>Add new region</h3>
@@ -9,7 +9,7 @@
         </div>
         <UIButton @click="$emit('close')" ghost variant="neutral" :trailing-addon="CloseCircle" />
       </div>
-      <div class="drawer__body">
+      <div class="dialog__body">
         <div class="grid grid-cols-2 gap-8">
           <UIFormField>
             <UILabel for="country" required>Country</UILabel>
@@ -49,7 +49,7 @@
           </UIFormField>
         </div>
       </div>
-      <div class="drawer__footer">
+      <div class="dialog__footer">
         <UIButton ghost variant="neutral" :leading-addon="UndoLeftRound" @click="$emit('close')"
           >Cancel & Close
         </UIButton>
@@ -59,11 +59,10 @@
         </UIButton>
       </div>
     </form>
-  </UIDrawer>
+  </UIDialog>
 </template>
 <script setup lang="ts">
 import { CloseCircle, MapPointAdd, MapPointWave, UndoLeftRound } from '@solar-icons/vue'
-import UIDrawer from '@/components/Drawer/UIDrawer.vue'
 import UIButton from '@/components/UIButton.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
@@ -79,6 +78,7 @@ import {
   useRegionFormHelpers,
   useSaveRegion,
 } from '@/composables/useEngineRegion.ts'
+import UIDialog from '@/components/Dialog/UIDialog.vue'
 
 const { show } = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void; (e: 'select', regionId: string): void }>()

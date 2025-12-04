@@ -1,7 +1,7 @@
 <template>
-  <Transition name="drawer-from-right">
+  <Transition name="dialog-from-right">
     <div class="overlay" v-if="show">
-      <div class="drawer" role="dialog" ref="drawerEl">
+      <div class="dialog dialog--drawer" role="dialog" ref="dialogEl">
         <slot />
       </div>
     </div>
@@ -11,7 +11,7 @@
 import { ref } from 'vue'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
 
-const drawerEl = ref<HTMLElement | null>(null)
+const dialogEl = ref<HTMLElement | null>(null)
 const { show } = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
@@ -22,10 +22,10 @@ function onClickOutside(ev: Event) {
   if(t?.parentNode?.parentElement?.role === 'listbox') return
   if(t?.parentElement?.role === 'listbox') return
 
-  const triggerNode = (drawerEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? drawerEl.value
+  const triggerNode = (dialogEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? dialogEl.value
   if (triggerNode instanceof Node && t && triggerNode.contains(t)) return
   emit('close')
 }
 
-useClickOutside(() => [drawerEl.value], onClickOutside)
+useClickOutside(() => [dialogEl.value], onClickOutside)
 </script>

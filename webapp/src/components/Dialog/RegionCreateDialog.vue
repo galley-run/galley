@@ -1,5 +1,5 @@
 <template>
-  <UIDrawer :show="show" @close="pristine && $emit('close')">
+  <UIDialog as-drawer :show="show" @close="pristine && $emit('close')">
     <form @submit.prevent="onSubmit" ref="formRef" novalidate>
       <div class="dialog__header">
         <MapPointWave />
@@ -59,11 +59,10 @@
         </UIButton>
       </div>
     </form>
-  </UIDrawer>
+  </UIDialog>
 </template>
 <script setup lang="ts">
 import { CloseCircle, MapPointAdd, MapPointWave, UndoLeftRound } from '@solar-icons/vue'
-import UIDrawer from '@/components/Drawer/UIDrawer.vue'
 import UIButton from '@/components/UIButton.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
@@ -79,6 +78,7 @@ import {
   useRegionFormHelpers,
   useSaveRegion,
 } from '@/composables/useEngineRegion.ts'
+import UIDialog from '@/components/Dialog/UIDialog.vue'
 
 const { show } = defineProps<{ show: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void; (e: 'select', regionId: string): void }>()

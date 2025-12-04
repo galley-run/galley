@@ -42,7 +42,7 @@
               inline
               :trailing-addon="AddCircle"
               title="Add new region"
-              :onclick="() => (showRegionCreateDrawer = true)"
+              :onclick="() => (showRegionCreateDialog = true)"
               >Add region</UIButton
             >
           </div>
@@ -74,7 +74,9 @@
       </div>
       <div class="grid xl:grid-cols-2 gap-8">
         <UIFormField :aria-disabled="node?.attributes?.provisioningStatus === 'ready'">
-          <UILabel required for="nodeType">Node type</UILabel>
+          <UILabel @info-click="toggleNodeTypeChefRecommendations()" required for="nodeType"
+            >Node type</UILabel
+          >
           <div>
             <UIRadioButton
               required
@@ -281,10 +283,14 @@
     <p>Nodes can only be removed while they're being provisioned.</p>
   </footer>
 
-  <RegionCreateDrawer
-    :show="showRegionCreateDrawer"
-    @close="() => (showRegionCreateDrawer = false)"
+  <RegionCreateDialog
+    :show="showRegionCreateDialog"
+    @close="() => (showRegionCreateDialog = false)"
     @select="selectRegion"
+  />
+  <NodeTypeRecommendationsChefDialog
+    :show="showNodeTypeChefRecommendations"
+    @close="() => (showNodeTypeChefRecommendations = false)"
   />
   <ConfirmDeleteNodeDialog
     :show="confirmDelete"
@@ -299,11 +305,11 @@ import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UILabel from '@/components/FormField/UILabel.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import FlagIcon from 'vue3-flag-icons'
 import UIButton from '@/components/UIButton.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
-import { AddCircle, ArrowLeft, DoubleAltArrowRight, Danger } from '@solar-icons/vue'
+import { AddCircle, ArrowLeft, Danger, DoubleAltArrowRight } from '@solar-icons/vue'
 import UIRadioButton from '@/components/FormField/UIRadioButton.vue'
 import SlashesDivider from '@/assets/SlashesDivider.vue'
 import UIToggle from '@/components/FormField/UIToggle.vue'
@@ -311,7 +317,8 @@ import UICodeBlock from '@/components/CodeBlock/UICodeBlock.vue'
 import UICodeLine from '@/components/CodeBlock/UICodeLine.vue'
 import { useRoute } from 'vue-router'
 import EngineNodeTabBar from '@/router/views/Engine/Node/EngineNodeTabBar.vue'
-import RegionCreateDrawer from '@/components/Drawer/RegionCreateDrawer.vue'
+import RegionCreateDialog from '@/components/Dialog/RegionCreateDialog.vue'
+import NodeTypeRecommendationsChefDialog from '@/components/Dialog/NodeTypeRecommendationsChefDialog.vue'
 import { useNode, useNodeFormHelpers, useNodes, useSaveNode } from '@/composables/useEngineNode.ts'
 import { useRegions } from '@/composables/useEngineRegion.ts'
 import router from '@/router'
@@ -365,48 +372,40 @@ const regionItems = computed(() => {
   )
 })
 
-const showRegionCreateDrawer = ref(false)
+const showRegionCreateDialog = ref(false)
+const showNodeTypeChefRecommendations = ref(false)
 const error = ref<string | null>(null)
 
 const { name, ipAddress, nodeType, deployMode, vesselEngineRegionId, provisioning, saveNode } =
   useNodeFormHelpers()
-const { nodes } = useNodes()
+const { nodes, refetch: refetchNode } = useNodes()
 const { isPending } = useSaveNode()
 const { regions, isLoading: isRegionsLoading, refetch: refetchRegions } = useRegions()
 
-// let refreshNodeTimeout: NodeJS.Timeout
-// watch(
-//   node,
-//   (value) => {
-//     if (value) {
-//       name.value = value.attributes.name
-//       ipAddress.value = value.attributes.ipAddress
-//       nodeType.value = value.attributes.nodeType
-//       deployMode.value = value.attributes.deployMode
-//       provisioning.value = value.attributes.provisioning
-//       region.value = value.attributes.vesselEngineRegionId ?? ''
-//
-//       if (refreshNodeTimeout) {
-//         clearTimeout(refreshNodeTimeout)
-//       }
-//
-//       if (value.attributes.provisioningStatus === 'open') {
-//         refreshNodeTimeout = setTimeout(async () => {
-//           await refetchNode()
-//         }, 30000)
-//       }
-//     }
-//   },
-//   { immediate: true },
-// )
-//
+let refreshNodeTimeout: NodeJS.Timeout
+watch(
+  node,
+  (value) => {
+    if (value) {
+      if (refreshNodeTimeout) {
+        clearTimeout(refreshNodeTimeout)
+      }
 
-// onBeforeUnmount(() => {
-//   if (refreshNodeTimeout) {
-//     clearTimeout(refreshNodeTimeout)
-//   }
-// })
+      if (value.attributes.provisioningStatus === 'open') {
+        refreshNodeTimeout = setTimeout(async () => {
+          await refetchNode()
+        }, 30000)
+      }
+    }
+  },
+  { immediate: true },
+)
 
+onBeforeUnmount(() => {
+  if (refreshNodeTimeout) {
+    clearTimeout(refreshNodeTimeout)
+  }
+})
 const featureProvisioningEnabled = ref(false)
 
 watch(nodeType, (value) => {
@@ -433,20 +432,24 @@ async function onSubmit() {
   }
 
   try {
-  const node = await saveNode()
-  if (nodeId.value) {
-    await router.push('/vessel/engine')
-  } else {
-    await router.push(`/vessel/${vesselId.value}/engine/node/${node.id}`)
-  }
-  } catch (e) {
-      const apiError = e as ApiError
-      error.value = apiError?.message || 'Something went wrong. Please try again later.'
+    const node = await saveNode()
+    if (nodeId.value) {
+      await router.push('/vessel/engine')
+    } else {
+      await router.push(`/vessel/${vesselId.value}/engine/node/${node.id}`)
     }
+  } catch (e) {
+    const apiError = e as ApiError
+    error.value = apiError?.message || 'Something went wrong. Please try again later.'
+  }
   // if (first) controller and provisionig? set engine to managed, if controller and not provisioning set engine to controlled
 }
 
 async function onDeleteNode() {
   await router.push('/vessel/engine')
+}
+
+function toggleNodeTypeChefRecommendations() {
+  showNodeTypeChefRecommendations.value = !showNodeTypeChefRecommendations.value
 }
 </script>

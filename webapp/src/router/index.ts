@@ -51,8 +51,6 @@ const routes = [
     component: MainLayout,
     children: [
       { path: '', component: DashboardView },
-      { path: '/charter/compute-plan', component: ComputePlanView },
-      { path: '/charter/compute-plan/add', component: ComputePlanEditView },
       { path: '/vessel/engine', component: EngineView },
       { path: '/vessel/:vesselId/engine/node/controller', component: EngineNodeFirstControllerView },
       { path: '/vessel/:vesselId/engine/node/add', component: EngineNodeEditView },
@@ -60,6 +58,9 @@ const routes = [
       { path: '/vessel/:vesselId/engine/node/:nodeId', component: EngineNodeEditView },
       { path: '/vessel/:vesselId/engine/region/add', component: EngineRegionEditView },
       { path: '/vessel/:vesselId/engine/region/:regionId', component: EngineRegionEditView },
+      { path: 'charter/compute-plan', component: ComputePlanView },
+      { path: 'charter/:charterId/compute-plan/add', component: ComputePlanEditView },
+      { path: 'charter/:charterId/compute-plan/:computePlanId', component: ComputePlanEditView },
     ],
   },
 ]

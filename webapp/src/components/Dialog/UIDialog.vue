@@ -1,8 +1,8 @@
 <template>
   <Teleport to="body">
     <Transition :name="asDrawer ? 'dialog-from-right' : 'dialog-from-bottom'">
-      <div class="overlay" v-if="show">
-        <div class="dialog" :class="[asDrawer && 'dialog--drawer']" role="dialog" ref="dialogEl">
+      <div class="overlay" :class="[asDrawer && 'overlay--drawer']" v-if="show">
+        <div class="dialog" :class="[asDrawer && 'dialog--drawer', $attrs.class]" role="dialog" ref="dialogEl">
           <slot />
         </div>
       </div>

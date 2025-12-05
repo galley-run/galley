@@ -1,65 +1,304 @@
 <template>
-  <div class="flex flex-col gap-8">
+  <form @submit.prevent="onSubmit" class="flex flex-col gap-8" ref="formRef" novalidate>
     <div class="card">
-      <h1>Compute plans</h1>
-      <p>
+      <h1 v-if="computePlanId">Edit compute plan</h1>
+      <h1 v-else>Add new compute plan</h1>
+      <p class="mb-6">
         This configuration can be used to bind applications and/or databases to. You can change
-        billing settings later, however once the configuration is set. You can’t edit it for
-        applications deployed with this virtual server.
+        billing settings later, however once the configuration is set, you can't edit it for
+        applications deployed with this compute plan.
       </p>
-      <div class="flex opacity-30">
-        <SlashesDivider />
-      </div>
-    </div>
-    <div class="card">
-      <div class="card__header">
-        <h2>Compute configurations</h2>
-        <div>
-          <UIButton ghost :leading-addon="Import" title="Import compute configurations" />
-          <UIButton ghost :leading-addon="AddCircle" title="Add compute configuration" />
-        </div>
-      </div>
-      <div class="stacked-list">
-        <div
-          class="stacked-list__item grid-cols-[1fr_max-content_max-content]"
-          v-for="computeConfiguration in computeConfigurations"
-          :key="computeConfiguration.label"
-        >
-          <div>
-            <p>{{ computeConfiguration.label }}</p>
-            <p>{{ computeConfiguration.cpu }} vCPU &bullet; {{ computeConfiguration.memory }} GB RAM</p>
-          </div>
-          <div>
-            <p>€{{ shortCurrencyFormat(computeConfiguration.runningCost) }} p/m</p>
-          </div>
-          <div>
-            <UIDropDown
-              :items="[
-                { label: 'Edit', value: 'edit' },
-                { label: 'Delete', value: 'delete', variant: 'destructive' },
-              ]"
-              :icon="MenuDots"
-              variant="icon"
-              menu-position="right"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-<script setup lang="ts">
-import SlashesDivider from '@/assets/SlashesDivider.vue'
-import { AddCircle, Import, MenuDots } from '@solar-icons/vue'
-import UIDropDown from '@/components/FormField/UIDropDown.vue'
-import UIButton from '@/components/UIButton.vue'
-import shortCurrencyFormat from '@/utils/shortCurrencyFormat.ts'
 
-const computeConfigurations = [
-  { label: 'Compute XS', cpu: 1, memory: 1, runningCost: 5 },
-  { label: 'Compute S', cpu: 1, memory: 2, runningCost: 7.5 },
-  { label: 'Compute M', cpu: 2, memory: 2, runningCost: 10 },
-  { label: 'Compute L', cpu: 2, memory: 4, runningCost: 15 },
-  { label: 'Compute XL', cpu: 4, memory: 4, runningCost: 25 },
+      <div class="space-y-8">
+        <div class="space-y-4">
+          <h6>Compute plan details</h6>
+
+          <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            <UIFormField>
+              <UILabel for="name" required>Name</UILabel>
+              <UITextInput
+                required
+                id="name"
+                placeholder="e.g. Compute Small or €5"
+                v-model="name"
+              />
+              <label for="name" class="form-field__error-message">
+                The name is a required field.
+              </label>
+            </UIFormField>
+
+            <UIFormField>
+              <UILabel required for="application">Use for</UILabel>
+              <UIDropDown
+                required
+                placeholder="Compute plan may apply for..."
+                id="application"
+                v-model="application"
+                :items="applicationTypes"
+              />
+              <label for="application">
+                Specify what type of workloads can use this compute plan.
+              </label>
+            </UIFormField>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h6>Resource size</h6>
+            <UIToggle label="Advanced settings" v-model="advancedMode" />
+          </div>
+          <p class="text-sm opacity-70">
+            Guaranteed resources for applications and databases using this plan.
+          </p>
+
+          <div class="grid grid-cols-2 gap-8">
+            <UIFormField>
+              <UILabel for="requestsCpu" required @info-click="toggleResourceChefRecommendations()"
+                >CPU</UILabel
+              >
+              <component
+                :is="advancedMode ? UITextInput : UIDropDown"
+                required
+                id="requestsCpu"
+                :items="cpuAutoComplete"
+                placeholder="e.g. 1"
+                v-model="requestsCpu"
+                trailing-addon="vCPU"
+              />
+              <label for="requestsCpu">Number of CPU cores (e.g., 1, 2, 0.5)</label>
+            </UIFormField>
+            <UIFormField>
+              <UILabel for="requestsMemory" required>Memory</UILabel>
+              <component
+                :is="advancedMode ? UITextInput : UIDropDown"
+                required
+                :items="memoryAutoComplete"
+                id="requestsMemory"
+                placeholder="e.g. 512M or 1G"
+                v-model="requestsMemory"
+              />
+              <label for="requestsMemory">Memory amount (e.g., 512M, 1G, 2G)</label>
+            </UIFormField>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h6>Resource limits (optional)</h6>
+          <p class="text-sm opacity-70">
+            Maximum resources applications can consume. Leave empty for no limits.
+          </p>
+
+          <div class="grid grid-cols-2 gap-8">
+            <UIFormField>
+              <UILabel for="limitsCpu">CPU limit</UILabel>
+              <component
+                :is="advancedMode ? UITextInput : UIDropDown"
+                required
+                id="limitsCpu"
+                :items="cpuAutoComplete"
+                placeholder="e.g. 1"
+                v-model="limitsCpu"
+                trailing-addon="vCPU"
+              />
+              <label for="limitsCpu">Maximum CPU cores</label>
+            </UIFormField>
+            <UIFormField>
+              <UILabel for="limitsMemory">Memory limit</UILabel>
+              <component
+                :is="advancedMode ? UITextInput : UIDropDown"
+                required
+                :items="memoryAutoComplete"
+                id="limitsMemory"
+                placeholder="e.g. 512M or 1G"
+                v-model="limitsMemory"
+              />
+              <label for="limitsMemory">Maximum memory amount</label>
+            </UIFormField>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h6>Billing</h6>
+
+          <div class="grid grid-cols-2 gap-8">
+            <UIFormField class="col-span-2">
+              <UIToggle
+                id="billingEnabled"
+                label="Enable billing for this compute plan"
+                v-model="billingEnabled"
+              />
+            </UIFormField>
+
+            <UIFormField v-if="billingEnabled">
+              <UILabel for="billingPeriod">Billing period</UILabel>
+              <UIDropDown
+                id="billingPeriod"
+                v-model="billingPeriod"
+                :items="[{ value: 'monthly', label: 'Monthly' }]"
+              />
+            </UIFormField>
+
+            <UIFormField v-if="billingEnabled">
+              <UILabel for="billingUnitPrice">Unit price</UILabel>
+              <UITextInput
+                id="billingUnitPrice"
+                placeholder="e.g. 5.50"
+                v-model="billingUnitPrice"
+              />
+              <label for="billingUnitPrice">Price per billing period</label>
+            </UIFormField>
+          </div>
+        </div>
+
+        <div v-if="error" class="alert alert--destructive">
+          <Danger />
+          {{ error }}
+        </div>
+
+        <div class="card__footer form-footer">
+          <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" :to="backRoute">
+            Back
+          </UIButton>
+          <UIButton
+            :disabled="saveIsPending || deleteIsPending"
+            ghost
+            variant="destructive"
+            v-if="computePlanId"
+            @click="confirmDelete = true"
+          >
+            Delete this plan
+            <LoadingIndicator v-if="deleteIsPending" />
+          </UIButton>
+          <UIButton :disabled="saveIsPending" type="submit" v-if="computePlanId">
+            Save this plan
+            <LoadingIndicator v-if="saveIsPending" />
+          </UIButton>
+          <UIButton :disabled="saveIsPending" type="submit" v-else :trailing-addon="AddCircle">
+            Create plan
+            <LoadingIndicator v-if="saveIsPending" />
+          </UIButton>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <ConfirmDeleteComputePlanDialog
+    :show="confirmDelete"
+    @close="confirmDelete = false"
+    @confirm="onDelete"
+    v-if="!!computePlanId"
+    :compute-plan-id="computePlanId"
+  />
+  <ResourceRecommendationsChefDialog
+    :show="showResourceChefRecommendations"
+    @close="() => (showResourceChefRecommendations = false)"
+  />
+</template>
+
+<script setup lang="ts">
+import UILabel from '@/components/FormField/UILabel.vue'
+import UIFormField from '@/components/FormField/UIFormField.vue'
+import UITextInput from '@/components/FormField/UITextInput.vue'
+import { computed, ref } from 'vue'
+import UIButton from '@/components/UIButton.vue'
+import LoadingIndicator from '@/assets/LoadingIndicator.vue'
+import { AddCircle, ArrowLeft, Danger } from '@solar-icons/vue'
+import { useRoute, useRouter } from 'vue-router'
+import UIDropDown from '@/components/FormField/UIDropDown.vue'
+import UIToggle from '@/components/FormField/UIToggle.vue'
+import {
+  applicationTypes,
+  useComputePlanFormHelpers,
+  useDeleteComputePlan,
+  useSaveComputePlan,
+} from '@/composables/useComputePlan.ts'
+import ConfirmDeleteComputePlanDialog from '@/components/Dialog/ConfirmDeleteComputePlanDialog.vue'
+import type { ApiError } from '@/utils/registerAxios.ts'
+import ResourceRecommendationsChefDialog from '@/components/Dialog/ResourceRecommendationsChefDialog.vue'
+
+const formRef = ref<HTMLFormElement | null>(null)
+const confirmDelete = ref(false)
+const error = ref<string | null>(null)
+const advancedMode = ref(false)
+const showResourceChefRecommendations = ref(false)
+
+const route = useRoute()
+const router = useRouter()
+const computePlanId = computed(() => route.params.computePlanId as string | undefined)
+const charterId = computed(() => route.params.charterId as string | undefined)
+const vesselId = computed(() => route.params.vesselId as string | undefined)
+
+const backRoute = computed(() => {
+  if (charterId.value && vesselId.value) {
+    return `/vessel/${vesselId.value}/charter/${charterId.value}/compute-plans`
+  }
+  return '/dashboard'
+})
+
+const {
+  name,
+  application,
+  requestsCpu,
+  requestsMemory,
+  limitsCpu,
+  limitsMemory,
+  billingEnabled,
+  billingPeriod,
+  billingUnitPrice,
+  saveComputePlan,
+} = useComputePlanFormHelpers(computePlanId, charterId, vesselId)
+
+const { isPending: saveIsPending } = useSaveComputePlan(computePlanId, charterId, vesselId)
+const { isPending: deleteIsPending } = useDeleteComputePlan(charterId, vesselId)
+
+const cpuAutoComplete = [
+  { value: '100m', label: '0.1 vCPU' },
+  { value: '250m', label: '0.25 vCPU' },
+  { value: '500m', label: '0.5 vCPU' },
+  { value: '1', label: '1 vCPU' },
+  { value: '2', label: '2 vCPU' },
+  { value: '4', label: '4 vCPU' },
+  { value: '8', label: '8 vCPU' },
+  { value: '16', label: '16 vCPU' },
 ]
+
+const memoryAutoComplete = [
+  { value: '128Mi', label: '128 MiB' },
+  { value: '256Mi', label: '256 MiB' },
+  { value: '512Mi', label: '512 MiB' },
+  { value: '1Gi', label: '1 GiB' },
+  { value: '2Gi', label: '2 GiB' },
+  { value: '4Gi', label: '4 GiB' },
+  { value: '8Gi', label: '8 GiB' },
+  { value: '16Gi', label: '16 GiB' },
+  { value: '32Gi', label: '32 GiB' },
+]
+
+async function onSubmit() {
+  error.value = null
+  const form = formRef.value!
+
+  form.reportValidity()
+  if (!form.checkValidity()) {
+    form.reportValidity()
+    return
+  }
+
+  try {
+    await saveComputePlan()
+    await router.push(backRoute.value)
+  } catch (e) {
+    const apiError = e as ApiError
+    error.value = apiError?.message || 'Something went wrong. Please try again later.'
+  }
+}
+
+async function onDelete() {
+  await router.push(backRoute.value)
+}
+
+function toggleResourceChefRecommendations() {
+  showResourceChefRecommendations.value = !showResourceChefRecommendations.value
+}
 </script>

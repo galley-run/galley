@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-col gap-8">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-8">
       <DashboardCard title="Monthly Running Cost">€ 25,00</DashboardCard>
       <DashboardCard title="Gateway">
         <a href="https://analytics.clicqo.nl" target="_blank">https://analytics.clicqo.nl</a>

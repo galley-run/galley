@@ -13,6 +13,7 @@ import generated.jooq.keys.CHARTERS_PKEY
 import generated.jooq.keys.CHARTERS__FK_CHARTERS_USER
 import generated.jooq.keys.CHARTERS__FK_CHARTERS_VESSEL
 import generated.jooq.keys.CHARTER_BILLING_PROFILE__FK_CHARTER_BILLING_CHARTER
+import generated.jooq.keys.CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER
 import generated.jooq.keys.CHARTER_PROJECTS__FK_PROJECTS_CHARTER
 import generated.jooq.keys.CREW_CHARTER_MEMBER__FK_CCM_CHARTER
 import generated.jooq.keys.LOGBOOK__FK_LOGBOOK_CHARTER
@@ -24,6 +25,7 @@ import generated.jooq.keys.PROJECT_DATABASES__FK_DB_CHARTER
 import generated.jooq.keys.PROJECT_SECRETS__FK_SECRETS_CHARTER
 import generated.jooq.keys.WEBHOOK_SUBSCRIPTIONS__FK_WS_CHARTER
 import generated.jooq.tables.CharterBillingProfile.CharterBillingProfilePath
+import generated.jooq.tables.CharterComputePlans.CharterComputePlansPath
 import generated.jooq.tables.CharterProjects.CharterProjectsPath
 import generated.jooq.tables.CrewCharterMember.CrewCharterMemberPath
 import generated.jooq.tables.Logbook.LogbookPath
@@ -235,6 +237,22 @@ open class Charters(
 
     val charterBillingProfile: CharterBillingProfilePath
         get(): CharterBillingProfilePath = charterBillingProfile()
+
+    private lateinit var _charterComputePlans: CharterComputePlansPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.charter_compute_plans</code> table
+     */
+    fun charterComputePlans(): CharterComputePlansPath {
+        if (!this::_charterComputePlans.isInitialized)
+            _charterComputePlans = CharterComputePlansPath(this, null, CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER.inverseKey)
+
+        return _charterComputePlans;
+    }
+
+    val charterComputePlans: CharterComputePlansPath
+        get(): CharterComputePlansPath = charterComputePlans()
 
     private lateinit var _projectConfigs: ProjectConfigsPath
 

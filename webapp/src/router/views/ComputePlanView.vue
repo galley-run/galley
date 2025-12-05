@@ -15,8 +15,13 @@
       <div class="card__header">
         <h2>Compute configurations</h2>
         <div>
-          <UIButton ghost :leading-addon="Import" title="Import compute configurations" />
-          <UIButton ghost :leading-addon="AddCircle" title="Add compute configuration" />
+          <!--          <UIButton ghost :leading-addon="Import" title="Import compute configurations" />-->
+          <UIButton
+            ghost
+            :to="`/charter/${selectedCharterId}/compute-plan/add`"
+            :leading-addon="AddCircle"
+            title="Add compute configuration"
+          />
         </div>
       </div>
       <div class="stacked-list">
@@ -27,7 +32,9 @@
         >
           <div>
             <p>{{ computeConfiguration.label }}</p>
-            <p>{{ computeConfiguration.cpu }} vCPU &bullet; {{ computeConfiguration.memory }} GB RAM</p>
+            <p>
+              {{ computeConfiguration.cpu }} vCPU &bullet; {{ computeConfiguration.memory }} GB RAM
+            </p>
           </div>
           <div>
             <p>€{{ shortCurrencyFormat(computeConfiguration.runningCost) }} p/m</p>
@@ -50,10 +57,15 @@
 </template>
 <script setup lang="ts">
 import SlashesDivider from '@/assets/SlashesDivider.vue'
-import { AddCircle, Import, MenuDots } from '@solar-icons/vue'
+import { AddCircle, MenuDots } from '@solar-icons/vue'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UIButton from '@/components/UIButton.vue'
 import shortCurrencyFormat from '@/utils/shortCurrencyFormat.ts'
+import { useProjectsStore } from '@/stores/projects.ts'
+import { storeToRefs } from 'pinia'
+
+const projectStore = useProjectsStore()
+const { selectedCharterId } = storeToRefs(projectStore)
 
 const computeConfigurations = [
   { label: 'Compute XS', cpu: 1, memory: 1, runningCost: 5 },

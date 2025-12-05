@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-8">
       <DashboardCard title="Nodes" :loading="isNodesLoading">{{
         engineNodes?.length ?? 0
       }}</DashboardCard>

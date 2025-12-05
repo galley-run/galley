@@ -50,4 +50,12 @@ open class ControllerVerticle : CoroutineVerticle() {
         ?.string
         ?.toUUID()
         ?: throw ApiStatusReplyException(ApiStatus.VESSEL_ENGINE_REGION_ID_INCORRECT)
+
+  val EventBusApiRequest.computePlanId: UUID
+    get() =
+      this.pathParams
+        ?.get("computePlanId")
+        ?.string
+        ?.toUUID()
+        ?: throw ApiStatusReplyException(ApiStatus.COMPUTE_PLAN_ID_INCORRECT)
 }

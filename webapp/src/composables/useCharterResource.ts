@@ -2,27 +2,37 @@ import { computed, type MaybeRefOrGetter } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import axios from 'axios'
 import type { ApiResponse } from '@/types/api'
-import { useVesselId, useResourceId } from './useResourceHelpers'
+import { useVesselId, useCharterId, useResourceId } from './useResourceHelpers'
 
 /**
- * Generic composable for vessel resources (regions, nodes, etc)
- * @param resourcePath - The resource path (e.g., 'engine/regions', 'engine/nodes')
- * @param resourceIdParam - The route param name for the resource ID (e.g., 'regionId', 'nodeId')
+ * Generic composable for charter resources (compute-plans, etc)
+ * @param resourcePath - The resource path (e.g., 'compute-plans')
+ * @param resourceIdParam - The route param name for the resource ID (e.g., 'computePlanId')
  */
-export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<TCreateData>>(
+export function useCharterResource<TResource, TCreateData, TUpdateData = Partial<TCreateData>>(
   resourcePath: string,
   resourceIdParam: string,
 ) {
-  // Get all resources for a vessel
-  function useResources(vesselId?: MaybeRefOrGetter<string | undefined>) {
+  // Get all resources for a charter
+  function useResources(
+    charterId?: MaybeRefOrGetter<string | undefined>,
+    vesselId?: MaybeRefOrGetter<string | undefined>,
+  ) {
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
 
     const query = useQuery({
-      enabled: computed(() => !!vesselIdValue.value),
-      queryKey: computed(() => ['vessel', vesselIdValue.value, ...resourcePath.split('/')]),
+      enabled: computed(() => !!vesselIdValue.value && !!charterIdValue.value),
+      queryKey: computed(() => [
+        'vessel',
+        vesselIdValue.value,
+        'charter',
+        charterIdValue.value,
+        ...resourcePath.split('/'),
+      ]),
       queryFn: () =>
         axios.get<ApiResponse<TResource>[], ApiResponse<TResource>[]>(
-          `/vessels/${vesselIdValue.value}/${resourcePath}`,
+          `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}`,
         ),
     })
 
@@ -37,22 +47,28 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
   // Get a single resource
   function useResource(
     resourceId?: MaybeRefOrGetter<string | undefined>,
+    charterId?: MaybeRefOrGetter<string | undefined>,
     vesselId?: MaybeRefOrGetter<string | undefined>,
   ) {
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
     const resourceIdValue = useResourceId(resourceIdParam, resourceId)
 
     const query = useQuery({
-      enabled: computed(() => !!vesselIdValue.value && !!resourceIdValue.value),
+      enabled: computed(
+        () => !!vesselIdValue.value && !!charterIdValue.value && !!resourceIdValue.value,
+      ),
       queryKey: computed(() => [
         'vessel',
         vesselIdValue.value,
+        'charter',
+        charterIdValue.value,
         ...resourcePath.split('/'),
         resourceIdValue.value,
       ]),
       queryFn: () =>
         axios.get<ApiResponse<TResource>, ApiResponse<TResource>>(
-          `/vessels/${vesselIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
+          `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
         ),
     })
 
@@ -65,19 +81,29 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
   }
 
   // Create a resource
-  function useCreateResource(vesselId?: MaybeRefOrGetter<string | undefined>) {
+  function useCreateResource(
+    charterId?: MaybeRefOrGetter<string | undefined>,
+    vesselId?: MaybeRefOrGetter<string | undefined>,
+  ) {
     const queryClient = useQueryClient()
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
 
     const mutation = useMutation({
       mutationFn: (data: TCreateData) =>
         axios.post<ApiResponse<TResource>, ApiResponse<TResource>>(
-          `/vessels/${vesselIdValue.value}/${resourcePath}`,
+          `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}`,
           data,
         ),
       onSuccess: async () => {
         await queryClient.invalidateQueries({
-          queryKey: ['vessel', vesselIdValue.value, ...resourcePath.split('/')],
+          queryKey: [
+            'vessel',
+            vesselIdValue.value,
+            'charter',
+            charterIdValue.value,
+            ...resourcePath.split('/'),
+          ],
         })
       },
     })
@@ -92,26 +118,36 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
   // Update a resource
   function useUpdateResource(
     resourceId?: MaybeRefOrGetter<string | undefined>,
+    charterId?: MaybeRefOrGetter<string | undefined>,
     vesselId?: MaybeRefOrGetter<string | undefined>,
   ) {
     const queryClient = useQueryClient()
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
     const resourceIdValue = useResourceId(resourceIdParam, resourceId)
 
     const mutation = useMutation({
       mutationFn: (data: TUpdateData) =>
         axios.patch<ApiResponse<TResource>, ApiResponse<TResource>>(
-          `/vessels/${vesselIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
+          `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
           data,
         ),
       onSuccess: async (updatedResource) => {
         const singleResourceKey = [
           'vessel',
           vesselIdValue.value,
+          'charter',
+          charterIdValue.value,
           ...resourcePath.split('/'),
           resourceIdValue.value,
         ]
-        const listResourceKey = ['vessel', vesselIdValue.value, ...resourcePath.split('/')]
+        const listResourceKey = [
+          'vessel',
+          vesselIdValue.value,
+          'charter',
+          charterIdValue.value,
+          ...resourcePath.split('/'),
+        ]
 
         // Update single resource cache with response data
         queryClient.setQueryData(singleResourceKey, updatedResource)
@@ -134,16 +170,28 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
   }
 
   // Delete a resource
-  function useDeleteResource(vesselId?: MaybeRefOrGetter<string | undefined>) {
+  function useDeleteResource(
+    charterId?: MaybeRefOrGetter<string | undefined>,
+    vesselId?: MaybeRefOrGetter<string | undefined>,
+  ) {
     const queryClient = useQueryClient()
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
 
     const mutation = useMutation({
       mutationFn: (resourceId: string) =>
-        axios.delete(`/vessels/${vesselIdValue.value}/${resourcePath}/${resourceId}`),
+        axios.delete(
+          `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}/${resourceId}`,
+        ),
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: ['vessel', vesselIdValue.value, ...resourcePath.split('/')],
+          queryKey: [
+            'vessel',
+            vesselIdValue.value,
+            'charter',
+            charterIdValue.value,
+            ...resourcePath.split('/'),
+          ],
         })
       },
     })
@@ -158,10 +206,12 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
   // Save resource (auto-detect create vs update based on resourceId)
   function useSaveResource(
     resourceId?: MaybeRefOrGetter<string | undefined>,
+    charterId?: MaybeRefOrGetter<string | undefined>,
     vesselId?: MaybeRefOrGetter<string | undefined>,
   ) {
     const queryClient = useQueryClient()
     const vesselIdValue = useVesselId(vesselId)
+    const charterIdValue = useCharterId(charterId)
     const resourceIdValue = useResourceId(resourceIdParam, resourceId)
 
     const mutation = useMutation({
@@ -169,25 +219,33 @@ export function useVesselResource<TResource, TCreateData, TUpdateData = Partial<
         if (resourceIdValue.value) {
           // Update existing resource
           return axios.patch<ApiResponse<TResource>, ApiResponse<TResource>>(
-            `/vessels/${vesselIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
+            `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}/${resourceIdValue.value}`,
             data,
           )
         } else {
           // Create new resource
           return axios.post<ApiResponse<TResource>, ApiResponse<TResource>>(
-            `/vessels/${vesselIdValue.value}/${resourcePath}`,
+            `/vessels/${vesselIdValue.value}/charters/${charterIdValue.value}/${resourcePath}`,
             data,
           )
         }
       },
       onSuccess: async (savedResource) => {
-        const listResourceKey = ['vessel', vesselIdValue.value, ...resourcePath.split('/')]
+        const listResourceKey = [
+          'vessel',
+          vesselIdValue.value,
+          'charter',
+          charterIdValue.value,
+          ...resourcePath.split('/'),
+        ]
 
         if (resourceIdValue.value) {
           // Update: set both single resource and list cache
           const singleResourceKey = [
             'vessel',
             vesselIdValue.value,
+            'charter',
+            charterIdValue.value,
             ...resourcePath.split('/'),
             resourceIdValue.value,
           ]

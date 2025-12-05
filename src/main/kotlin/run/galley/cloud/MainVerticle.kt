@@ -42,6 +42,7 @@ import nl.clicqo.messaging.email.EmailComposer
 import nl.clicqo.messaging.email.EmailComposerCodec
 import nl.clicqo.messaging.email.EmailMessagingVerticle
 import run.galley.cloud.controller.AuthControllerVerticle
+import run.galley.cloud.controller.CharterComputePlanControllerVerticle
 import run.galley.cloud.controller.CharterControllerVerticle
 import run.galley.cloud.controller.ProjectControllerVerticle
 import run.galley.cloud.controller.VesselBillingProfileControllerVerticle
@@ -49,6 +50,7 @@ import run.galley.cloud.controller.VesselControllerVerticle
 import run.galley.cloud.controller.VesselEngineControllerVerticle
 import run.galley.cloud.controller.VesselEngineNodeControllerVerticle
 import run.galley.cloud.controller.VesselEngineRegionControllerVerticle
+import run.galley.cloud.data.CharterComputePlanDataVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.CrewCharterMemberDataVerticle
 import run.galley.cloud.data.CrewDataVerticle
@@ -203,6 +205,7 @@ class MainVerticle : CoroutineVerticle() {
     vertx.deployVerticle(CrewDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CrewCharterMemberDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterDataVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CharterComputePlanDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselDataVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselEngineDataVerticle(), deploymentOptions).coAwait()
@@ -213,6 +216,7 @@ class MainVerticle : CoroutineVerticle() {
     // Deploy the controller verticles
     vertx.deployVerticle(AuthControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(CharterControllerVerticle(), deploymentOptions).coAwait()
+    vertx.deployVerticle(CharterComputePlanControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(ProjectControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselControllerVerticle(), deploymentOptions).coAwait()
     vertx.deployVerticle(VesselBillingProfileControllerVerticle(), deploymentOptions).coAwait()

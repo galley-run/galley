@@ -1,6 +1,6 @@
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import axios, { type AxiosResponse } from 'axios'
+import axios from 'axios'
 import type { ApiResponse } from '@/types/api'
 import { useRoute } from 'vue-router'
 import { useProjectsStore } from '@/stores/projects.ts'

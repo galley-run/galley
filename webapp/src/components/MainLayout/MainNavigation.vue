@@ -108,7 +108,7 @@ const vesselSections = [
     items: [
       { icon: Settings, label: 'Settings', href: '/charter/settings', disabled: true, },
       { icon: WalletMoney, label: 'Billing', href: '/charter/billing', disabled: true, },
-      { icon: ServerSquareCloud, label: 'Compute Plans', href: '/charter/compute-plans' },
+      { icon: ServerSquareCloud, label: 'Compute Plans', href: '/charter/compute-plan' },
       { icon: Diploma, label: 'Compliance', href: '/charter/compliance', disabled: true, },
       { icon: UsersGroupTwoRounded, label: 'Crew', href: '/charter/crew', disabled: true, },
     ],

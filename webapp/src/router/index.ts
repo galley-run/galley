@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import MainLayout from '@/router/layouts/MainLayout.vue'
 import DashboardView from '@/router/views/DashboardView.vue'
-import ComputePlansView from '@/router/views/ComputePlansView.vue'
+import ComputePlanView from '@/router/views/ComputePlanView.vue'
 import EngineView from '@/router/views/Engine/EngineView.vue'
 import OnboardingLayout from '@/router/layouts/OnboardingLayout.vue'
 import RegistrationView from '@/router/views/Onboarding/RegistrationView.vue'
@@ -18,6 +18,7 @@ import EngineNodeEditView from '@/router/views/Engine/Node/EngineNodeEditView.vu
 import EngineRegionEditView from '@/router/views/Engine/Node/EngineRegionEditView.vue'
 import EngineNodeInfoView from '@/router/views/Engine/Node/EngineNodeInfoView.vue'
 import EngineNodeFirstControllerView from '@/router/views/Engine/Node/EngineNodeFirstControllerView.vue'
+import ComputePlanEditView from '@/router/views/ComputePlanEditView.vue'
 
 const routes = [
   {
@@ -50,7 +51,8 @@ const routes = [
     component: MainLayout,
     children: [
       { path: '', component: DashboardView },
-      { path: '/charter/compute-plans', component: ComputePlansView },
+      { path: '/charter/compute-plan', component: ComputePlanView },
+      { path: '/charter/compute-plan/add', component: ComputePlanEditView },
       { path: '/vessel/engine', component: EngineView },
       { path: '/vessel/:vesselId/engine/node/controller', component: EngineNodeFirstControllerView },
       { path: '/vessel/:vesselId/engine/node/add', component: EngineNodeEditView },

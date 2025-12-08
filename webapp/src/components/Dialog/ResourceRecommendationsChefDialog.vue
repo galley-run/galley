@@ -1,8 +1,8 @@
 <template>
   <UIDialog class="dialog--chef" :show="show" @close="$emit('close')">
     <div class="dialog__header">
-      <ChefHat />
-      <h3>Recommendations by the chef</h3>
+      <InfoCircle />
+      <h3>Resource recommendations</h3>
       <UIButton @click="$emit('close')" ghost variant="neutral" :trailing-addon="CloseCircle" />
     </div>
     <div class="dialog__body">
@@ -21,9 +21,7 @@
             <td>512 MiB - 1 GiB</td>
           </tr>
           <tr>
-            <td colspan="3">
-              Good for a small Node, Python or JVM app.
-            </td>
+            <td colspan="3">Good for a small Node, Python or JVM app.</td>
           </tr>
           <tr>
             <th>Worker / Queue</th>
@@ -32,7 +30,8 @@
           </tr>
           <tr>
             <td colspan="3">
-              Extra headroom for batch jobs and bursts. Optionally enable Burst mode to allow your resource to temporary use some extra space when its needed.
+              Extra headroom for batch jobs and bursts. Optionally enable Burst mode to allow your
+              resource to temporary use some extra space when its needed.
             </td>
           </tr>
           <tr>
@@ -41,9 +40,7 @@
             <td>2 - 4 GiB</td>
           </tr>
           <tr>
-            <td colspan="3">
-              RAM is key on Postgres, shared buffers use ~25% of it.
-            </td>
+            <td colspan="3">RAM is key on Postgres, shared buffers use ~25% of it.</td>
           </tr>
           <tr>
             <th>MongoDB</th>
@@ -51,9 +48,7 @@
             <td>2 - 8 GiB</td>
           </tr>
           <tr>
-            <td colspan="3">
-              WiredTiger (MongoDB’s engine) cache benefits from some more memory.
-            </td>
+            <td colspan="3">WiredTiger (MongoDB’s engine) cache benefits from some more memory.</td>
           </tr>
           <tr>
             <th>Redis</th>
@@ -61,9 +56,7 @@
             <td>512 MiB - 2 GiB</td>
           </tr>
           <tr>
-            <td colspan="3">
-              Try to match your memory to your dataset size for Redis.
-            </td>
+            <td colspan="3">Try to match your memory to your dataset size for Redis.</td>
           </tr>
           <tr>
             <th>Web / API  (Staging env)</th>
@@ -72,21 +65,31 @@
           </tr>
           <tr>
             <td colspan="3">
-              Staging isn’t as intensive used as your production environment and an occasional outage can be okay for a cost benefit.
+              Staging isn’t as intensive used as your production environment and an occasional
+              outage can be okay for a cost benefit.
             </td>
           </tr>
         </tbody>
       </table>
 
-      <p>Please note that these are general recommendations and in now way hard requirements of your needs. Please read the documentation of the tools you're using to have a better estimation of the CPU / Memory you need.</p>
-<!--      <div class="mt-6">-->
-<!--        <UIButton :leading-addon="ChatDots" target="_blank" href="https://chatgpt.com?q=">Ask the chef</UIButton>-->
-<!--      </div>-->
+      <div class="alert alert--info">
+        <div class="alert__body">
+          <h6>Keep in mind</h6>
+          <p>
+            These are general recommendations and in no way hard requirements of your needs. Please
+            read the documentation of the tools you're using to have a better estimation of the CPU
+            / Memory you need.
+          </p>
+        </div>
+      </div>
+      <!--      <div class="mt-6">-->
+      <!--        <UIButton :leading-addon="ChatDots" target="_blank" href="https://chatgpt.com?q=">Ask the chef</UIButton>-->
+      <!--      </div>-->
     </div>
   </UIDialog>
 </template>
 <script setup lang="ts">
-import { ChefHat, CloseCircle } from '@solar-icons/vue'
+import { CloseCircle, InfoCircle } from '@solar-icons/vue'
 import UIButton from '@/components/UIButton.vue'
 import UIDialog from '@/components/Dialog/UIDialog.vue'
 

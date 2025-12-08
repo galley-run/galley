@@ -25,12 +25,13 @@ type Item = {
 }
 
 const {
-  items,
+  items: itemValues,
   modelValue = null,
   variant,
   placeholder,
   selectFirst = false,
   disabled,
+  min,
   maxHeightPx,
   icon,
   menuPosition = 'left',
@@ -43,10 +44,19 @@ const {
   id?: string
   disabled?: boolean
   selectFirst?: boolean
+  min?: string
   maxHeightPx?: number
   icon?: FunctionalComponent<IconProps>
   menuPosition?: 'left' | 'right'
 }>()
+
+const items = computed(() => {
+  if (min) {
+    const minIndex = itemValues?.findIndex((item) => item.value === min)
+    return itemValues?.filter((_, index) => index >= minIndex)
+  }
+  return itemValues
+})
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string | null): void
@@ -88,17 +98,17 @@ const menuStyle = computed(() => {
   }
 })
 
-const selectedItem = computed(() => items.find((i) => i.value === modelValue) ?? null)
+const selectedItem = computed(() => items.value.find((i) => i.value === modelValue) ?? null)
 
 function open() {
   if (disabled) return
   isOpen.value = true
 
   // Set activeIndex to the selected
-  activeIndex.value = items.findIndex((i) => i.value === modelValue && !i.disabled)
+  activeIndex.value = items.value.findIndex((i) => i.value === modelValue && !i.disabled)
   if (activeIndex.value === -1 && selectFirst) {
     // Or select first enabled item
-    activeIndex.value = items.findIndex((i) => !i.disabled)
+    activeIndex.value = items.value.findIndex((i) => !i.disabled)
   }
   requestAnimationFrame(() => listEl.value?.focus())
 }
@@ -134,7 +144,7 @@ function toggleKey(e: KeyboardEvent) {
 }
 
 async function selectAt(index: number) {
-  const item = items[index]
+  const item = items.value[index]
 
   if (!item || item.disabled) return
 
@@ -161,7 +171,7 @@ async function selectAt(index: number) {
 
 function onKeydownList(e: KeyboardEvent) {
   if (!isOpen.value) return
-  const enabledIndexes = items.map((i, idx) => (i.disabled ? -1 : idx)).filter((i) => i >= 0)
+  const enabledIndexes = items.value.map((i, idx) => (i.disabled ? -1 : idx)).filter((i) => i >= 0)
   const currentPos = enabledIndexes.indexOf(activeIndex.value)
 
   switch (e.key) {
@@ -204,7 +214,7 @@ function onKeydownList(e: KeyboardEvent) {
       lastLetterCount.value =
         lastLetter.value === e.key ? (lastLetterCount.value ?? -1) + modifier : 0
       lastLetter.value = e.key
-      const selectNext = Object.values(items).filter(
+      const selectNext = Object.values(items.value).filter(
         (i) => !i.disabled && i.label.toLowerCase().startsWith(e.key.toLowerCase()),
       )
       if (selectNext.length === 0) {
@@ -216,11 +226,11 @@ function onKeydownList(e: KeyboardEvent) {
         selectNext &&
         lastLetterCount?.value &&
         selectNext[lastLetterCount.value] &&
-        items.indexOf(selectNext[lastLetterCount.value])
+        items.value.indexOf(selectNext[lastLetterCount.value])
       if (!index || index === -1) {
         lastLetterCount.value = 0
       }
-      activeIndex.value = items.indexOf(selectNext[lastLetterCount.value])
+      activeIndex.value = items.value.indexOf(selectNext[lastLetterCount.value])
       ensureActiveVisible()
       break
   }
@@ -236,7 +246,8 @@ function ensureActiveVisible() {
 function onClickOutside(ev: Event) {
   const t = ev.target as Node | null
   if (!isOpen.value) return
-  const triggerNode = (triggerEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? triggerEl.value
+  const triggerNode =
+    (triggerEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? triggerEl.value
   if (triggerNode instanceof Node && t && triggerNode.contains(t)) return
   const listNode = (listEl.value as HTMLElement & { $el?: HTMLElement })?.$el ?? listEl.value
   if (listNode instanceof Node && t && listNode.contains(t)) return
@@ -261,7 +272,7 @@ watch(
   () => items,
   () => {
     if (!isOpen.value) return
-    activeIndex.value = Math.max(0, Math.min(activeIndex.value, items.length - 1))
+    activeIndex.value = Math.max(0, Math.min(activeIndex.value, items.value.length - 1))
   },
 )
 </script>
@@ -275,7 +286,7 @@ watch(
       :aria-expanded="isOpen"
       :aria-haspopup="'listbox'"
       :disabled="disabled"
-      class="transition-all flex items-center py-1.5 px-3 gap-1.5  text-base cursor-pointer focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg focus:outline-1 outline-offset-1 outline-navy-100 active:bg-navy-100"
+      class="transition-all flex items-center py-1.5 px-3 gap-1.5 text-base cursor-pointer focus:bg-navy-50 focus:text-navy-900 hover:bg-navy-50 hover:text-navy-900 rounded-lg focus:outline-1 outline-offset-1 outline-navy-100 active:bg-navy-100"
       @click="toggle"
       v-if="variant === 'inline'"
     >
@@ -310,8 +321,8 @@ watch(
       <span class="flex form-field-input-value tracking-tight truncate py-2.5 gap-2 items-center">
         <slot name="leadingAddon" :item="selectedItem" />
         <slot name="buttonLeadingAddon" />
-        <template v-if="selectedItem?.label">{{selectedItem?.label}}</template>
-        <span class="text-tides-600" v-else-if="placeholder">{{placeholder}}</span>
+        <template v-if="selectedItem?.label">{{ selectedItem?.label }}</template>
+        <span class="text-tides-600" v-else-if="placeholder">{{ placeholder }}</span>
         <span class="text-tides-600" v-else>Select...</span>
       </span>
       <slot />

@@ -46,13 +46,10 @@
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h6>Resource size</h6>
-            <UIToggle label="Advanced settings" v-model="advancedMode" />
           </div>
-          <p class="text-sm opacity-70">
-            Guaranteed resources for applications and databases using this plan.
-          </p>
+          <p>Guaranteed resources for applications and databases using this plan.</p>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid xl:grid-cols-4 gap-8">
             <UIFormField>
               <UILabel for="requestsCpu" required @info-click="toggleResourceChefRecommendations()"
                 >CPU</UILabel
@@ -69,33 +66,53 @@
               <label for="requestsCpu">Number of CPU cores (e.g., 1, 2, 0.5)</label>
             </UIFormField>
             <UIFormField>
-              <UILabel for="requestsMemory" required>Memory</UILabel>
+              <UILabel
+                for="requestsMemory"
+                required
+                @info-click="toggleResourceChefRecommendations()"
+                >Memory</UILabel
+              >
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
                 :items="memoryAutoComplete"
                 id="requestsMemory"
-                placeholder="e.g. 512M or 1G"
+                placeholder="e.g. 512Mi or 1Gi"
                 v-model="requestsMemory"
               />
-              <label for="requestsMemory">Memory amount (e.g., 512M, 1G, 2G)</label>
+              <label for="requestsMemory">Memory amount (e.g., 512Mi, 1Gi, 2Gi)</label>
+            </UIFormField>
+            <UIFormField>
+              <UILabel for="advancedMode">Advanced settings</UILabel>
+              <UIToggle label="Allow precision values" v-model="advancedMode" />
+              <UIToggle label="Enable burstable instance" v-model="burstMode" />
+              <label for="billingUnitPrice"
+                >Enabling burstable instance will allow you to define resource limits.</label
+              >
             </UIFormField>
           </div>
         </div>
 
-        <div class="space-y-4">
-          <h6>Resource limits (optional)</h6>
-          <p class="text-sm opacity-70">
-            Maximum resources applications can consume. Leave empty for no limits.
+        <div class="space-y-4" v-if="burstMode">
+          <h6>Resource limits</h6>
+          <p>
+            You can set resource limits, which your ""application & DBs"" can consume. Resource
+            limits can never be lower than the regular resource size.
           </p>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid xl:grid-cols-4 gap-8">
             <UIFormField>
-              <UILabel for="limitsCpu">CPU limit</UILabel>
+              <UILabel
+                for="limitsCpu"
+                required
+                @info-click="toggleResourceLimitsChefRecommendations()"
+                >CPU limit</UILabel
+              >
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
                 id="limitsCpu"
+                :min="requestsCpu"
                 :items="cpuAutoComplete"
                 placeholder="e.g. 1"
                 v-model="limitsCpu"
@@ -104,10 +121,16 @@
               <label for="limitsCpu">Maximum CPU cores</label>
             </UIFormField>
             <UIFormField>
-              <UILabel for="limitsMemory">Memory limit</UILabel>
+              <UILabel
+                for="limitsMemory"
+                required
+                @info-click="toggleResourceLimitsChefRecommendations()"
+                >Memory limit</UILabel
+              >
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
+                :min="requestsMemory"
                 :items="memoryAutoComplete"
                 id="limitsMemory"
                 placeholder="e.g. 512M or 1G"
@@ -151,9 +174,11 @@
           </div>
         </div>
 
-        <div v-if="error" class="alert alert--destructive">
+        <div v-if="error" class="alert alert--destructive flex items-center">
           <Danger />
-          {{ error }}
+          <div class="alert__body">
+            {{ error }}
+          </div>
         </div>
 
         <div class="card__footer form-footer">
@@ -194,6 +219,10 @@
     :show="showResourceChefRecommendations"
     @close="() => (showResourceChefRecommendations = false)"
   />
+  <ResourceLimitsRecommendationsChefDialog
+    :show="showResourceLimitsChefRecommendations"
+    @close="() => (showResourceLimitsChefRecommendations = false)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -216,12 +245,15 @@ import {
 import ConfirmDeleteComputePlanDialog from '@/components/Dialog/ConfirmDeleteComputePlanDialog.vue'
 import type { ApiError } from '@/utils/registerAxios.ts'
 import ResourceRecommendationsChefDialog from '@/components/Dialog/ResourceRecommendationsChefDialog.vue'
+import ResourceLimitsRecommendationsChefDialog from '@/components/Dialog/ResourceLimitsRecommendationsChefDialog.vue'
 
 const formRef = ref<HTMLFormElement | null>(null)
 const confirmDelete = ref(false)
 const error = ref<string | null>(null)
 const advancedMode = ref(false)
+const burstMode = ref(false)
 const showResourceChefRecommendations = ref(false)
+const showResourceLimitsChefRecommendations = ref(false)
 
 const route = useRoute()
 const router = useRouter()
@@ -253,9 +285,9 @@ const { isPending: saveIsPending } = useSaveComputePlan(computePlanId, charterId
 const { isPending: deleteIsPending } = useDeleteComputePlan(charterId, vesselId)
 
 const cpuAutoComplete = [
-  { value: '100m', label: '0.1 vCPU' },
-  { value: '250m', label: '0.25 vCPU' },
-  { value: '500m', label: '0.5 vCPU' },
+  { value: '0.1', label: '0.1 vCPU' },
+  { value: '0.25', label: '0.25 vCPU' },
+  { value: '0.5', label: '0.5 vCPU' },
   { value: '1', label: '1 vCPU' },
   { value: '2', label: '2 vCPU' },
   { value: '4', label: '4 vCPU' },
@@ -300,5 +332,8 @@ async function onDelete() {
 
 function toggleResourceChefRecommendations() {
   showResourceChefRecommendations.value = !showResourceChefRecommendations.value
+}
+function toggleResourceLimitsChefRecommendations() {
+  showResourceLimitsChefRecommendations.value = !showResourceLimitsChefRecommendations.value
 }
 </script>

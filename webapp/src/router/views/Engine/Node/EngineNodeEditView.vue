@@ -249,10 +249,11 @@
         >
       </UICodeBlock>
 
-      <div v-if="error" class="alert alert--destructive">
+      <div v-if="error" class="alert alert--destructive flex items-center">
         <Danger />
-
-        {{ error }}
+        <div class="alert__body">
+          {{ error }}
+        </div>
       </div>
       <div class="card__footer form-footer">
         <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/vessel/engine"

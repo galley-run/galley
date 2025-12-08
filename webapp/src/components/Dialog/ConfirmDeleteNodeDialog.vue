@@ -7,7 +7,9 @@
     </div>
     <div class="dialog__body">
       <div v-if="error" class="alert alert--destructive">
-        {{ error }}
+        <div class="alert__body">
+          {{ error }}
+        </div>
       </div>
       <p>Are you sure you want to delete this node? This action cannot be undone.</p>
     </div>

@@ -202,9 +202,7 @@
       @apply p-8
     }
 
-    /* Lead */
-
-    > p:first-of-type {
+    p {
       @apply text-tides-900 max-w-3xl;
     }
 
@@ -433,10 +431,14 @@
   }
 
   .overlay {
-    @apply fixed inset-0 z-20 flex transition-all bg-white/40;
+    @apply fixed overflow-scroll py-10 inset-0 z-20 flex transition-all bg-white/40;
   }
 
   .overlay--drawer {
+    @apply bg-transparent
+  }
+
+  .overlay--stacked {
     @apply bg-transparent
   }
 
@@ -453,7 +455,7 @@
   }
 
   .dialog.dialog--chef .dialog__body {
-    @apply bg-navy-100/50;
+    @apply bg-navy-50/50;
   }
 
   .dialog-from-bottom-enter-active,
@@ -481,7 +483,7 @@
   }
 
   .dialog {
-    @apply h-fit self-center mx-auto w-[90vw] max-w-2xl shadow-[0px_75px_150px] dark:shadow-[0px_75px_100px_200px] dark:shadow-navy-800/20 shadow-navy-800/20 rounded-2xl border border-navy-100 overflow-clip backdrop-blur-lg dark:backdrop-blur-2xl;
+    @apply h-fit self-center-safe mx-auto w-[90vw] max-w-2xl shadow-[0px_75px_150px] dark:shadow-[0px_75px_200px_200px] shadow-navy-800/20 dark:shadow-white  rounded-2xl border border-navy-100 overflow-clip backdrop-blur-lg dark:backdrop-blur-2xl;
 
     .dialog__header {
       @apply p-8 bg-navy-100/50 flex items-center gap-4;
@@ -504,10 +506,22 @@
     }
 
     .dialog__body {
-      @apply bg-white/65 p-8 h-full transform-gpu;
+      @apply bg-white/65 p-8 h-full transform-gpu space-y-4;
 
-      .alert {
-        @apply  px-8 -mt-8 -mx-8 mb-8 rounded-none outline-0;
+      .alert:first-child {
+        @apply px-8 py-8 -mt-8 -mx-8 mb-8 rounded-none outline-0;
+      }
+
+      ul {
+        @apply list-disc list-inside;
+      }
+
+      ol {
+        @apply list-decimal list-inside;
+      }
+
+      > h1, > h2, > h3, > h4, > h5, > h6 {
+        @apply mt-8;
       }
     }
 
@@ -524,8 +538,29 @@
     }
   }
 
+  .overlay--stacked .dialog {
+    @apply shadow-[0px_25px_250px_100px] shadow-tides-950/40 dark:shadow-[0px_25px_200px_150px] dark:shadow-white bg-white/80;
+  }
+
+  .overlay--stacked .dialog--stacked-1 {
+    @apply max-w-[44rem];
+  }
+
+  .overlay--stacked .dialog--stacked-2 {
+    @apply max-w-[48rem];
+  }
+
+  .overlay--stacked .dialog--stacked-3 {
+    @apply max-w-[52rem];
+  }
+
+
   .alert {
-    @apply outline rounded-xl outline-tides-300 px-4 py-4 flex items-center gap-3;
+    @apply outline rounded-xl outline-tides-300 px-6 py-6 gap-3;
+  }
+
+  .alert__body {
+    @apply space-y-4;
   }
 
   .alert--destructive {
@@ -533,6 +568,22 @@
 
     h1, h2, h3, h4, h5, h6 {
       @apply text-red-900;
+    }
+  }
+
+  .alert--info {
+    @apply outline-navy-100 bg-navy-100/75 text-navy-900;
+
+    h1, h2, h3, h4, h5, h6 {
+      @apply text-navy-900;
+    }
+  }
+
+  .alert--warning {
+    @apply outline-cliona-100 bg-cliona-300/75 text-cliona-900;
+
+    h1, h2, h3, h4, h5, h6 {
+      @apply text-cliona-900;
     }
   }
 

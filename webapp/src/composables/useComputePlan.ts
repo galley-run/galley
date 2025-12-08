@@ -117,6 +117,10 @@ export const applicationTypes = [
   { value: 'databases', label: 'Databases' },
 ]
 
+export function getApplicationType(application: string | null) {
+  return applicationTypes.find((type) => type.value === application)?.label || 'Applications & Databases'
+}
+
 // Form helpers with watchers for create/edit forms
 export function useComputePlanFormHelpers(
   computePlanId?: MaybeRefOrGetter<string | undefined>,

@@ -96,8 +96,8 @@
         <div class="space-y-4" v-if="burstMode">
           <h6>Resource limits</h6>
           <p>
-            You can set resource limits, which your ""application & DBs"" can consume. Resource
-            limits can never be lower than the regular resource size.
+            You can set resource limits, which your {{ getApplicationType(application).toLowerCase() }} can consume.<br />
+            Resource limits can never be lower than the regular resource size.
           </p>
 
           <div class="grid xl:grid-cols-4 gap-8">
@@ -114,7 +114,7 @@
                 id="limitsCpu"
                 :min="requestsCpu"
                 :items="cpuAutoComplete"
-                placeholder="e.g. 1"
+                :placeholder="advancedMode ? 'e.g. 1' : 'e.g. 1 vCPU'"
                 v-model="limitsCpu"
                 trailing-addon="vCPU"
               />
@@ -140,6 +140,8 @@
             </UIFormField>
           </div>
         </div>
+
+        <SlashesDivider class="opacity-30" />
 
         <div class="space-y-4">
           <h6>Billing</h6>
@@ -237,7 +239,7 @@ import { useRoute, useRouter } from 'vue-router'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UIToggle from '@/components/FormField/UIToggle.vue'
 import {
-  applicationTypes,
+  applicationTypes, getApplicationType,
   useComputePlanFormHelpers,
   useDeleteComputePlan,
   useSaveComputePlan,
@@ -246,6 +248,7 @@ import ConfirmDeleteComputePlanDialog from '@/components/Dialog/ConfirmDeleteCom
 import type { ApiError } from '@/utils/registerAxios.ts'
 import ResourceRecommendationsChefDialog from '@/components/Dialog/ResourceRecommendationsChefDialog.vue'
 import ResourceLimitsRecommendationsChefDialog from '@/components/Dialog/ResourceLimitsRecommendationsChefDialog.vue'
+import SlashesDivider from '@/assets/SlashesDivider.vue'
 
 const formRef = ref<HTMLFormElement | null>(null)
 const confirmDelete = ref(false)

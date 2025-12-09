@@ -169,12 +169,18 @@ class CharterComputePlanControllerVerticle :
 
     // Extract and flatten nested fields if present
     val requests = computePlan.getJsonObject("requests")
-    val limits = computePlan.getJsonObject("limits") ?: requests
+    val limits = computePlan.getJsonObject("limits")
     val billing = computePlan.getJsonObject("billing")
 
     if (requests != null) {
       computePlan.put(CHARTER_COMPUTE_PLANS.REQUESTS_CPU.name, requests.getString("cpu"))
       computePlan.put(CHARTER_COMPUTE_PLANS.REQUESTS_MEMORY.name, requests.getString("memory"))
+
+      if (limits == null) {
+        computePlan.put(CHARTER_COMPUTE_PLANS.LIMITS_CPU.name, requests.getString("cpu"))
+        computePlan.put(CHARTER_COMPUTE_PLANS.LIMITS_MEMORY.name, requests.getString("memory"))
+        computePlan.remove("limits")
+      }
       computePlan.remove("requests")
     }
 

@@ -70,7 +70,7 @@ class CharterComputePlanApiIntegrationTest : BaseIntegrationTest() {
     pg
       .query(
         """
-        TRUNCATE TABLE charter_compute_plans, outbox_events, charters, vessels, sessions, users RESTART IDENTITY CASCADE;
+        TRUNCATE TABLE charter_compute_plans, charter_projects, outbox_events, charters, crew, vessels, sessions, users RESTART IDENTITY CASCADE;
         """.trimIndent(),
       ).execute()
       .coAwait()

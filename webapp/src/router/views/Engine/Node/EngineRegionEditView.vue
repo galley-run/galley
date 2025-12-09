@@ -13,7 +13,7 @@
         <div class="space-y-4">
           <h6>Geographic region</h6>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
             <UIFormField>
               <UILabel for="country" required>Country</UILabel>
               <UIDropDown
@@ -33,7 +33,7 @@
                 :items="geoRegions"
               />
             </UIFormField>
-            <UIFormField class="col-span-2">
+            <UIFormField>
               <UILabel for="city">City</UILabel>
               <UITextInput id="city" placeholder="e.g. Amsterdam" v-model="locationCity" />
             </UIFormField>
@@ -43,7 +43,7 @@
         <div class="space-y-4">
           <h6>Region details</h6>
 
-          <div class="grid grid-cols-2 gap-8">
+          <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
             <UIFormField>
               <UILabel for="name" required>Name</UILabel>
               <UITextInput required id="name" placeholder="e.g. AMS1" v-model="name" />

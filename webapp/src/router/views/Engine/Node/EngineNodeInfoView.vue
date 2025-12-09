@@ -9,7 +9,7 @@
         viewable below here.
       </p>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-8">
       <DashboardCard title="IP Address" :loading="isLoading"
         >{{ data?.attributes?.ipAddress }}
       </DashboardCard>

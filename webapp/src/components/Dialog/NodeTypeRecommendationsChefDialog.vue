@@ -1,8 +1,8 @@
 <template>
   <UIDialog class="dialog--chef" :show="show" @close="$emit('close')">
     <div class="dialog__header">
-      <ChefHat />
-      <h3>Recommendations by the chef</h3>
+      <InfoCircle />
+      <h3>Node recommendations</h3>
       <UIButton @click="$emit('close')" ghost variant="neutral" :trailing-addon="CloseCircle" />
     </div>
     <div class="dialog__body">
@@ -50,14 +50,25 @@
           </tr>
         </tbody>
       </table>
-<!--      <div class="mt-6">-->
+      <div class="alert alert--info">
+        <div class="alert__body">
+          <h6>Keep in mind</h6>
+          <p>
+            These are general recommendations and in no way hard requirements of your needs. Please
+            read the documentation of the tools you're using to have a better estimation of the CPU
+            / Memory you need.
+          </p>
+        </div>
+      </div>
+
+      <!--      <div class="mt-6">-->
 <!--        <UIButton :leading-addon="ChatDots" target="_blank" href="https://chatgpt.com?q=">Ask the chef</UIButton>-->
 <!--      </div>-->
     </div>
   </UIDialog>
 </template>
 <script setup lang="ts">
-import { ChefHat, CloseCircle } from '@solar-icons/vue'
+import { InfoCircle, CloseCircle } from '@solar-icons/vue'
 import UIButton from '@/components/UIButton.vue'
 import UIDialog from '@/components/Dialog/UIDialog.vue'
 

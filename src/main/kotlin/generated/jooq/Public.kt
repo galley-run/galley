@@ -6,6 +6,7 @@ package generated.jooq
 
 import generated.jooq.tables.ApiKeys
 import generated.jooq.tables.CharterBillingProfile
+import generated.jooq.tables.CharterComputePlans
 import generated.jooq.tables.CharterProjects
 import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
@@ -75,6 +76,11 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
      * The table <code>public.charter_billing_profile</code>.
      */
     val CHARTER_BILLING_PROFILE: CharterBillingProfile get() = CharterBillingProfile.CHARTER_BILLING_PROFILE
+
+    /**
+     * The table <code>public.charter_compute_plans</code>.
+     */
+    val CHARTER_COMPUTE_PLANS: CharterComputePlans get() = CharterComputePlans.CHARTER_COMPUTE_PLANS
 
     /**
      * The table <code>public.charter_projects</code>.
@@ -343,6 +349,7 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
     override fun getTables(): List<Table<*>> = listOf(
         ApiKeys.API_KEYS,
         CharterBillingProfile.CHARTER_BILLING_PROFILE,
+        CharterComputePlans.CHARTER_COMPUTE_PLANS,
         CharterProjects.CHARTER_PROJECTS,
         Charters.CHARTERS,
         Crew.CREW,

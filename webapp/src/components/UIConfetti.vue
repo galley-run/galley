@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, defineProps, defineExpose, watchEffect } from 'vue'
+import { onMounted, onBeforeUnmount, ref, defineExpose, watchEffect } from 'vue'
 
 type Vec = { x: number; y: number }
 

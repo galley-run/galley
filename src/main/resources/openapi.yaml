@@ -32,6 +32,8 @@ tags:
     name: charter/logbook
   - description: Managing the crew of the charter
     name: charter/crew
+  - description: Manage compute plans within a charter where applications and databases can be applied to
+    name: charter/compute-plan
   - description: Manage projects within a charter
     name: project
   - description: Manage applications within a project
@@ -694,6 +696,176 @@ paths:
         - charter
       security:
         - vesselCaptain: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/compute-plans:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+    get:
+      tags:
+        - charter/compute-plan
+      summary: List compute plans for charter
+      operationId: charter.computePlan.query.list
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListComputePlans
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ComputePlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - charter/compute-plan
+      summary: Create new compute plans for charter
+      operationId: charter.computePlan.cmd.create
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
+      requestBody:
+        required: true
+        description: Billing profile information to create
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ComputePlanCreate'
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ComputePlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/compute-plans/{computePlanId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - $ref: '#/components/parameters/computePlanId'
+    get:
+      tags:
+        - charter/compute-plan
+      summary: Get compute plan by ID
+      operationId: charter.computePlan.query.get
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ComputePlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - charter/compute-plan
+      summary: Update project
+      operationId: charter.computePlan.cmd.patch
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
+      requestBody:
+        required: true
+        description: Project update data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ComputePlanUpdate'
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ComputePlan'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - charter/compute-plan
+      summary: Delete project
+      operationId: charter.computePlan.cmd.delete
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+        - charterPurser: []
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
@@ -1865,6 +2037,211 @@ components:
             - 'null'
           examples:
             - Clicqo
+    ComputeBilling:
+      type: object
+      required:
+        - enabled
+      properties:
+        enabled:
+          type: boolean
+          examples:
+            - true
+        period:
+          type:
+            - string
+            - 'null'
+          enum:
+            - monthly
+            - null
+          examples:
+            - monthly
+        unitPrice:
+          type:
+            - string
+            - 'null'
+          examples:
+            - '5.50'
+      description: A simplified representation of Compute billing specification
+    ComputePlan:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: Simplified project representation used for listings.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: Project ID (UUID)
+            type:
+              type: string
+              enum:
+                - CharterComputePlan
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - application
+                - requests
+              properties:
+                name:
+                  type: string
+                application:
+                  description: Application should match a Node's deployMode
+                  enum:
+                    - applications
+                    - databases
+                    - applications_databases
+                    - null
+                  type:
+                    - string
+                    - 'null'
+                requests:
+                  type: object
+                  required:
+                    - cpu
+                    - memory
+                  properties:
+                    cpu:
+                      type: string
+                      examples:
+                        - '1'
+                    memory:
+                      type: string
+                      examples:
+                        - 512M
+                        - 1G
+                        - 2G
+                limits:
+                  type:
+                    - object
+                    - 'null'
+                  required:
+                    - cpu
+                    - memory
+                  properties:
+                    cpu:
+                      type: string
+                      examples:
+                        - '1'
+                    memory:
+                      type: string
+                      examples:
+                        - 512M
+                        - 1G
+                        - 2G
+                billing:
+                  $ref: '#/components/schemas/ComputeBilling'
+    ComputePlanCreate:
+      type: object
+      required:
+        - name
+        - application
+        - requests
+      properties:
+        name:
+          type: string
+        application:
+          description: Application should match a Node's deployMode
+          enum:
+            - applications
+            - databases
+            - applications_databases
+            - null
+          type:
+            - string
+            - 'null'
+        requests:
+          type: object
+          required:
+            - cpu
+            - memory
+          properties:
+            cpu:
+              type: string
+              examples:
+                - '1'
+            memory:
+              type: string
+              examples:
+                - 512M
+                - 1G
+                - 2G
+        limits:
+          type:
+            - object
+            - 'null'
+          required:
+            - cpu
+            - memory
+          properties:
+            cpu:
+              type: string
+              examples:
+                - '1'
+            memory:
+              type: string
+              examples:
+                - 512M
+                - 1G
+                - 2G
+        billing:
+          $ref: '#/components/schemas/ComputeBilling'
+    ComputePlanUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        application:
+          description: Application should match a Node's deployMode
+          enum:
+            - applications
+            - databases
+            - applications_databases
+            - null
+          type:
+            - string
+            - 'null'
+        requests:
+          type: object
+          required:
+            - cpu
+            - memory
+          properties:
+            cpu:
+              type: string
+              examples:
+                - '1'
+            memory:
+              type: string
+              examples:
+                - 512M
+                - 1G
+                - 2G
+        limits:
+          type:
+            - object
+            - 'null'
+          required:
+            - cpu
+            - memory
+          properties:
+            cpu:
+              type: string
+              examples:
+                - '1'
+            memory:
+              type: string
+              examples:
+                - 512M
+                - 1G
+                - 2G
+        billing:
+          $ref: '#/components/schemas/ComputeBilling'
     ProjectSummary:
       allOf:
         - $ref: '#/components/schemas/JSONAPIResource'
@@ -2295,6 +2672,13 @@ components:
         format: uuid
     charterId:
       name: charterId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    computePlanId:
+      name: computePlanId
       in: path
       required: true
       schema:

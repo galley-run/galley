@@ -111,7 +111,7 @@ class ProjectApiIntegrationTest : BaseIntegrationTest() {
     pg
       .query(
         """
-        TRUNCATE TABLE outbox_events, charters, vessels, charter_projects, sessions, users RESTART IDENTITY CASCADE;
+        TRUNCATE TABLE charter_compute_plans, charter_projects, outbox_events, charters, crew, vessels, sessions, users RESTART IDENTITY CASCADE;
         """.trimIndent(),
       ).execute()
       .coAwait()

@@ -1,8 +1,17 @@
 <template>
   <Teleport to="body">
     <Transition :name="asDrawer ? 'dialog-from-right' : 'dialog-from-bottom'">
-      <div class="overlay" v-if="show">
-        <div class="dialog" :class="[asDrawer && 'dialog--drawer']" role="dialog" ref="dialogEl">
+      <div
+        class="overlay"
+        :class="[asDrawer && 'overlay--drawer', stacked && 'overlay--stacked']"
+        v-if="show"
+      >
+        <div
+          class="dialog"
+          :class="[asDrawer && 'dialog--drawer', stacked && 'dialog--stacked-'+ Number(stacked), $attrs.class]"
+          role="dialog"
+          ref="dialogEl"
+        >
           <slot />
         </div>
       </div>
@@ -14,7 +23,11 @@ import { ref } from 'vue'
 import { useClickOutside } from '@/composables/useClickOutside.ts'
 
 const dialogEl = ref<HTMLElement | null>(null)
-const { show, asDrawer } = defineProps<{ show: boolean, asDrawer?: boolean }>()
+const { show, asDrawer, stacked } = defineProps<{
+  show: boolean
+  asDrawer?: boolean
+  stacked?: boolean | number
+}>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 
 function onClickOutside(ev: Event) {

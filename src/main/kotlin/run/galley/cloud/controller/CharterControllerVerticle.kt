@@ -3,8 +3,10 @@ package run.galley.cloud.controller
 import generated.jooq.tables.pojos.CharterProjects
 import generated.jooq.tables.pojos.Charters
 import generated.jooq.tables.references.CHARTERS
+import generated.jooq.tables.references.CHARTER_COMPUTE_PLANS
 import generated.jooq.tables.references.CHARTER_PROJECTS
 import io.vertx.core.eventbus.Message
+import io.vertx.core.json.JsonObject
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException
 import nl.clicqo.api.Pagination
@@ -23,6 +25,7 @@ import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.crew.CrewRole
 import run.galley.cloud.crew.getCharters
+import run.galley.cloud.data.CharterComputePlanDataVerticle
 import run.galley.cloud.data.CharterDataVerticle
 import run.galley.cloud.data.ProjectDataVerticle
 import run.galley.cloud.model.toJsonAPIResourceObject
@@ -136,7 +139,7 @@ class CharterControllerVerticle :
         userId = userId,
       )
 
-    val dataResponse =
+    val createdCharter =
       vertx
         .eventBus()
         .request<EventBusDataResponse<Charters>>(CharterDataVerticle.CREATE, dataRequest)
@@ -144,8 +147,22 @@ class CharterControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject()
+
+    val dataResponse =
+      createdCharter?.toJsonAPIResourceObject()
         ?: throw ApiStatusReplyException(ApiStatus.CHARTER_CREATE_FAILURE)
+
+    val computePlanRequest =
+      EventBusCmdDataRequest(
+        payload =
+          JsonObject()
+            .put(CHARTER_COMPUTE_PLANS.VESSEL_ID.name, createdCharter.vesselId.toString())
+            .put(CHARTER_COMPUTE_PLANS.CHARTER_ID.name, createdCharter.id.toString()),
+      )
+
+    vertx
+      .eventBus()
+      .send(CharterComputePlanDataVerticle.CREATE_INITIAL, computePlanRequest)
 
     message.reply(
       EventBusApiResponse(

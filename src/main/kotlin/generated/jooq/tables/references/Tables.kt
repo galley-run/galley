@@ -7,6 +7,7 @@ package generated.jooq.tables.references
 
 import generated.jooq.tables.ApiKeys
 import generated.jooq.tables.CharterBillingProfile
+import generated.jooq.tables.CharterComputePlans
 import generated.jooq.tables.CharterProjects
 import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
@@ -58,6 +59,11 @@ val API_KEYS: ApiKeys = ApiKeys.API_KEYS
  * The table <code>public.charter_billing_profile</code>.
  */
 val CHARTER_BILLING_PROFILE: CharterBillingProfile = CharterBillingProfile.CHARTER_BILLING_PROFILE
+
+/**
+ * The table <code>public.charter_compute_plans</code>.
+ */
+val CHARTER_COMPUTE_PLANS: CharterComputePlans = CharterComputePlans.CHARTER_COMPUTE_PLANS
 
 /**
  * The table <code>public.charter_projects</code>.

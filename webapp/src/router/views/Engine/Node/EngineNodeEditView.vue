@@ -12,7 +12,7 @@
 
       <h6>Configuration</h6>
 
-      <div class="grid xl:grid-cols-4 gap-8">
+      <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
         <UIFormField>
           <UILabel required for="name">Domain name</UILabel>
           <UITextInput required id="name" placeholder="e.g. app1.cloud.galley.run" v-model="name" />
@@ -168,7 +168,7 @@
 
       <h6 v-if="featureProvisioningEnabled">Provisioning</h6>
 
-      <div class="grid xl:grid-cols-4 gap-8" v-if="featureProvisioningEnabled">
+      <div class="grid grid-cols-1 xl:grid-cols-4 gap-8" v-if="featureProvisioningEnabled">
         <UIFormField>
           <UILabel for="provisioning">Automatic Provisioning</UILabel>
           <UIToggle
@@ -249,10 +249,11 @@
         >
       </UICodeBlock>
 
-      <div v-if="error" class="alert alert--destructive">
+      <div v-if="error" class="alert alert--destructive flex items-center">
         <Danger />
-
-        {{ error }}
+        <div class="alert__body">
+          {{ error }}
+        </div>
       </div>
       <div class="card__footer form-footer">
         <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/vessel/engine"

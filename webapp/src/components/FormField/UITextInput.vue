@@ -25,9 +25,10 @@ defineOptions({
 
 const model = defineModel<string>({ default: '' })
 
-const { leadingAddon, trailingAddon } = defineProps<{
+const { leadingAddon, trailingAddon, format } = defineProps<{
   leadingAddon?: FunctionalComponent<IconProps> | string
   trailingAddon?: FunctionalComponent<IconProps> | string
+  format?: 'money'
 }>()
 
 const emit = defineEmits<{
@@ -42,7 +43,17 @@ function onInput(e: Event) {
 }
 
 function onChange(e: Event) {
-  const v = (e.target as HTMLInputElement).value
+  let v: string | number = (e.target as HTMLInputElement).value
+  if (format === 'money') {
+    v = v.replace(',', '.')
+    if (isNaN(Number(v))) {
+      v = 0
+    }
+
+    // TODO: use locale from user settings
+    v = Intl.NumberFormat("nl-NL", { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(v))
+  }
+
   model.value = v
   emit('change', v)
 }

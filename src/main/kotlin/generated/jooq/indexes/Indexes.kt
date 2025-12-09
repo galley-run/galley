@@ -7,6 +7,7 @@ package generated.jooq.indexes
 
 import generated.jooq.tables.ApiKeys
 import generated.jooq.tables.CharterBillingProfile
+import generated.jooq.tables.CharterComputePlans
 import generated.jooq.tables.CharterProjects
 import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
@@ -60,6 +61,9 @@ val IDX_CHARTER_PROJECTS_VESSEL_ID: Index = Internal.createIndex(DSL.name("idx_c
 val IDX_CHARTERS_DELETED_AT: Index = Internal.createIndex(DSL.name("idx_charters_deleted_at"), Charters.CHARTERS, arrayOf(Charters.CHARTERS.DELETED_AT), false)
 val IDX_CHARTERS_VESSEL: Index = Internal.createIndex(DSL.name("idx_charters_vessel"), Charters.CHARTERS, arrayOf(Charters.CHARTERS.VESSEL_ID), false)
 val IDX_CHARTERS_VESSEL_CREATED: Index = Internal.createIndex(DSL.name("idx_charters_vessel_created"), Charters.CHARTERS, arrayOf(Charters.CHARTERS.VESSEL_ID, Charters.CHARTERS.CREATED_AT), false)
+val IDX_COMPUTE_PLANS_CHARTER: Index = Internal.createIndex(DSL.name("idx_compute_plans_charter"), CharterComputePlans.CHARTER_COMPUTE_PLANS, arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.CHARTER_ID), false)
+val IDX_COMPUTE_PLANS_DELETED: Index = Internal.createIndex(DSL.name("idx_compute_plans_deleted"), CharterComputePlans.CHARTER_COMPUTE_PLANS, arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.DELETED_AT), false)
+val IDX_COMPUTE_PLANS_VESSEL: Index = Internal.createIndex(DSL.name("idx_compute_plans_vessel"), CharterComputePlans.CHARTER_COMPUTE_PLANS, arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.VESSEL_ID), false)
 val IDX_CONFIGS_CHARTER: Index = Internal.createIndex(DSL.name("idx_configs_charter"), ProjectConfigs.PROJECT_CONFIGS, arrayOf(ProjectConfigs.PROJECT_CONFIGS.CHARTER_ID), false)
 val IDX_CONFIGS_PROJECT: Index = Internal.createIndex(DSL.name("idx_configs_project"), ProjectConfigs.PROJECT_CONFIGS, arrayOf(ProjectConfigs.PROJECT_CONFIGS.PROJECT_ID), false)
 val IDX_CONFIGS_VESSEL: Index = Internal.createIndex(DSL.name("idx_configs_vessel"), ProjectConfigs.PROJECT_CONFIGS, arrayOf(ProjectConfigs.PROJECT_CONFIGS.VESSEL_ID), false)
@@ -135,6 +139,7 @@ val SESSIONS_EXPIRES_AT_IDX: Index = Internal.createIndex(DSL.name("sessions_exp
 val SESSIONS_REVOKED_AT_IDX: Index = Internal.createIndex(DSL.name("sessions_revoked_at_idx"), Sessions.SESSIONS, arrayOf(Sessions.SESSIONS.REVOKED_AT), false)
 val SESSIONS_USER_ID_IDX: Index = Internal.createIndex(DSL.name("sessions_user_id_idx"), Sessions.SESSIONS, arrayOf(Sessions.SESSIONS.USER_ID), false)
 val UQ_CHARTERS_VESSEL_NAME: Index = Internal.createIndex(DSL.name("uq_charters_vessel_name"), Charters.CHARTERS, arrayOf(Charters.CHARTERS.VESSEL_ID, Charters.CHARTERS.NAME), true)
+val UQ_COMPUTE_PLANS_CHARTER_APPLICATION_NAME: Index = Internal.createIndex(DSL.name("uq_compute_plans_charter_application_name"), CharterComputePlans.CHARTER_COMPUTE_PLANS, arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.CHARTER_ID, CharterComputePlans.CHARTER_COMPUTE_PLANS.APPLICATION, CharterComputePlans.CHARTER_COMPUTE_PLANS.NAME), true)
 val UQ_CONFIGS_PROJECT_KEY: Index = Internal.createIndex(DSL.name("uq_configs_project_key"), ProjectConfigs.PROJECT_CONFIGS, arrayOf(ProjectConfigs.PROJECT_CONFIGS.PROJECT_ID, ProjectConfigs.PROJECT_CONFIGS.KEY), true)
 val UQ_CREW_CHARTER_MEMBER: Index = Internal.createIndex(DSL.name("uq_crew_charter_member"), CrewCharterMember.CREW_CHARTER_MEMBER, arrayOf(CrewCharterMember.CREW_CHARTER_MEMBER.CREW_ID, CrewCharterMember.CREW_CHARTER_MEMBER.CHARTER_ID), true)
 val UQ_CREW_USER_VESSEL: Index = Internal.createIndex(DSL.name("uq_crew_user_vessel"), Crew.CREW, arrayOf(Crew.CREW.USER_ID, Crew.CREW.VESSEL_ID), true)

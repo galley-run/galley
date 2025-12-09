@@ -73,4 +73,8 @@ object ApiStatus {
   val VESSEL_ENGINE_REGION_DELETE_FAILURE_ACTIVE_NODES =
     ApiStatus(2402, "The region could not be deleted, due to active nodes", HttpStatus.Conflict)
   val VESSEL_ENGINE_REGION_DELETION_FAILED = ApiStatus(2403, "The region could not be deleted", HttpStatus.BadRequest)
+
+  val COMPUTE_PLAN_NOT_FOUND = ApiStatus(2500, "The compute plan could not be found", HttpStatus.NotFound)
+  val COMPUTE_PLAN_CREATE_FAILURE = ApiStatus(2501, "The compute plan could not be created")
+  val COMPUTE_PLAN_ID_INCORRECT = ApiStatus(2502, "The compute plan id is incorrect")
 }

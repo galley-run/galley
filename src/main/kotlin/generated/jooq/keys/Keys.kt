@@ -7,6 +7,7 @@ package generated.jooq.keys
 
 import generated.jooq.tables.ApiKeys
 import generated.jooq.tables.CharterBillingProfile
+import generated.jooq.tables.CharterComputePlans
 import generated.jooq.tables.CharterProjects
 import generated.jooq.tables.Charters
 import generated.jooq.tables.Crew
@@ -34,6 +35,7 @@ import generated.jooq.tables.WebhookDeliveries
 import generated.jooq.tables.WebhookSubscriptions
 import generated.jooq.tables.records.ApiKeysRecord
 import generated.jooq.tables.records.CharterBillingProfileRecord
+import generated.jooq.tables.records.CharterComputePlansRecord
 import generated.jooq.tables.records.CharterProjectsRecord
 import generated.jooq.tables.records.ChartersRecord
 import generated.jooq.tables.records.CrewCharterMemberRecord
@@ -76,6 +78,7 @@ val API_KEYS_PKEY: UniqueKey<ApiKeysRecord> = Internal.createUniqueKey(ApiKeys.A
 val API_KEYS_PREFIX_KEY: UniqueKey<ApiKeysRecord> = Internal.createUniqueKey(ApiKeys.API_KEYS, DSL.name("api_keys_prefix_key"), arrayOf(ApiKeys.API_KEYS.PREFIX), true)
 val CHARTER_BILLING_PROFILE_PKEY: UniqueKey<CharterBillingProfileRecord> = Internal.createUniqueKey(CharterBillingProfile.CHARTER_BILLING_PROFILE, DSL.name("charter_billing_profile_pkey"), arrayOf(CharterBillingProfile.CHARTER_BILLING_PROFILE.ID), true)
 val UQ_CHARTER_BILLING_CHARTER: UniqueKey<CharterBillingProfileRecord> = Internal.createUniqueKey(CharterBillingProfile.CHARTER_BILLING_PROFILE, DSL.name("uq_charter_billing_charter"), arrayOf(CharterBillingProfile.CHARTER_BILLING_PROFILE.VESSEL_ID, CharterBillingProfile.CHARTER_BILLING_PROFILE.CHARTER_ID), true)
+val CHARTER_COMPUTE_PLANS_PKEY: UniqueKey<CharterComputePlansRecord> = Internal.createUniqueKey(CharterComputePlans.CHARTER_COMPUTE_PLANS, DSL.name("charter_compute_plans_pkey"), arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.ID), true)
 val CHARTER_PROJECTS_PKEY: UniqueKey<CharterProjectsRecord> = Internal.createUniqueKey(CharterProjects.CHARTER_PROJECTS, DSL.name("charter_projects_pkey"), arrayOf(CharterProjects.CHARTER_PROJECTS.ID), true)
 val CHARTERS_PKEY: UniqueKey<ChartersRecord> = Internal.createUniqueKey(Charters.CHARTERS, DSL.name("charters_pkey"), arrayOf(Charters.CHARTERS.ID), true)
 val CREW_PKEY: UniqueKey<CrewRecord> = Internal.createUniqueKey(Crew.CREW, DSL.name("crew_pkey"), arrayOf(Crew.CREW.ID), true)
@@ -119,6 +122,8 @@ val WEBHOOK_SUBSCRIPTIONS_PKEY: UniqueKey<WebhookSubscriptionsRecord> = Internal
 val API_KEYS__FK_API_KEYS_USER: ForeignKey<ApiKeysRecord, UsersRecord> = Internal.createForeignKey(ApiKeys.API_KEYS, DSL.name("fk_api_keys_user"), arrayOf(ApiKeys.API_KEYS.USER_ID), generated.jooq.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
 val CHARTER_BILLING_PROFILE__FK_CHARTER_BILLING_CHARTER: ForeignKey<CharterBillingProfileRecord, ChartersRecord> = Internal.createForeignKey(CharterBillingProfile.CHARTER_BILLING_PROFILE, DSL.name("fk_charter_billing_charter"), arrayOf(CharterBillingProfile.CHARTER_BILLING_PROFILE.CHARTER_ID), generated.jooq.keys.CHARTERS_PKEY, arrayOf(Charters.CHARTERS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
 val CHARTER_BILLING_PROFILE__FK_CHARTER_BILLING_VESSEL: ForeignKey<CharterBillingProfileRecord, VesselsRecord> = Internal.createForeignKey(CharterBillingProfile.CHARTER_BILLING_PROFILE, DSL.name("fk_charter_billing_vessel"), arrayOf(CharterBillingProfile.CHARTER_BILLING_PROFILE.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER: ForeignKey<CharterComputePlansRecord, ChartersRecord> = Internal.createForeignKey(CharterComputePlans.CHARTER_COMPUTE_PLANS, DSL.name("fk_compute_plans_charter"), arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.CHARTER_ID), generated.jooq.keys.CHARTERS_PKEY, arrayOf(Charters.CHARTERS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_VESSEL: ForeignKey<CharterComputePlansRecord, VesselsRecord> = Internal.createForeignKey(CharterComputePlans.CHARTER_COMPUTE_PLANS, DSL.name("fk_compute_plans_vessel"), arrayOf(CharterComputePlans.CHARTER_COMPUTE_PLANS.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
 val CHARTER_PROJECTS__FK_CHARTER_PROJECTS_VESSEL: ForeignKey<CharterProjectsRecord, VesselsRecord> = Internal.createForeignKey(CharterProjects.CHARTER_PROJECTS, DSL.name("fk_charter_projects_vessel"), arrayOf(CharterProjects.CHARTER_PROJECTS.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val CHARTER_PROJECTS__FK_PROJECTS_CHARTER: ForeignKey<CharterProjectsRecord, ChartersRecord> = Internal.createForeignKey(CharterProjects.CHARTER_PROJECTS, DSL.name("fk_projects_charter"), arrayOf(CharterProjects.CHARTER_PROJECTS.CHARTER_ID), generated.jooq.keys.CHARTERS_PKEY, arrayOf(Charters.CHARTERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val CHARTERS__FK_CHARTERS_USER: ForeignKey<ChartersRecord, UsersRecord> = Internal.createForeignKey(Charters.CHARTERS, DSL.name("fk_charters_user"), arrayOf(Charters.CHARTERS.USER_ID), generated.jooq.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)

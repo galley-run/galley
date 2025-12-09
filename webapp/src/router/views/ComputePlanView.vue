@@ -163,6 +163,7 @@ import { storeToRefs } from 'pinia'
 import { useComputePlans } from '@/composables/useComputePlan.ts'
 import { computed, ref } from 'vue'
 import ConfirmDeleteComputePlanDialog from '@/components/Dialog/ConfirmDeleteComputePlanDialog.vue'
+import { toBytes } from '@/utils/bytes.ts'
 
 const projectStore = useProjectsStore()
 const { selectedCharterId } = storeToRefs(projectStore)
@@ -170,10 +171,32 @@ const { selectedCharterId } = storeToRefs(projectStore)
 const { computePlans } = useComputePlans()
 
 const computePlansApplications = computed(() =>
-  computePlans?.value?.filter((cp) => cp.attributes.application === 'applications' || cp.attributes.application === 'applications_databases'),
+  computePlans?.value
+    ?.filter((cp) => cp.attributes.application === 'applications' || cp.attributes.application === 'applications_databases')
+    .sort((a, b) => {
+      const cpuA = parseFloat(a.attributes.requests.cpu)
+      const cpuB = parseFloat(b.attributes.requests.cpu)
+      if (cpuA !== cpuB) {
+        return cpuA - cpuB
+      }
+      const memA = toBytes(a.attributes.requests.memory)
+      const memB = toBytes(b.attributes.requests.memory)
+      return memA - memB
+    }),
 )
 const computePlansDatabases = computed(() =>
-  computePlans?.value?.filter((cp) => cp.attributes.application === 'databases' || cp.attributes.application === 'applications_databases'),
+  computePlans?.value
+    ?.filter((cp) => cp.attributes.application === 'databases' || cp.attributes.application === 'applications_databases')
+    .sort((a, b) => {
+      const cpuA = parseFloat(a.attributes.requests.cpu)
+      const cpuB = parseFloat(b.attributes.requests.cpu)
+      if (cpuA !== cpuB) {
+        return cpuA - cpuB
+      }
+      const memA = toBytes(a.attributes.requests.memory)
+      const memB = toBytes(b.attributes.requests.memory)
+      return memA - memB
+    }),
 )
 
 const confirmDeleteDialog = ref<undefined | string>(undefined)

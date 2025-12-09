@@ -21,7 +21,7 @@ import nl.clicqo.ext.toUUID
 import nl.clicqo.web.HttpStatus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.data.CharterComputePlanDataVerticle
-import run.galley.cloud.model.toJsonAPIResourceObject
+import run.galley.cloud.model.toNestedJsonAPIResourceObject
 
 class CharterComputePlanControllerVerticle :
   ControllerVerticle(),
@@ -72,7 +72,7 @@ class CharterComputePlanControllerVerticle :
         .payload
         ?.toMany() ?: emptyList()
 
-    val dataResponse = JsonArray(computePlans.map { it.toJsonAPIResourceObject() })
+    val dataResponse = JsonArray(computePlans.map { it.toNestedJsonAPIResourceObject() })
 
     message.reply(EventBusApiResponse(dataResponse))
   }
@@ -102,7 +102,7 @@ class CharterComputePlanControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject()
+        ?.let { it.toNestedJsonAPIResourceObject() }
         ?: throw ApiStatusReplyException(ApiStatus.COMPUTE_PLAN_NOT_FOUND)
 
     message.reply(EventBusApiResponse(dataResponse))
@@ -119,7 +119,7 @@ class CharterComputePlanControllerVerticle :
 
     // Extract nested fields from the request body according to OpenAPI spec
     val requests = computePlan.getJsonObject("requests")
-    val limits = computePlan.getJsonObject("limits")
+    val limits = computePlan.getJsonObject("limits") ?: requests
     val billing = computePlan.getJsonObject("billing")
 
     // Flatten the nested structure for database storage
@@ -152,7 +152,7 @@ class CharterComputePlanControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject()
+        ?.toNestedJsonAPIResourceObject()
         ?: throw ApiStatusReplyException(ApiStatus.COMPUTE_PLAN_CREATE_FAILURE)
 
     message.reply(EventBusApiResponse(dataResponse, httpStatus = HttpStatus.Ok))
@@ -169,7 +169,7 @@ class CharterComputePlanControllerVerticle :
 
     // Extract and flatten nested fields if present
     val requests = computePlan.getJsonObject("requests")
-    val limits = computePlan.getJsonObject("limits")
+    val limits = computePlan.getJsonObject("limits") ?: requests
     val billing = computePlan.getJsonObject("billing")
 
     if (requests != null) {
@@ -210,7 +210,7 @@ class CharterComputePlanControllerVerticle :
         .body()
         .payload
         ?.toOne()
-        ?.toJsonAPIResourceObject()
+        ?.toNestedJsonAPIResourceObject()
         ?: throw ApiStatusReplyException(ApiStatus.COMPUTE_PLAN_NOT_FOUND)
 
     message.reply(EventBusApiResponse(dataResponse))

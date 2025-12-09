@@ -18,8 +18,9 @@
               <UILabel for="name" required>Name</UILabel>
               <UITextInput
                 required
+                name="name"
                 id="name"
-                placeholder="e.g. Compute Small or €5"
+                placeholder="e.g. Compute Small"
                 v-model="name"
               />
               <label for="name" class="form-field__error-message">
@@ -31,6 +32,7 @@
               <UILabel required for="application">Use for</UILabel>
               <UIDropDown
                 required
+                name="application"
                 placeholder="Compute plan may apply for..."
                 id="application"
                 v-model="application"
@@ -57,6 +59,7 @@
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
+                name="requestsCpu"
                 id="requestsCpu"
                 :items="cpuAutoComplete"
                 placeholder="e.g. 1"
@@ -75,6 +78,7 @@
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
+                name="requestsMemory"
                 :items="memoryAutoComplete"
                 id="requestsMemory"
                 placeholder="e.g. 512Mi or 1Gi"
@@ -96,7 +100,8 @@
         <div class="space-y-4" v-if="burstMode">
           <h6>Resource limits</h6>
           <p>
-            You can set resource limits, which your {{ getApplicationType(application).toLowerCase() }} can consume.<br />
+            You can set resource limits, which your
+            {{ getApplicationType(application).toLowerCase() }} can consume.<br />
             Resource limits can never be lower than the regular resource size.
           </p>
 
@@ -112,6 +117,7 @@
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
                 id="limitsCpu"
+                name="limitsCpu"
                 :min="requestsCpu"
                 :items="cpuAutoComplete"
                 :placeholder="advancedMode ? 'e.g. 1' : 'e.g. 1 vCPU'"
@@ -130,6 +136,7 @@
               <component
                 :is="advancedMode ? UITextInput : UIDropDown"
                 required
+                name="limitsMemory"
                 :min="requestsMemory"
                 :items="memoryAutoComplete"
                 id="limitsMemory"
@@ -141,40 +148,46 @@
           </div>
         </div>
 
-        <SlashesDivider class="opacity-30" />
+        <!--        TODO: Enable billing section once we have a proper billing solution and can handle multi currency .-->
+        <!--        <SlashesDivider class="opacity-30" />-->
 
-        <div class="space-y-4">
-          <h6>Billing</h6>
+        <!--        <div class="space-y-4">-->
+        <!--          <h6>Billing</h6>-->
 
-          <div class="grid grid-cols-2 gap-8">
-            <UIFormField class="col-span-2">
-              <UIToggle
-                id="billingEnabled"
-                label="Enable billing for this compute plan"
-                v-model="billingEnabled"
-              />
-            </UIFormField>
+        <!--          <div class="grid xl:grid-cols-4 gap-8">-->
+        <!--            <UIFormField>-->
+        <!--              <UIToggle-->
+        <!--                id="billingEnabled"-->
+        <!--                label="Enable billing for this compute plan"-->
+        <!--                name="billingEnabled"-->
+        <!--                v-model="billingEnabled"-->
+        <!--              />-->
+        <!--            </UIFormField>-->
 
-            <UIFormField v-if="billingEnabled">
-              <UILabel for="billingPeriod">Billing period</UILabel>
-              <UIDropDown
-                id="billingPeriod"
-                v-model="billingPeriod"
-                :items="[{ value: 'monthly', label: 'Monthly' }]"
-              />
-            </UIFormField>
+        <!--            <UIFormField v-if="billingEnabled">-->
+        <!--              <UILabel for="billingPeriod">Billing period</UILabel>-->
+        <!--              <UIDropDown-->
+        <!--                id="billingPeriod"-->
+        <!--                name="billingPeriod"-->
+        <!--                v-model="billingPeriod"-->
+        <!--                :items="[{ value: 'monthly', label: 'Monthly' }]"-->
+        <!--              />-->
+        <!--            </UIFormField>-->
 
-            <UIFormField v-if="billingEnabled">
-              <UILabel for="billingUnitPrice">Unit price</UILabel>
-              <UITextInput
-                id="billingUnitPrice"
-                placeholder="e.g. 5.50"
-                v-model="billingUnitPrice"
-              />
-              <label for="billingUnitPrice">Price per billing period</label>
-            </UIFormField>
-          </div>
-        </div>
+        <!--            <UIFormField v-if="billingEnabled">-->
+        <!--              <UILabel for="billingUnitPrice">Unit price</UILabel>-->
+        <!--              <UITextInput-->
+        <!--                id="billingUnitPrice"-->
+        <!--                name="billingUnitPrice"-->
+        <!--                leading-addon="&euro;"-->
+        <!--                format="money"-->
+        <!--                placeholder="e.g. 5.50"-->
+        <!--                v-model="billingUnitPrice"-->
+        <!--              />-->
+        <!--              <label for="billingUnitPrice">Price per billing period</label>-->
+        <!--            </UIFormField>-->
+        <!--          </div>-->
+        <!--        </div>-->
 
         <div v-if="error" class="alert alert--destructive flex items-center">
           <Danger />
@@ -184,7 +197,7 @@
         </div>
 
         <div class="card__footer form-footer">
-          <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" :to="backRoute">
+          <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" to="/charter/compute-plan">
             Back
           </UIButton>
           <UIButton
@@ -231,7 +244,7 @@
 import UILabel from '@/components/FormField/UILabel.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
 import UITextInput from '@/components/FormField/UITextInput.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import UIButton from '@/components/UIButton.vue'
 import LoadingIndicator from '@/assets/LoadingIndicator.vue'
 import { AddCircle, ArrowLeft, Danger } from '@solar-icons/vue'
@@ -239,7 +252,8 @@ import { useRoute, useRouter } from 'vue-router'
 import UIDropDown from '@/components/FormField/UIDropDown.vue'
 import UIToggle from '@/components/FormField/UIToggle.vue'
 import {
-  applicationTypes, getApplicationType,
+  applicationTypes,
+  getApplicationType,
   useComputePlanFormHelpers,
   useDeleteComputePlan,
   useSaveComputePlan,
@@ -248,13 +262,11 @@ import ConfirmDeleteComputePlanDialog from '@/components/Dialog/ConfirmDeleteCom
 import type { ApiError } from '@/utils/registerAxios.ts'
 import ResourceRecommendationsChefDialog from '@/components/Dialog/ResourceRecommendationsChefDialog.vue'
 import ResourceLimitsRecommendationsChefDialog from '@/components/Dialog/ResourceLimitsRecommendationsChefDialog.vue'
-import SlashesDivider from '@/assets/SlashesDivider.vue'
 
 const formRef = ref<HTMLFormElement | null>(null)
 const confirmDelete = ref(false)
 const error = ref<string | null>(null)
 const advancedMode = ref(false)
-const burstMode = ref(false)
 const showResourceChefRecommendations = ref(false)
 const showResourceLimitsChefRecommendations = ref(false)
 
@@ -264,13 +276,6 @@ const computePlanId = computed(() => route.params.computePlanId as string | unde
 const charterId = computed(() => route.params.charterId as string | undefined)
 const vesselId = computed(() => route.params.vesselId as string | undefined)
 
-const backRoute = computed(() => {
-  if (charterId.value && vesselId.value) {
-    return `/vessel/${vesselId.value}/charter/${charterId.value}/compute-plans`
-  }
-  return '/dashboard'
-})
-
 const {
   name,
   application,
@@ -278,11 +283,20 @@ const {
   requestsMemory,
   limitsCpu,
   limitsMemory,
-  billingEnabled,
-  billingPeriod,
-  billingUnitPrice,
+  burstMode,
   saveComputePlan,
 } = useComputePlanFormHelpers(computePlanId, charterId, vesselId)
+
+watch(
+  burstMode,
+  (value) => {
+    if (!value) {
+      limitsCpu.value = undefined
+      limitsMemory.value = undefined
+    }
+  },
+  { immediate: true },
+)
 
 const { isPending: saveIsPending } = useSaveComputePlan(computePlanId, charterId, vesselId)
 const { isPending: deleteIsPending } = useDeleteComputePlan(charterId, vesselId)
@@ -322,7 +336,7 @@ async function onSubmit() {
 
   try {
     await saveComputePlan()
-    await router.push(backRoute.value)
+    await router.push('/charter/compute-plan')
   } catch (e) {
     const apiError = e as ApiError
     error.value = apiError?.message || 'Something went wrong. Please try again later.'
@@ -330,7 +344,7 @@ async function onSubmit() {
 }
 
 async function onDelete() {
-  await router.push(backRoute.value)
+  await router.push('/charter/compute-plan')
 }
 
 function toggleResourceChefRecommendations() {

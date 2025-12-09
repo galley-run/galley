@@ -2050,13 +2050,18 @@ components:
           examples:
             - true
         period:
-          type: string
+          type:
+            - string
+            - 'null'
           enum:
             - monthly
+            - null
           examples:
             - monthly
         unitPrice:
-          type: string
+          type:
+            - string
+            - 'null'
           examples:
             - '5.50'
       description: A simplified representation of Compute billing specification

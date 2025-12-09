@@ -36,7 +36,7 @@
           </tr>
           <tr>
             <th>Postgres</th>
-            <td>2+</td>
+            <td>1+</td>
             <td>2 - 4 GiB</td>
           </tr>
           <tr>
@@ -51,7 +51,7 @@
             <td colspan="3">WiredTiger (MongoDB’s engine) cache benefits from some more memory.</td>
           </tr>
           <tr>
-            <th>Redis</th>
+            <th>Redis / SQLite</th>
             <td>0.5 - 1</td>
             <td>512 MiB - 2 GiB</td>
           </tr>

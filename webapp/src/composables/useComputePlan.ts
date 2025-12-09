@@ -1,5 +1,5 @@
 import { type MaybeRefOrGetter, ref, watch } from 'vue'
-import type { ComputePlan } from '@/types/api/charter'
+import type { ComputePlan } from '@/types/api/computePlan'
 import { useCharterResource } from './useCharterResource'
 
 // Compute plan-specific types based on OpenAPI spec
@@ -131,13 +131,14 @@ export function useComputePlanFormHelpers(
   const application = ref<'applications' | 'databases' | 'applications_databases' | null>(
     'applications_databases',
   )
-  const requestsCpu = ref('1')
-  const requestsMemory = ref('512M')
-  const limitsCpu = ref<string | undefined>(undefined)
-  const limitsMemory = ref<string | undefined>(undefined)
+  const requestsCpu = ref('0.25')
+  const requestsMemory = ref('128Mi')
+  const limitsCpu = ref<string | undefined>('0.25')
+  const limitsMemory = ref<string | undefined>('128Mi')
   const billingEnabled = ref(false)
   const billingPeriod = ref<'monthly'>('monthly')
   const billingUnitPrice = ref<string | undefined>(undefined)
+  const burstMode = ref(false)
 
   const { saveComputePlan } = useSaveComputePlan(computePlanId, charterId, vesselId)
   const { computePlan } = useComputePlan(computePlanId, charterId, vesselId)
@@ -156,6 +157,8 @@ export function useComputePlanFormHelpers(
         billingEnabled.value = data.attributes.billing?.enabled || false
         billingPeriod.value = data.attributes.billing?.period || 'monthly'
         billingUnitPrice.value = data.attributes.billing?.unitPrice
+
+        burstMode.value = !(data.attributes.requests.cpu === data.attributes?.limits?.cpu && data.attributes.requests.memory === data.attributes?.limits?.memory)
       }
     },
     { immediate: true },
@@ -194,5 +197,6 @@ export function useComputePlanFormHelpers(
     billingEnabled,
     billingPeriod,
     billingUnitPrice,
+    burstMode,
   }
 }

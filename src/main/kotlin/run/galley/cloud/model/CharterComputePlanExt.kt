@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject
  * Converts a CharterComputePlans POJO to JSON API resource object with nested structure
  * according to the OpenAPI specification.
  */
-fun CharterComputePlans.toJsonAPIResourceObject(): JsonObject {
+fun CharterComputePlans.toNestedJsonAPIResourceObject(): JsonObject {
   val attributes =
     JsonObject()
       .put("vesselId", this.vesselId?.toString())

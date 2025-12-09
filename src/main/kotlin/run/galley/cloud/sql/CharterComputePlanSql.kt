@@ -16,6 +16,7 @@ import org.jooq.Condition
 import org.jooq.Query
 import org.jooq.impl.DSL.currentOffsetDateTime
 import run.galley.cloud.ApiStatus
+import run.galley.cloud.model.factory.CharterComputePlanFactory
 import java.util.UUID
 
 object CharterComputePlanSql {
@@ -44,22 +45,12 @@ object CharterComputePlanSql {
 
     return Jooq.postgres
       .insertInto(CHARTER_COMPUTE_PLANS)
-      .set(
-        mapOf(
-          CHARTER_COMPUTE_PLANS.VESSEL_ID to payload.getUUID(CHARTER_COMPUTE_PLANS.VESSEL_ID.name),
-          CHARTER_COMPUTE_PLANS.CHARTER_ID to payload.getUUID(CHARTER_COMPUTE_PLANS.CHARTER_ID.name),
-          CHARTER_COMPUTE_PLANS.NAME to payload.getString(CHARTER_COMPUTE_PLANS.NAME.name),
-          CHARTER_COMPUTE_PLANS.APPLICATION to payload.getString(CHARTER_COMPUTE_PLANS.APPLICATION.name),
-          CHARTER_COMPUTE_PLANS.REQUESTS_CPU to payload.getString(CHARTER_COMPUTE_PLANS.REQUESTS_CPU.name),
-          CHARTER_COMPUTE_PLANS.REQUESTS_MEMORY to payload.getString(CHARTER_COMPUTE_PLANS.REQUESTS_MEMORY.name),
-          CHARTER_COMPUTE_PLANS.LIMITS_CPU to payload.getString(CHARTER_COMPUTE_PLANS.LIMITS_CPU.name),
-          CHARTER_COMPUTE_PLANS.LIMITS_MEMORY to payload.getString(CHARTER_COMPUTE_PLANS.LIMITS_MEMORY.name),
-          CHARTER_COMPUTE_PLANS.BILLING_ENABLED to payload.getBoolean(CHARTER_COMPUTE_PLANS.BILLING_ENABLED.name),
-          CHARTER_COMPUTE_PLANS.BILLING_PERIOD to payload.getString(CHARTER_COMPUTE_PLANS.BILLING_PERIOD.name),
-          CHARTER_COMPUTE_PLANS.BILLING_UNIT_PRICE to payload.getString(CHARTER_COMPUTE_PLANS.BILLING_UNIT_PRICE.name),
-        ),
-      ).returning()
+      .set(CharterComputePlanFactory.toRecord(payload))
+      .returning()
   }
+
+  fun createComputePlans(computePlans: List<CharterComputePlansRecord>): Query =
+    Jooq.postgres.insertInto(CHARTER_COMPUTE_PLANS).set(computePlans)
 
   fun patchComputePlan(request: EventBusCmdDataRequest): Query {
     val payload = request.payload?.keysToSnakeCase() ?: throw ApiStatus.REQUEST_BODY_MISSING
@@ -67,9 +58,8 @@ object CharterComputePlanSql {
 
     return Jooq.postgres
       .update(CHARTER_COMPUTE_PLANS)
-      .set(
-        payload.toRecord<CharterComputePlansRecord>(CHARTER_COMPUTE_PLANS),
-      ).where(CHARTER_COMPUTE_PLANS.ID.eq(identifier))
+      .set(CharterComputePlanFactory.toRecord(payload))
+      .where(CHARTER_COMPUTE_PLANS.ID.eq(identifier))
       .applyConditions(
         requiredConditions = listOf(CHARTER_COMPUTE_PLANS.VESSEL_ID, CHARTER_COMPUTE_PLANS.CHARTER_ID),
         *buildConditions(request.filters),

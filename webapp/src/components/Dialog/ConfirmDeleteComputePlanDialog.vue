@@ -32,7 +32,7 @@ import { useDeleteComputePlan } from '@/composables/useComputePlan.ts'
 import { ref } from 'vue'
 import type { ApiError } from '@/utils/registerAxios.ts'
 
-const { show, computePlanId } = defineProps<{ show: boolean; computePlanId: string | null }>()
+const { show, computePlanId } = defineProps<{ show: boolean; computePlanId: string | undefined }>()
 const emit = defineEmits<{ (e: 'close'): void; (e: 'confirm'): void }>()
 
 const error = ref<string | null>(null)

@@ -201,6 +201,8 @@ fun <R : Record?> SelectConditionStep<R>.applyPagination(
  * @param R the jOOQ Record type to create
  * @param table the jOOQ Table instance to create a new record from
  * @return a new Record instance with fields populated from the JsonObject
+ *
+ * @deprecated Create a Factory.toRecord() instead
  */
 fun <R : TableRecordImpl<R>> JsonObject.toRecord(table: org.jooq.Table<R>): R {
   val record = table.newRecord()

@@ -8,7 +8,7 @@ import generated.jooq.Public
 import generated.jooq.indexes.IDX_COMPUTE_PLANS_CHARTER
 import generated.jooq.indexes.IDX_COMPUTE_PLANS_DELETED
 import generated.jooq.indexes.IDX_COMPUTE_PLANS_VESSEL
-import generated.jooq.indexes.UQ_COMPUTE_PLANS_CHARTER_NAME
+import generated.jooq.indexes.UQ_COMPUTE_PLANS_CHARTER_APPLICATION_NAME
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS_PKEY
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_VESSEL
@@ -187,7 +187,7 @@ open class CharterComputePlans(
         override fun `as`(alias: Table<*>): CharterComputePlansPath = CharterComputePlansPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_COMPUTE_PLANS_CHARTER, IDX_COMPUTE_PLANS_DELETED, IDX_COMPUTE_PLANS_VESSEL, UQ_COMPUTE_PLANS_CHARTER_NAME)
+    override fun getIndexes(): List<Index> = listOf(IDX_COMPUTE_PLANS_CHARTER, IDX_COMPUTE_PLANS_DELETED, IDX_COMPUTE_PLANS_VESSEL, UQ_COMPUTE_PLANS_CHARTER_APPLICATION_NAME)
     override fun getPrimaryKey(): UniqueKey<CharterComputePlansRecord> = CHARTER_COMPUTE_PLANS_PKEY
     override fun getReferences(): List<ForeignKey<CharterComputePlansRecord, *>> = listOf(CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER, CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_VESSEL)
 

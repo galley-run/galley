@@ -768,14 +768,11 @@ paths:
             application/vnd.galley.v1+json:
               schema:
                 type: object
-                title: CreateComputePlan
                 required:
                   - data
                 properties:
                   data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ComputePlan'
+                    $ref: '#/components/schemas/ComputePlan'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

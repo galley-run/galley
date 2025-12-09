@@ -6,6 +6,8 @@ package generated.jooq.tables.records
 
 import generated.jooq.tables.ProjectApplications
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -51,6 +53,30 @@ open class ProjectApplicationsRecord() : UpdatableRecordImpl<ProjectApplications
         set(value): Unit = set(7, value)
         get(): OffsetDateTime? = get(7) as OffsetDateTime?
 
+    open var charterComputePlanId: UUID?
+        set(value): Unit = set(8, value)
+        get(): UUID? = get(8) as UUID?
+
+    open var description: String?
+        set(value): Unit = set(9, value)
+        get(): String? = get(9) as String?
+
+    open var labels: ClusterSerializable?
+        set(value): Unit = set(10, value)
+        get(): ClusterSerializable? = get(10) as ClusterSerializable?
+
+    open var annotations: ClusterSerializable?
+        set(value): Unit = set(11, value)
+        get(): ClusterSerializable? = get(11) as ClusterSerializable?
+
+    open var deployment: ClusterSerializable?
+        set(value): Unit = set(12, value)
+        get(): ClusterSerializable? = get(12) as ClusterSerializable?
+
+    open var pod: ClusterSerializable?
+        set(value): Unit = set(13, value)
+        get(): ClusterSerializable? = get(13) as ClusterSerializable?
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -60,7 +86,7 @@ open class ProjectApplicationsRecord() : UpdatableRecordImpl<ProjectApplications
     /**
      * Create a detached, initialised ProjectApplicationsRecord
      */
-    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, name: String? = null, slug: String? = null, createdAt: OffsetDateTime? = null, deletedAt: OffsetDateTime? = null): this() {
+    constructor(id: UUID? = null, vesselId: UUID? = null, charterId: UUID? = null, projectId: UUID? = null, name: String? = null, slug: String? = null, createdAt: OffsetDateTime? = null, deletedAt: OffsetDateTime? = null, charterComputePlanId: UUID? = null, description: String? = null, labels: ClusterSerializable? = null, annotations: ClusterSerializable? = null, deployment: ClusterSerializable? = null, pod: ClusterSerializable? = null): this() {
         this.id = id
         this.vesselId = vesselId
         this.charterId = charterId
@@ -69,6 +95,12 @@ open class ProjectApplicationsRecord() : UpdatableRecordImpl<ProjectApplications
         this.slug = slug
         this.createdAt = createdAt
         this.deletedAt = deletedAt
+        this.charterComputePlanId = charterComputePlanId
+        this.description = description
+        this.labels = labels
+        this.annotations = annotations
+        this.deployment = deployment
+        this.pod = pod
         resetTouchedOnNotNull()
     }
 
@@ -85,6 +117,12 @@ open class ProjectApplicationsRecord() : UpdatableRecordImpl<ProjectApplications
             this.slug = value.slug
             this.createdAt = value.createdAt
             this.deletedAt = value.deletedAt
+            this.charterComputePlanId = value.charterComputePlanId
+            this.description = value.description
+            this.labels = value.labels
+            this.annotations = value.annotations
+            this.deployment = value.deployment
+            this.pod = value.pod
             resetTouchedOnNotNull()
         }
     }

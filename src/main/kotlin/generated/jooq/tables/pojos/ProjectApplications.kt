@@ -4,6 +4,8 @@
 package generated.jooq.tables.pojos
 
 
+import io.vertx.core.shareddata.ClusterSerializable
+
 import java.io.Serializable
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -23,7 +25,13 @@ data class ProjectApplications(
     var name: String? = null,
     var slug: String? = null,
     var createdAt: OffsetDateTime? = null,
-    var deletedAt: OffsetDateTime? = null
+    var deletedAt: OffsetDateTime? = null,
+    var charterComputePlanId: UUID? = null,
+    var description: String? = null,
+    var labels: ClusterSerializable? = null,
+    var annotations: ClusterSerializable? = null,
+    var deployment: ClusterSerializable? = null,
+    var pod: ClusterSerializable? = null
 ): BaseModel, Serializable {
 
 
@@ -83,6 +91,42 @@ data class ProjectApplications(
         }
         else if (this.deletedAt != o.deletedAt)
             return false
+        if (this.charterComputePlanId == null) {
+            if (o.charterComputePlanId != null)
+                return false
+        }
+        else if (this.charterComputePlanId != o.charterComputePlanId)
+            return false
+        if (this.description == null) {
+            if (o.description != null)
+                return false
+        }
+        else if (this.description != o.description)
+            return false
+        if (this.labels == null) {
+            if (o.labels != null)
+                return false
+        }
+        else if (this.labels != o.labels)
+            return false
+        if (this.annotations == null) {
+            if (o.annotations != null)
+                return false
+        }
+        else if (this.annotations != o.annotations)
+            return false
+        if (this.deployment == null) {
+            if (o.deployment != null)
+                return false
+        }
+        else if (this.deployment != o.deployment)
+            return false
+        if (this.pod == null) {
+            if (o.pod != null)
+                return false
+        }
+        else if (this.pod != o.pod)
+            return false
         return true
     }
 
@@ -97,6 +141,12 @@ data class ProjectApplications(
         result = prime * result + (if (this.slug == null) 0 else this.slug.hashCode())
         result = prime * result + (if (this.createdAt == null) 0 else this.createdAt.hashCode())
         result = prime * result + (if (this.deletedAt == null) 0 else this.deletedAt.hashCode())
+        result = prime * result + (if (this.charterComputePlanId == null) 0 else this.charterComputePlanId.hashCode())
+        result = prime * result + (if (this.description == null) 0 else this.description.hashCode())
+        result = prime * result + (if (this.labels == null) 0 else this.labels.hashCode())
+        result = prime * result + (if (this.annotations == null) 0 else this.annotations.hashCode())
+        result = prime * result + (if (this.deployment == null) 0 else this.deployment.hashCode())
+        result = prime * result + (if (this.pod == null) 0 else this.pod.hashCode())
         return result
     }
 
@@ -111,6 +161,12 @@ data class ProjectApplications(
         sb.append(", ").append(slug)
         sb.append(", ").append(createdAt)
         sb.append(", ").append(deletedAt)
+        sb.append(", ").append(charterComputePlanId)
+        sb.append(", ").append(description)
+        sb.append(", ").append(labels)
+        sb.append(", ").append(annotations)
+        sb.append(", ").append(deployment)
+        sb.append(", ").append(pod)
 
         sb.append(")")
         return sb.toString()

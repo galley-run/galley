@@ -53,6 +53,7 @@ val IDX_APP_CHARTER: Index = Internal.createIndex(DSL.name("idx_app_charter"), P
 val IDX_APP_DELETED: Index = Internal.createIndex(DSL.name("idx_app_deleted"), ProjectApplications.PROJECT_APPLICATIONS, arrayOf(ProjectApplications.PROJECT_APPLICATIONS.DELETED_AT), false)
 val IDX_APP_PROJECT: Index = Internal.createIndex(DSL.name("idx_app_project"), ProjectApplications.PROJECT_APPLICATIONS, arrayOf(ProjectApplications.PROJECT_APPLICATIONS.PROJECT_ID), false)
 val IDX_APP_VESSEL: Index = Internal.createIndex(DSL.name("idx_app_vessel"), ProjectApplications.PROJECT_APPLICATIONS, arrayOf(ProjectApplications.PROJECT_APPLICATIONS.VESSEL_ID), false)
+val IDX_APPLICATIONS_CHARTER_COMPUTE_PLAN_ID: Index = Internal.createIndex(DSL.name("idx_applications_charter_compute_plan_id"), ProjectApplications.PROJECT_APPLICATIONS, arrayOf(ProjectApplications.PROJECT_APPLICATIONS.CHARTER_COMPUTE_PLAN_ID), false)
 val IDX_CCM_CHARTER: Index = Internal.createIndex(DSL.name("idx_ccm_charter"), CrewCharterMember.CREW_CHARTER_MEMBER, arrayOf(CrewCharterMember.CREW_CHARTER_MEMBER.CHARTER_ID), false)
 val IDX_CCM_CHARTER_ROLE: Index = Internal.createIndex(DSL.name("idx_ccm_charter_role"), CrewCharterMember.CREW_CHARTER_MEMBER, arrayOf(CrewCharterMember.CREW_CHARTER_MEMBER.CHARTER_ID, CrewCharterMember.CREW_CHARTER_MEMBER.CHARTER_ROLE), false)
 val IDX_CCM_CREW: Index = Internal.createIndex(DSL.name("idx_ccm_crew"), CrewCharterMember.CREW_CHARTER_MEMBER, arrayOf(CrewCharterMember.CREW_CHARTER_MEMBER.CREW_ID), false)

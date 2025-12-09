@@ -12,7 +12,9 @@ import generated.jooq.indexes.UQ_COMPUTE_PLANS_CHARTER_APPLICATION_NAME
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS_PKEY
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_CHARTER
 import generated.jooq.keys.CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_VESSEL
+import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APPLICATIONS_CHARTER_COMPUTE_PLAN
 import generated.jooq.tables.Charters.ChartersPath
+import generated.jooq.tables.ProjectApplications.ProjectApplicationsPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.CharterComputePlansRecord
 
@@ -202,6 +204,22 @@ open class CharterComputePlans(
      */
     fun vessels(): VesselsPath = vessels
     val vessels: VesselsPath by lazy { VesselsPath(this, CHARTER_COMPUTE_PLANS__FK_COMPUTE_PLANS_VESSEL, null) }
+
+    private lateinit var _projectApplications: ProjectApplicationsPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.project_applications</code> table
+     */
+    fun projectApplications(): ProjectApplicationsPath {
+        if (!this::_projectApplications.isInitialized)
+            _projectApplications = ProjectApplicationsPath(this, null, PROJECT_APPLICATIONS__FK_APPLICATIONS_CHARTER_COMPUTE_PLAN.inverseKey)
+
+        return _projectApplications;
+    }
+
+    val projectApplications: ProjectApplicationsPath
+        get(): ProjectApplicationsPath = projectApplications()
     override fun `as`(alias: String): CharterComputePlans = CharterComputePlans(DSL.name(alias), this)
     override fun `as`(alias: Name): CharterComputePlans = CharterComputePlans(alias, this)
     override fun `as`(alias: Table<*>): CharterComputePlans = CharterComputePlans(alias.qualifiedName, this)

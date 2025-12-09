@@ -5,25 +5,32 @@ package generated.jooq.tables
 
 
 import generated.jooq.Public
+import generated.jooq.indexes.IDX_APPLICATIONS_CHARTER_COMPUTE_PLAN_ID
 import generated.jooq.indexes.IDX_APP_CHARTER
 import generated.jooq.indexes.IDX_APP_DELETED
 import generated.jooq.indexes.IDX_APP_PROJECT
 import generated.jooq.indexes.IDX_APP_VESSEL
 import generated.jooq.indexes.UQ_PROJECT_SLUG
 import generated.jooq.keys.PROJECT_APPLICATIONS_PKEY
+import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APPLICATIONS_CHARTER_COMPUTE_PLAN
 import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APP_CHARTER
 import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APP_PROJECT
 import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APP_VESSEL
+import generated.jooq.tables.CharterComputePlans.CharterComputePlansPath
 import generated.jooq.tables.CharterProjects.CharterProjectsPath
 import generated.jooq.tables.Charters.ChartersPath
 import generated.jooq.tables.Vessels.VesselsPath
 import generated.jooq.tables.records.ProjectApplicationsRecord
+
+import io.vertx.core.shareddata.ClusterSerializable
 
 import java.time.OffsetDateTime
 import java.util.UUID
 
 import kotlin.collections.Collection
 import kotlin.collections.List
+
+import nl.clicqo.data.JooqJsonbObjectBinding
 
 import org.jooq.Condition
 import org.jooq.Field
@@ -126,6 +133,37 @@ open class ProjectApplications(
      */
     val DELETED_AT: TableField<ProjectApplicationsRecord, OffsetDateTime?> = createField(DSL.name("deleted_at"), SQLDataType.TIMESTAMPWITHTIMEZONE(6), this, "")
 
+    /**
+     * The column
+     * <code>public.project_applications.charter_compute_plan_id</code>.
+     */
+    val CHARTER_COMPUTE_PLAN_ID: TableField<ProjectApplicationsRecord, UUID?> = createField(DSL.name("charter_compute_plan_id"), SQLDataType.UUID, this, "")
+
+    /**
+     * The column <code>public.project_applications.description</code>.
+     */
+    val DESCRIPTION: TableField<ProjectApplicationsRecord, String?> = createField(DSL.name("description"), SQLDataType.CLOB, this, "")
+
+    /**
+     * The column <code>public.project_applications.labels</code>.
+     */
+    val LABELS: TableField<ProjectApplicationsRecord, ClusterSerializable?> = createField(DSL.name("labels"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
+
+    /**
+     * The column <code>public.project_applications.annotations</code>.
+     */
+    val ANNOTATIONS: TableField<ProjectApplicationsRecord, ClusterSerializable?> = createField(DSL.name("annotations"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
+
+    /**
+     * The column <code>public.project_applications.deployment</code>.
+     */
+    val DEPLOYMENT: TableField<ProjectApplicationsRecord, ClusterSerializable?> = createField(DSL.name("deployment"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
+
+    /**
+     * The column <code>public.project_applications.pod</code>.
+     */
+    val POD: TableField<ProjectApplicationsRecord, ClusterSerializable?> = createField(DSL.name("pod"), SQLDataType.JSONB, this, "", JooqJsonbObjectBinding())
+
     private constructor(alias: Name, aliased: Table<ProjectApplicationsRecord>?): this(alias, null, null, null, aliased, null, null)
     private constructor(alias: Name, aliased: Table<ProjectApplicationsRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
     private constructor(alias: Name, aliased: Table<ProjectApplicationsRecord>?, where: Condition?): this(alias, null, null, null, aliased, null, where)
@@ -160,9 +198,9 @@ open class ProjectApplications(
         override fun `as`(alias: Table<*>): ProjectApplicationsPath = ProjectApplicationsPath(alias.qualifiedName, this)
     }
     override fun getSchema(): Schema? = if (aliased()) null else Public.PUBLIC
-    override fun getIndexes(): List<Index> = listOf(IDX_APP_CHARTER, IDX_APP_DELETED, IDX_APP_PROJECT, IDX_APP_VESSEL, UQ_PROJECT_SLUG)
+    override fun getIndexes(): List<Index> = listOf(IDX_APP_CHARTER, IDX_APP_DELETED, IDX_APP_PROJECT, IDX_APP_VESSEL, IDX_APPLICATIONS_CHARTER_COMPUTE_PLAN_ID, UQ_PROJECT_SLUG)
     override fun getPrimaryKey(): UniqueKey<ProjectApplicationsRecord> = PROJECT_APPLICATIONS_PKEY
-    override fun getReferences(): List<ForeignKey<ProjectApplicationsRecord, *>> = listOf(PROJECT_APPLICATIONS__FK_APP_CHARTER, PROJECT_APPLICATIONS__FK_APP_PROJECT, PROJECT_APPLICATIONS__FK_APP_VESSEL)
+    override fun getReferences(): List<ForeignKey<ProjectApplicationsRecord, *>> = listOf(PROJECT_APPLICATIONS__FK_APP_CHARTER, PROJECT_APPLICATIONS__FK_APP_PROJECT, PROJECT_APPLICATIONS__FK_APP_VESSEL, PROJECT_APPLICATIONS__FK_APPLICATIONS_CHARTER_COMPUTE_PLAN)
 
     /**
      * Get the implicit join path to the <code>public.charters</code> table.
@@ -182,6 +220,13 @@ open class ProjectApplications(
      */
     fun vessels(): VesselsPath = vessels
     val vessels: VesselsPath by lazy { VesselsPath(this, PROJECT_APPLICATIONS__FK_APP_VESSEL, null) }
+
+    /**
+     * Get the implicit join path to the
+     * <code>public.charter_compute_plans</code> table.
+     */
+    fun charterComputePlans(): CharterComputePlansPath = charterComputePlans
+    val charterComputePlans: CharterComputePlansPath by lazy { CharterComputePlansPath(this, PROJECT_APPLICATIONS__FK_APPLICATIONS_CHARTER_COMPUTE_PLAN, null) }
     override fun `as`(alias: String): ProjectApplications = ProjectApplications(DSL.name(alias), this)
     override fun `as`(alias: Name): ProjectApplications = ProjectApplications(alias, this)
     override fun `as`(alias: Table<*>): ProjectApplications = ProjectApplications(alias.qualifiedName, this)

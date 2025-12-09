@@ -1010,6 +1010,152 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/projects/{projectId}/applications:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - $ref: '#/components/parameters/projectId'
+    get:
+      tags:
+        - project/applications
+      summary: List applications for project
+      operationId: listApplicationsForProject
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                title: ListApplications
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ApplicationSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - project/applications
+      summary: Create application
+      operationId: createApplication
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        description: Application creation data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreate'
+      responses:
+        '201':
+          description: The request was successful, and a new resource was created.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Application'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/projects/{projectId}/applications/{applicationId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/applicationId'
+    get:
+      tags:
+        - project/applications
+      summary: Get application by ID
+      operationId: getApplication
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the requested resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Application'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - project/applications
+      summary: Update application
+      operationId: updateApplication
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        description: Application update data
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdate'
+      responses:
+        '200':
+          description: The request was successful, and the server has returned the updated resource in the response body.
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Application'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -2350,6 +2496,792 @@ components:
           examples:
             - Updated web application
       additionalProperties: false
+    ApplicationSummary:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - Application
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - projectId
+                - name
+                - slug
+              properties:
+                vesselId:
+                  type: string
+                  format: uuid
+                charterId:
+                  type: string
+                  format: uuid
+                projectId:
+                  type: string
+                  format: uuid
+                computePlanId:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type:
+                    - string
+                    - 'null'
+                labels:
+                  type:
+                    - object
+                    - 'null'
+                annotations:
+                  type:
+                    - object
+                    - 'null'
+                createdAt:
+                  type: string
+                  format: date-time
+                deletedAt:
+                  type: string
+                  format: date-time
+    DeploymentSpec:
+      type: object
+      description: A Galley representation of a Kubernetes deployment
+      properties:
+        replicas:
+          type: number
+          examples:
+            - 1
+        strategy:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - RollingUpdate
+                - Recreate
+            rollingUpdate:
+              type:
+                - 'null'
+                - object
+              properties:
+                maxUnavailable:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - '1'
+                    - 25%
+                maxSurge:
+                  type:
+                    - string
+                    - 'null'
+                  examples:
+                    - '1'
+                    - 25%
+        minReadySeconds:
+          type:
+            - 'null'
+            - number
+        revisionHistoryLimit:
+          type:
+            - 'null'
+            - number
+        progressDeadlineSeconds:
+          type:
+            - 'null'
+            - number
+        autoscaling:
+          type:
+            - 'null'
+            - object
+          properties:
+            enabled:
+              type: boolean
+            minReplicas:
+              type: number
+            maxReplicas:
+              type: number
+            targetCpuUtilizationPercentage:
+              type:
+                - number
+                - 'null'
+            targetMemoryUtilizationPercentage:
+              type:
+                - number
+                - 'null'
+    ContainerSpec:
+      type: object
+      description: A Galley representation of a Kubernetes container
+      properties:
+        name:
+          type: string
+        image:
+          type: string
+          description: Full container image reference, e.g. ghcr.io/org/image:tag.
+        imageTag:
+          type:
+            - 'null'
+            - string
+          description: Optional image tag if you prefer to store it separate from image.
+        imagePullPolicy:
+          type:
+            - 'null'
+            - string
+          enum:
+            - Always
+            - IfNotPresent
+            - Never
+        command:
+          type:
+            - 'null'
+            - array
+          items:
+            type: string
+          description: Override container ENTRYPOINT.
+        args:
+          type:
+            - 'null'
+            - array
+          items:
+            type: string
+          description: Override container CMD.
+        workingDir:
+          type:
+            - 'null'
+            - string
+        ports:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            properties:
+              name:
+                type:
+                  - 'null'
+                  - string
+              containerPort:
+                type: number
+              protocol:
+                type:
+                  - 'null'
+                  - string
+                enum:
+                  - TCP
+                  - UDP
+                  - SCTP
+        env:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            description: A single environment variable definition.
+            properties:
+              name:
+                type: string
+              value:
+                type:
+                  - 'null'
+                  - string
+              valueFrom:
+                type:
+                  - 'null'
+                  - object
+                description: |
+                  Reference to external sources for this env var, mirroring core/v1.EnvVarSource.
+                properties:
+                  configMapKeyRef:
+                    type:
+                      - 'null'
+                      - object
+                    properties:
+                      name:
+                        type:
+                          - 'null'
+                          - string
+                      key:
+                        type: string
+                      optional:
+                        type:
+                          - 'null'
+                          - boolean
+                  secretKeyRef:
+                    type:
+                      - 'null'
+                      - object
+                    properties:
+                      name:
+                        type:
+                          - 'null'
+                          - string
+                      key:
+                        type: string
+                      optional:
+                        type:
+                          - 'null'
+                          - boolean
+                  fieldRef:
+                    type:
+                      - 'null'
+                      - object
+                    description: |
+                      Reference to a field of the pod (e.g. metadata.name). Free-form object mirroring core/v1.ObjectFieldSelector.
+                  resourceFieldRef:
+                    type:
+                      - 'null'
+                      - object
+                    description: |
+                      Reference to container resources (e.g. limits.cpu). Free-form object mirroring core/v1.ResourceFieldSelector.
+        envFrom:
+          type:
+            - 'null'
+            - object
+          description: Attach all keys from selected ConfigMaps and Secrets as environment variables.
+          properties:
+            configMaps:
+              type:
+                - 'null'
+                - array
+              items:
+                type: string
+            secrets:
+              type:
+                - 'null'
+                - array
+              items:
+                type: string
+        resources:
+          type:
+            - 'null'
+            - object
+          description: Container-level resource requests and limits.
+          properties:
+            requests:
+              type:
+                - 'null'
+                - object
+              properties:
+                cpu:
+                  type:
+                    - 'null'
+                    - string
+                  examples:
+                    - 250m
+                    - '1'
+                memory:
+                  type:
+                    - 'null'
+                    - string
+                  examples:
+                    - 256Mi
+                    - 1Gi
+            limits:
+              type:
+                - 'null'
+                - object
+              properties:
+                cpu:
+                  type:
+                    - 'null'
+                    - string
+                memory:
+                  type:
+                    - 'null'
+                    - string
+        volumeMounts:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              mountPath:
+                type: string
+              readOnly:
+                type:
+                  - 'null'
+                  - boolean
+              subPath:
+                type:
+                  - 'null'
+                  - string
+        livenessProbe:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes liveness probe configuration. Free-form object mirroring core/v1.Probe.
+        readinessProbe:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes readiness probe configuration. Free-form object mirroring core/v1.Probe.
+        startupProbe:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes startup probe configuration. Free-form object mirroring core/v1.Probe.
+        lifecycle:
+          type:
+            - 'null'
+            - object
+          description: |
+            Container lifecycle hooks (postStart, preStop). Free-form object mirroring core/v1.Lifecycle.
+        securityContext:
+          type:
+            - 'null'
+            - object
+          description: |
+            Container-level securityContext. Free-form object mirroring core/v1.SecurityContext.
+      required:
+        - name
+        - image
+    VolumeSpec:
+      type: object
+      description: A Galley representation of a Kubernetes Volume
+      properties:
+        type:
+          type: string
+          enum:
+            - persistent
+            - configMap
+            - secret
+            - emptyDir
+        name:
+          type: string
+          description: Name of the volume. Must match volumeMount.name in a container.
+        persistent:
+          type:
+            - 'null'
+            - object
+          description: Persistent volume backed by a PersistentVolumeClaim.
+          properties:
+            claimName:
+              type: string
+            readOnly:
+              type:
+                - 'null'
+                - boolean
+        configMap:
+          type:
+            - 'null'
+            - object
+          description: Volume populated from a ConfigMap.
+          properties:
+            configMapName:
+              type: string
+            defaultMode:
+              type:
+                - 'null'
+                - number
+            optional:
+              type:
+                - 'null'
+                - boolean
+            items:
+              type:
+                - 'null'
+                - array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  path:
+                    type: string
+        secret:
+          type:
+            - 'null'
+            - object
+          description: Volume populated from a Secret.
+          properties:
+            secretName:
+              type: string
+            defaultMode:
+              type:
+                - 'null'
+                - number
+            optional:
+              type:
+                - 'null'
+                - boolean
+            items:
+              type:
+                - 'null'
+                - array
+              items:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  path:
+                    type: string
+        emptyDir:
+          type:
+            - 'null'
+            - object
+          description: Empty directory volume, optionally memory-backed.
+          properties:
+            medium:
+              type:
+                - 'null'
+                - string
+              enum:
+                - ''
+                - Memory
+            sizeLimit:
+              type:
+                - 'null'
+                - string
+              examples:
+                - 128Mi
+                - 1Gi
+      required:
+        - type
+        - name
+    ApplicationPodSpec:
+      type: object
+      description: A Galley representation of a Kubernetes Pod
+      properties:
+        serviceAccountName:
+          type:
+            - string
+            - 'null'
+        restartPolicy:
+          type:
+            - string
+            - 'null'
+          enum:
+            - Always
+            - OnFailure
+            - Never
+          default: Always
+        terminationGracePeriodSeconds:
+          type:
+            - 'null'
+            - number
+        dnsPolicy:
+          type:
+            - 'null'
+            - string
+          enum:
+            - ClusterFirst
+            - ClusterFirstWithHostNet
+            - Default
+            - None
+        dnsConfig:
+          type:
+            - 'null'
+            - object
+          properties:
+            nameservers:
+              type:
+                - 'null'
+                - array
+              items:
+                type: string
+            searches:
+              type:
+                - 'null'
+                - array
+              items:
+                type: string
+            options:
+              type:
+                - 'null'
+                - array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  value:
+                    type:
+                      - 'null'
+                      - string
+        imagePullSecrets:
+          type:
+            - 'null'
+            - array
+          items:
+            type: string
+        nodeSelector:
+          type:
+            - 'null'
+            - object
+          additionalProperties:
+            type: string
+        nodeAffinity:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes NodeAffinity spec. Free-form object mirroring core/v1.NodeAffinity.
+        podAffinity:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes PodAffinity spec. Free-form object mirroring core/v1.PodAffinity.
+        podAntiAffinity:
+          type:
+            - 'null'
+            - object
+          description: |
+            Kubernetes PodAntiAffinity spec. Free-form object mirroring core/v1.PodAntiAffinity.
+        tolerations:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            properties:
+              key:
+                type:
+                  - 'null'
+                  - string
+              operator:
+                type:
+                  - 'null'
+                  - string
+                enum:
+                  - Exists
+                  - Equal
+              value:
+                type:
+                  - 'null'
+                  - string
+              effect:
+                type:
+                  - 'null'
+                  - string
+                enum:
+                  - NoSchedule
+                  - PreferNoSchedule
+                  - NoExecute
+              tolerationSeconds:
+                type:
+                  - 'null'
+                  - number
+        topologySpreadConstraints:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            properties:
+              maxSkew:
+                type: number
+              topologyKey:
+                type: string
+              whenUnsatisfiable:
+                type: string
+                enum:
+                  - DoNotSchedule
+                  - ScheduleAnyway
+              labelSelector:
+                type:
+                  - 'null'
+                  - object
+                description: |
+                  Label selector used for the topology spread constraint. Free-form object mirroring meta/v1.LabelSelector.
+        securityContext:
+          type:
+            - 'null'
+            - object
+          description: |
+            Pod-level securityContext settings. Free-form object mirroring core/v1.PodSecurityContext.
+        hostAliases:
+          type:
+            - 'null'
+            - array
+          items:
+            type: object
+            properties:
+              ip:
+                type: string
+              hostnames:
+                type: array
+                items:
+                  type: string
+        containers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerSpec'
+        initContainers:
+          type:
+            - 'null'
+            - array
+          items:
+            $ref: '#/components/schemas/ContainerSpec'
+        volumes:
+          type:
+            - 'null'
+            - array
+          items:
+            $ref: '#/components/schemas/VolumeSpec'
+      required:
+        - containers
+    ApplicationCreate:
+      type: object
+      required:
+        - name
+        - slug
+      description: Request body for POST /applications.
+      properties:
+        computePlanId:
+          type: string
+          format: uuid
+          description: Compute Plan ID
+        name:
+          type: string
+          description: Application name
+          minLength: 1
+          examples:
+            - My App
+        slug:
+          type: string
+          description: URL-friendly identifier
+          minLength: 1
+          pattern: ^[a-z0-9-]+$
+          examples:
+            - my-app
+        description:
+          type:
+            - string
+            - 'null'
+          description: Application description
+        labels:
+          type:
+            - object
+            - 'null'
+          description: Key-value labels for organization
+        annotations:
+          type:
+            - object
+            - 'null'
+          description: Key-value annotations for metadata
+        deployment:
+          $ref: '#/components/schemas/DeploymentSpec'
+        pod:
+          $ref: '#/components/schemas/ApplicationPodSpec'
+      additionalProperties: false
+    Application:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+            type:
+              type: string
+              enum:
+                - Application
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - projectId
+                - name
+                - slug
+              properties:
+                vesselId:
+                  type: string
+                  format: uuid
+                charterId:
+                  type: string
+                  format: uuid
+                projectId:
+                  type: string
+                  format: uuid
+                computePlanId:
+                  type: string
+                  format: uuid
+                name:
+                  type: string
+                slug:
+                  type: string
+                description:
+                  type:
+                    - string
+                    - 'null'
+                labels:
+                  type:
+                    - object
+                    - 'null'
+                annotations:
+                  type:
+                    - object
+                    - 'null'
+                deployment:
+                  $ref: '#/components/schemas/DeploymentSpec'
+                pod:
+                  $ref: '#/components/schemas/ApplicationPodSpec'
+                createdAt:
+                  type: string
+                  format: date-time
+    ApplicationUpdate:
+      type: object
+      description: Request body for PATCH /applications/{id}.
+      properties:
+        computePlanId:
+          type: string
+          format: uuid
+          description: Optional compute plan ID
+        name:
+          type: string
+          description: Application name
+          minLength: 1
+          examples:
+            - Updated App
+        slug:
+          type: string
+          description: URL-friendly identifier
+          minLength: 1
+          pattern: ^[a-z0-9-]+$
+          examples:
+            - updated-app
+        description:
+          type:
+            - string
+            - 'null'
+          description: Application description
+        labels:
+          type:
+            - object
+            - 'null'
+          description: Key-value labels for organization
+        annotations:
+          type:
+            - object
+            - 'null'
+          description: Key-value annotations for metadata
+        deployment:
+          $ref: '#/components/schemas/DeploymentSpec'
+        pod:
+          $ref: '#/components/schemas/ApplicationPodSpec'
+      additionalProperties: false
     RefreshToken:
       type: object
       required:
@@ -2686,6 +3618,13 @@ components:
         format: uuid
     projectId:
       name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    applicationId:
+      name: applicationId
       in: path
       required: true
       schema:

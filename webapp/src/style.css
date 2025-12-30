@@ -4,6 +4,7 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 @custom-variant aria-current-page (&[aria-current="page"]);
+@custom-variant aria-current-step (&[aria-current="step"]);
 
 @theme {
   --font-sans: 'DM Sans', sans-serif;
@@ -203,7 +204,7 @@
     }
 
     p {
-      @apply text-tides-900 max-w-3xl;
+      @apply text-tides-900 max-w-3xl text-balance;
     }
 
     a {
@@ -268,6 +269,24 @@
         h6 {
           @apply text-navy-200;
         }
+      }
+    }
+  }
+
+  ol.stepper {
+    @apply list-none flex flex-row gap-4 mx-auto;
+
+    li {
+      @apply relative not-first:ml-12 size-10 text-lg flex items-center justify-center rounded-full bg-navy-100 aria-current-step:bg-navy-500 aria-current-step:text-white aria-checked:bg-navy-200 aria-checked:text-white transition-all;
+
+      &:not(:first-child):after {
+        @apply content-[""] block w-8 h-1 absolute top-4 -left-12 bg-navy-50 rounded-full transition-all;
+      }
+      &[aria-current=step]:not(:first-child):after {
+        @apply bg-navy-500;
+      }
+      &[aria-checked=true]:not(:first-child):after {
+        @apply bg-navy-300;
       }
     }
   }

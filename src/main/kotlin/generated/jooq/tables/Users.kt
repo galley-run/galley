@@ -11,6 +11,7 @@ import generated.jooq.keys.CHARTERS__FK_CHARTERS_USER
 import generated.jooq.keys.CREW__FK_CREW_USER
 import generated.jooq.keys.EMAIL_LOGIN_TOKENS__FK_EMAIL_LOGIN_USER
 import generated.jooq.keys.LOGBOOK__FK_LOGBOOK_USER
+import generated.jooq.keys.OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_USER
 import generated.jooq.keys.SESSIONS__SESSIONS_USER_ID_FKEY
 import generated.jooq.keys.SIGN_UP_INQUIRIES__FK_SIGNUPS_USER
 import generated.jooq.keys.USERS_EMAIL_KEY
@@ -23,6 +24,7 @@ import generated.jooq.tables.Charters.ChartersPath
 import generated.jooq.tables.Crew.CrewPath
 import generated.jooq.tables.EmailLoginTokens.EmailLoginTokensPath
 import generated.jooq.tables.Logbook.LogbookPath
+import generated.jooq.tables.OAuthConnections.OauthConnectionsPath
 import generated.jooq.tables.Sessions.SessionsPath
 import generated.jooq.tables.SignUpInquiries.SignUpInquiriesPath
 import generated.jooq.tables.UserIdentities.UserIdentitiesPath
@@ -238,6 +240,22 @@ open class Users(
 
     val logbook: LogbookPath
         get(): LogbookPath = logbook()
+
+    private lateinit var _oauthConnections: OauthConnectionsPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.oauth_connections</code> table
+     */
+    fun oauthConnections(): OauthConnectionsPath {
+        if (!this::_oauthConnections.isInitialized)
+            _oauthConnections = OauthConnectionsPath(this, null, OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_USER.inverseKey)
+
+        return _oauthConnections;
+    }
+
+    val oauthConnections: OauthConnectionsPath
+        get(): OauthConnectionsPath = oauthConnections()
 
     private lateinit var _signUpInquiries: SignUpInquiriesPath
 

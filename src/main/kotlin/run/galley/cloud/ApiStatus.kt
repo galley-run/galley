@@ -77,4 +77,13 @@ object ApiStatus {
   val COMPUTE_PLAN_NOT_FOUND = ApiStatus(2500, "The compute plan could not be found", HttpStatus.NotFound)
   val COMPUTE_PLAN_CREATE_FAILURE = ApiStatus(2501, "The compute plan could not be created")
   val COMPUTE_PLAN_ID_INCORRECT = ApiStatus(2502, "The compute plan id is incorrect")
+
+  val OAUTH_PROVIDER_MISSING = ApiStatus(2601, "The oauth provider is missing")
+  val OAUTH_TYPE_MISSING = ApiStatus(2602, "The oauth type is missing")
+  val OAUTH_STATUS_MISSING = ApiStatus(2603, "The oauth status is missing")
+  val OAUTH_CONNECTION_CREATE_FAILURE = ApiStatus(2604, "The oauth connection could not be created")
+  val OAUTH_CONNECTION_APPROVAL_FAILURE = ApiStatus(2605, "The oauth connection could not be approved", HttpStatus.BadRequest)
+  val OAUTH_CODE_MISSING = ApiStatus(2606, "The oauth authorization code is missing")
+  val OAUTH_STATE_MISSING = ApiStatus(2607, "The oauth state is missing")
+  val OAUTH_CONNECTION_NOT_FOUND = ApiStatus(2608, "The oauth connection could not be found", HttpStatus.NotFound)
 }

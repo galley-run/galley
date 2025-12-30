@@ -17,6 +17,9 @@ import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.MvLogbookRecent
 import generated.jooq.tables.MvOutboxReady
+import generated.jooq.tables.OAuthConnectionGrants
+import generated.jooq.tables.OAuthConnections
+import generated.jooq.tables.OAuthCredentials
 import generated.jooq.tables.OutboxEvents
 import generated.jooq.tables.PgpArmorHeaders
 import generated.jooq.tables.ProjectApiGateway
@@ -109,6 +112,24 @@ val MV_LOGBOOK_RECENT: MvLogbookRecent = MvLogbookRecent.MV_LOGBOOK_RECENT
  * The table <code>public.mv_outbox_ready</code>.
  */
 val MV_OUTBOX_READY: MvOutboxReady = MvOutboxReady.MV_OUTBOX_READY
+
+/**
+ * Permission grants for OAuth connections. Defines who can use, manage, or
+ * revoke each connection.
+ */
+val OAUTH_CONNECTION_GRANTS: OAuthConnectionGrants = OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS
+
+/**
+ * OAuth integrations at charter/vessel level. Contains connection metadata and
+ * display information. Credentials are stored separately in oauth_credentials.
+ */
+val OAUTH_CONNECTIONS: OAuthConnections = OAuthConnections.OAUTH_CONNECTIONS
+
+/**
+ * Encrypted OAuth credentials and tokens. Separated from connections to allow
+ * fine-grained access control.
+ */
+val OAUTH_CREDENTIALS: OAuthCredentials = OAuthCredentials.OAUTH_CREDENTIALS
 
 /**
  * The table <code>public.outbox_events</code>.
@@ -230,11 +251,9 @@ fun REGEXP_SPLIT_TO_TABLE(
       configuration: Configuration
     , __1: String?
     , __2: String?
-    , __3: String?
 ): Result<RegexpSplitToTableRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
       __1
     , __2
-    , __3
 )).fetch()
 
 /**
@@ -243,11 +262,9 @@ fun REGEXP_SPLIT_TO_TABLE(
 fun REGEXP_SPLIT_TO_TABLE(
       __1: String?
     , __2: String?
-    , __3: String?
 ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
     __1,
-    __2,
-    __3
+    __2
 )
 
 /**
@@ -256,11 +273,9 @@ fun REGEXP_SPLIT_TO_TABLE(
 fun REGEXP_SPLIT_TO_TABLE(
       __1: Field<String?>
     , __2: Field<String?>
-    , __3: Field<String?>
 ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
     __1,
-    __2,
-    __3
+    __2
 )
 
 /**

@@ -13,6 +13,7 @@ import generated.jooq.keys.CHARTER_PROJECTS__FK_CHARTER_PROJECTS_VESSEL
 import generated.jooq.keys.CREW__FK_CREW_VESSEL
 import generated.jooq.keys.LOCKER__FK_LOCKER_VESSEL
 import generated.jooq.keys.LOGBOOK__FK_LOGBOOK_VESSEL
+import generated.jooq.keys.OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_VESSEL
 import generated.jooq.keys.OUTBOX_EVENTS__FK_OUTBOX_VESSEL
 import generated.jooq.keys.PROJECT_API_GATEWAY__FK_GW_VESSEL
 import generated.jooq.keys.PROJECT_APPLICATIONS__FK_APP_VESSEL
@@ -34,6 +35,7 @@ import generated.jooq.tables.Charters.ChartersPath
 import generated.jooq.tables.Crew.CrewPath
 import generated.jooq.tables.Locker.LockerPath
 import generated.jooq.tables.Logbook.LogbookPath
+import generated.jooq.tables.OAuthConnections.OauthConnectionsPath
 import generated.jooq.tables.OutboxEvents.OutboxEventsPath
 import generated.jooq.tables.ProjectApiGateway.ProjectApiGatewayPath
 import generated.jooq.tables.ProjectApplications.ProjectApplicationsPath
@@ -384,6 +386,22 @@ open class Vessels(
 
     val vesselEngineNodes: VesselEngineNodesPath
         get(): VesselEngineNodesPath = vesselEngineNodes()
+
+    private lateinit var _oauthConnections: OauthConnectionsPath
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.oauth_connections</code> table
+     */
+    fun oauthConnections(): OauthConnectionsPath {
+        if (!this::_oauthConnections.isInitialized)
+            _oauthConnections = OauthConnectionsPath(this, null, OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_VESSEL.inverseKey)
+
+        return _oauthConnections;
+    }
+
+    val oauthConnections: OauthConnectionsPath
+        get(): OauthConnectionsPath = oauthConnections()
 
     private lateinit var _outboxEvents: OutboxEventsPath
 

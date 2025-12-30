@@ -23,7 +23,9 @@ class AgentWebSocketServer(
 ) {
   private val logger = LoggerFactory.getLogger(this::class.java)
   private var reconnectTimerId: Long? = null
-  private var backoff = 1000L
+  private var backoff = 5000L
+  private var reconnectCount = 0
+  private val minBackoff = 60000L // 1 minute minimum
 
   // Overrides an inbound connection with an outbound connection on the requested vesselEngineId
   suspend fun createOutboundConnection(vesselEngineId: UUID): WebSocket? {
@@ -87,6 +89,14 @@ class AgentWebSocketServer(
   }
 
   private fun scheduleReconnect(vesselEngineId: UUID) {
+    reconnectCount++
+
+    // After 10 reconnects, reduce backoff by 5s until minimum of 1 minute
+    if (reconnectCount > 10 && backoff > minBackoff) {
+      backoff = maxOf(backoff - 5000L, minBackoff)
+      logger.info("Reconnect attempt #$reconnectCount: Reducing backoff to ${backoff}ms")
+    }
+
     reconnectTimerId =
       vertx.setTimer(backoff) {
         val scope = CoroutineScope(vertx.dispatcher() + SupervisorJob())

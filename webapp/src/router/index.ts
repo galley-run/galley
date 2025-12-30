@@ -19,8 +19,16 @@ import EngineRegionEditView from '@/router/views/Engine/Node/EngineRegionEditVie
 import EngineNodeInfoView from '@/router/views/Engine/Node/EngineNodeInfoView.vue'
 import EngineNodeFirstControllerView from '@/router/views/Engine/Node/EngineNodeFirstControllerView.vue'
 import ComputePlanEditView from '@/router/views/ComputePlanEditView.vue'
+import ApplicationAddView from '@/router/views/Engine/Node/ApplicationAddView.vue'
+import ApplicationView from '@/router/views/Engine/ApplicationView.vue'
+import OAuthCallbackView from '@/router/views/OAuthCallbackView.vue'
 
 const routes = [
+  {
+    path: '/callback/oauth/:provider',
+    component: OAuthCallbackView,
+    meta: { public: false },
+  },
   {
     path: '/auth',
     component: LoginLayout,
@@ -51,13 +59,15 @@ const routes = [
     component: MainLayout,
     children: [
       { path: '', component: DashboardView },
-      { path: '/vessel/engine', component: EngineView },
-      { path: '/vessel/:vesselId/engine/node/controller', component: EngineNodeFirstControllerView },
-      { path: '/vessel/:vesselId/engine/node/add', component: EngineNodeEditView },
-      { path: '/vessel/:vesselId/engine/node/:nodeId/server-info', component: EngineNodeInfoView },
-      { path: '/vessel/:vesselId/engine/node/:nodeId', component: EngineNodeEditView },
-      { path: '/vessel/:vesselId/engine/region/add', component: EngineRegionEditView },
-      { path: '/vessel/:vesselId/engine/region/:regionId', component: EngineRegionEditView },
+      { path: 'application', component: ApplicationView },
+      { path: 'application/add', component: ApplicationAddView },
+      { path: 'vessel/engine', component: EngineView },
+      { path: 'vessel/:vesselId/engine/node/controller', component: EngineNodeFirstControllerView },
+      { path: 'vessel/:vesselId/engine/node/add', component: EngineNodeEditView },
+      { path: 'vessel/:vesselId/engine/node/:nodeId/server-info', component: EngineNodeInfoView },
+      { path: 'vessel/:vesselId/engine/node/:nodeId', component: EngineNodeEditView },
+      { path: 'vessel/:vesselId/engine/region/add', component: EngineRegionEditView },
+      { path: 'vessel/:vesselId/engine/region/:regionId', component: EngineRegionEditView },
       { path: 'charter/compute-plan', component: ComputePlanView },
       { path: 'charter/:charterId/compute-plan/add', component: ComputePlanEditView },
       { path: 'charter/:charterId/compute-plan/:computePlanId', component: ComputePlanEditView },

@@ -73,7 +73,7 @@ const projectSections = [
     items: [
       { icon: PresentationGraph, label: 'Dashboard', href: '/' },
       { icon: Routing3, label: 'Gateway', href: '/gateway', disabled: true, },
-      { icon: Server2, label: 'Applications', href: '/applications', disabled: true, },
+      { icon: Server2, label: 'Applications', href: '/application', },
       { icon: Database, label: 'Databases', href: '/databases', disabled: true, },
       { icon: FolderWithFiles, label: 'Object Storage', href: '/object-storage', disabled: true, },
     ],

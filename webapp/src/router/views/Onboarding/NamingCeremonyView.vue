@@ -127,7 +127,7 @@
         <UITextInput id="vesselName" placeholder="e.g. Boaty McBoatface" v-model="vessel.name" />
       </UIFormField>
     </div>
-    <div class="form-footer">
+    <div class="form-footer justify-between">
       <p>All fields marked with an asterisk (*) are required</p>
       <UIButton type="submit" :leading-addon="ShieldStar"> Set up your first project </UIButton>
     </div>

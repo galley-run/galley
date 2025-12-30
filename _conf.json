@@ -1,51 +1,79 @@
 {
+  "_outboundAgent": {
+    "{UUID}": "ws://localhost:8912/agents/connect"
+  },
+  "license": {
+    "key": "{KEY}"
+  },
   "http": {
+    "host": "0.0.0.0",
     "port": 443,
-    "certPath": "api.galley.dev.pem",
-    "keyPath": "api.galley.dev-key.pem"
+    "certPath": "{FILE.PEM}",
+    "keyPath": "{KEYFILE.PEM}"
   },
   "jwt": {
-    "secret": "secret",
-    "keystore": "keystore.p12",
+    "secret": "{SECRET}",
+    "keystore": "{FILE.P12}",
     "type": "pkcs12",
-    "pepper": "long-and-random-string",
-    "ttl": {
-      "access": 90
-    }
+    "pepper": "{PEPPER}"
   },
   "api.galley.run": {
     "openApiFile": "openapi.yaml",
-    "cors": [".*"],
+    "cors": [
+      "http://localhost:5173",
+      "https://cloud.galley.dev",
+      "https://cloud.galley.run"
+    ],
     "host": "api.galley.dev"
   },
   "cloud.galley.run": {
     "host": "cloud.galley.dev",
-    "cors": ["*"]
+    "cors": [
+      "*"
+    ]
   },
   "get.galley.run": {
+    "protocol": "https://",
     "host": "get.galley.dev",
-    "cors": ["*"]
+    "cors": [
+      "*"
+    ]
   },
   "db": {
-    "port": 5432,
+    "port": 54332,
     "database": "galley",
     "host": "localhost",
     "pool_size": 5,
-    "username": "username",
-    "password": "password"
+    "username": "postgres",
+    "password": "postgres"
   },
   "messaging": {
     "email": {
       "hostname": "127.0.0.1",
       "port": 25,
-      "username": "",
-      "password": "",
+      "username": "patrick@galley.run",
+      "password": "{PASSWORD}",
       "defaults": {
         "from": "Galley <welcome@galley.run>",
-        "cc": ["Galley <cc@galley.run>"],
-        "bcc": ["Galley <bcc@galley.run>"],
-        "urlPrefix": "https://cloud.galley.dev"
+        "urlPrefix": "http://localhost:5173"
       }
+    }
+  },
+  "base_url": "https://api.galley.dev",
+  "oauth": {
+    "github": {
+      "client_id": "{CLIENT ID}",
+      "client_secret": "{CLIENT SECRET}",
+      "app_id": null
+    },
+    "gitlab": {
+      "client_id": "",
+      "client_secret": "",
+      "site": "https://gitlab.com"
+    },
+    "bitbucket": {
+      "client_id": "",
+      "client_secret": ""
     }
   }
 }

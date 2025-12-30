@@ -1156,6 +1156,201 @@ paths:
           $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/connections:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+    get:
+      tags:
+        - connections
+      summary: List OAuth connections for charter
+      operationId: charter.connection.query.list
+      security:
+        - any: []
+      parameters:
+        - name: provider
+          in: query
+          required: false
+          description: Filter by OAuth provider
+          schema:
+            type: string
+            enum:
+              - github
+              - gitlab
+              - bitbucket
+              - dockerhub
+              - ghcr
+        - name: type
+          in: query
+          required: false
+          description: Filter by connection type
+          schema:
+            type: string
+            enum:
+              - git
+              - registry
+        - name: status
+          in: query
+          required: false
+          description: Filter by connection status
+          schema:
+            type: string
+            enum:
+              - pending
+              - active
+              - revoked
+              - error
+      responses:
+        '200':
+          description: List of OAuth connections for the charter
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OAuthConnectionSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - connections
+      summary: Create a new OAuth connection (admin only)
+      description: Creates a new OAuth connection at charter level. Requires admin permissions.
+      operationId: charter.connection.cmd.create
+      security:
+        - vesselCaptain: []
+        - charterCaptain: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              type: object
+              required:
+                - type
+                - provider
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - git
+                    - registry
+                  description: Type of OAuth connection
+                provider:
+                  type: string
+                  enum:
+                    - github
+                    - gitlab
+                    - bitbucket
+                    - dockerhub
+                    - ghcr
+                  description: OAuth provider identifier
+      responses:
+        '201':
+          description: OAuth connection created successfully
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OAuthConnectionCreated'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/connections/approval:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+    post:
+      tags:
+        - connections
+      summary: Complete OAuth connection flow
+      description: Receives OAuth callback data from the frontend to complete the OAuth flow
+      operationId: charter.connection.cmd.approve
+      security:
+        - any: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.galley.v1+json:
+            schema:
+              type: object
+              required:
+                - provider
+                - code
+              properties:
+                provider:
+                  type: string
+                  enum:
+                    - github
+                    - gitlab
+                    - bitbucket
+                    - dockerhub
+                    - ghcr
+                  description: OAuth provider identifier
+                code:
+                  type: string
+                  description: OAuth authorization code from callback
+                state:
+                  type: string
+                  description: State parameter for CSRF protection
+                installation_id:
+                  type: integer
+                  description: GitHub App installation ID (for GitHub App flow)
+                setup_action:
+                  type: string
+                  enum:
+                    - install
+                    - update
+                  description: GitHub App setup action
+                scope:
+                  type: string
+                  description: Granted OAuth scopes
+      responses:
+        '200':
+          description: OAuth connection approved and created successfully
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OAuthConnection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
     post:
       tags:
@@ -1308,6 +1503,44 @@ paths:
           $ref: '#/components/responses/NoContent'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /hooks/callback/oauth/github/app:
+    get:
+      tags:
+        - auth
+      summary: GitHub OAuth App callback
+      operationId: hooks.callback.oauth.github.app
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          description: A temporary code that expires after 10 minutes
+          schema:
+            type: string
+        - name: installation_id
+          in: query
+          required: true
+          description: The ID of the GitHub App installation
+          schema:
+            type: integer
+        - name: setup_action
+          in: query
+          required: true
+          description: The setup action performed
+          schema:
+            type: string
+            enum:
+              - install
+              - update
+      responses:
+        '200':
+          description: Webhook received successfully
+        '302':
+          description: Redirect to the application after successful OAuth flow
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /license:
@@ -3282,6 +3515,171 @@ components:
         pod:
           $ref: '#/components/schemas/ApplicationPodSpec'
       additionalProperties: false
+    OAuthConnectionSummary:
+      type: object
+      required:
+        - id
+        - type
+        - provider
+        - status
+        - display_name
+        - created_by_user_id
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the OAuth connection
+        vessel_id:
+          oneOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          description: ID of the vessel this connection belongs to (null if charter-level)
+        charter_id:
+          oneOf:
+            - type: string
+              format: uuid
+            - type: 'null'
+          description: ID of the charter this connection belongs to (null if vessel-level)
+        type:
+          type: string
+          enum:
+            - git
+            - registry
+          description: Type of OAuth connection
+        provider:
+          type: string
+          enum:
+            - github
+            - gitlab
+            - bitbucket
+            - dockerhub
+            - ghcr
+          description: OAuth provider
+        status:
+          type: string
+          enum:
+            - pending
+            - active
+            - revoked
+            - error
+          description: Current status of the connection
+        display_name:
+          type: string
+          description: Display name for this connection (e.g., "GitHub (Acme Org)")
+        created_by_user_id:
+          type: string
+          format: uuid
+          description: ID of the user who created this connection
+        provider_account_id:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: External provider account/org ID
+        account_login:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: Account login/username on the provider
+        last_validated_at:
+          oneOf:
+            - type: string
+              format: date-time
+            - type: 'null'
+          description: When this connection was last validated
+        created_at:
+          type: string
+          format: date-time
+          description: When this connection was created
+        user_permissions:
+          type: array
+          description: Permissions the current user has for this connection
+          items:
+            type: string
+            enum:
+              - use
+              - manage
+              - revoke
+    OAuthConnectionCreated:
+      type: object
+      required:
+        - id
+        - type
+        - attributes
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the OAuth connection
+        type:
+          type: string
+          enum:
+            - OAuthConnectionCreate
+        attributes:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - pending
+                - active
+                - revoked
+                - error
+              description: Current status of the connection
+            authorization_url:
+              type: string
+              description: The url to redirect the user to
+    OAuthConnection:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A simplified representation of a Node, typically used in list views.
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              format: uuid
+              examples:
+                - 27D9B362-0BB3-4F8D-B8E6-CF7FCEE2F327
+            type:
+              type: string
+              enum:
+                - OAuthConnection
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - type
+                - provider
+                - status
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - git
+                    - registry
+                  description: Type of OAuth connection
+                provider:
+                  type: string
+                  enum:
+                    - github
+                    - gitlab
+                    - bitbucket
+                    - dockerhub
+                    - ghcr
+                  description: OAuth provider
+                status:
+                  type: string
+                  enum:
+                    - pending
+                    - active
+                    - revoked
+                    - error
+                  description: Current status of the connection
     RefreshToken:
       type: object
       required:

@@ -15,6 +15,9 @@ import generated.jooq.tables.CrewCharterMember
 import generated.jooq.tables.EmailLoginTokens
 import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
+import generated.jooq.tables.OAuthConnectionGrants
+import generated.jooq.tables.OAuthConnections
+import generated.jooq.tables.OAuthCredentials
 import generated.jooq.tables.OutboxEvents
 import generated.jooq.tables.ProjectApiGateway
 import generated.jooq.tables.ProjectApplications
@@ -43,6 +46,9 @@ import generated.jooq.tables.records.CrewRecord
 import generated.jooq.tables.records.EmailLoginTokensRecord
 import generated.jooq.tables.records.LockerRecord
 import generated.jooq.tables.records.LogbookRecord
+import generated.jooq.tables.records.OAuthConnectionGrantsRecord
+import generated.jooq.tables.records.OAuthConnectionsRecord
+import generated.jooq.tables.records.OAuthCredentialsRecord
 import generated.jooq.tables.records.OutboxEventsRecord
 import generated.jooq.tables.records.ProjectApiGatewayRecord
 import generated.jooq.tables.records.ProjectApplicationsRecord
@@ -87,6 +93,10 @@ val EMAIL_LOGIN_TOKENS_PKEY: UniqueKey<EmailLoginTokensRecord> = Internal.create
 val EMAIL_LOGIN_TOKENS_TOKEN_HASH_KEY: UniqueKey<EmailLoginTokensRecord> = Internal.createUniqueKey(EmailLoginTokens.EMAIL_LOGIN_TOKENS, DSL.name("email_login_tokens_token_hash_key"), arrayOf(EmailLoginTokens.EMAIL_LOGIN_TOKENS.TOKEN_HASH), true)
 val LOCKER_PKEY: UniqueKey<LockerRecord> = Internal.createUniqueKey(Locker.LOCKER, DSL.name("locker_pkey"), arrayOf(Locker.LOCKER.ID), true)
 val LOGBOOK_PKEY: UniqueKey<LogbookRecord> = Internal.createUniqueKey(Logbook.LOGBOOK, DSL.name("logbook_pkey"), arrayOf(Logbook.LOGBOOK.ID), true)
+val OAUTH_CONNECTION_GRANTS_PKEY: UniqueKey<OAuthConnectionGrantsRecord> = Internal.createUniqueKey(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, DSL.name("oauth_connection_grants_pkey"), arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.ID), true)
+val UQ_OAUTH_GRANTS_PRINCIPAL: UniqueKey<OAuthConnectionGrantsRecord> = Internal.createUniqueKey(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, DSL.name("uq_oauth_grants_principal"), arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.CONNECTION_ID, OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PRINCIPAL_TYPE, OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PRINCIPAL_ID, OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PERMISSION), true)
+val OAUTH_CONNECTIONS_PKEY: UniqueKey<OAuthConnectionsRecord> = Internal.createUniqueKey(OAuthConnections.OAUTH_CONNECTIONS, DSL.name("oauth_connections_pkey"), arrayOf(OAuthConnections.OAUTH_CONNECTIONS.ID), true)
+val OAUTH_CREDENTIALS_PKEY: UniqueKey<OAuthCredentialsRecord> = Internal.createUniqueKey(OAuthCredentials.OAUTH_CREDENTIALS, DSL.name("oauth_credentials_pkey"), arrayOf(OAuthCredentials.OAUTH_CREDENTIALS.ID), true)
 val OUTBOX_EVENTS_PKEY: UniqueKey<OutboxEventsRecord> = Internal.createUniqueKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("outbox_events_pkey"), arrayOf(OutboxEvents.OUTBOX_EVENTS.ID), true)
 val UQ_OUTBOX_EVENT_KEY: UniqueKey<OutboxEventsRecord> = Internal.createUniqueKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("uq_outbox_event_key"), arrayOf(OutboxEvents.OUTBOX_EVENTS.EVENT_KEY), true)
 val PROJECT_API_GATEWAY_PKEY: UniqueKey<ProjectApiGatewayRecord> = Internal.createUniqueKey(ProjectApiGateway.PROJECT_API_GATEWAY, DSL.name("project_api_gateway_pkey"), arrayOf(ProjectApiGateway.PROJECT_API_GATEWAY.ID), true)
@@ -138,6 +148,10 @@ val LOCKER__FK_LOCKER_VESSEL: ForeignKey<LockerRecord, VesselsRecord> = Internal
 val LOGBOOK__FK_LOGBOOK_CHARTER: ForeignKey<LogbookRecord, ChartersRecord> = Internal.createForeignKey(Logbook.LOGBOOK, DSL.name("fk_logbook_charter"), arrayOf(Logbook.LOGBOOK.CHARTER_ID), generated.jooq.keys.CHARTERS_PKEY, arrayOf(Charters.CHARTERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val LOGBOOK__FK_LOGBOOK_USER: ForeignKey<LogbookRecord, UsersRecord> = Internal.createForeignKey(Logbook.LOGBOOK, DSL.name("fk_logbook_user"), arrayOf(Logbook.LOGBOOK.USER_ID), generated.jooq.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val LOGBOOK__FK_LOGBOOK_VESSEL: ForeignKey<LogbookRecord, VesselsRecord> = Internal.createForeignKey(Logbook.LOGBOOK, DSL.name("fk_logbook_vessel"), arrayOf(Logbook.LOGBOOK.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
+val OAUTH_CONNECTION_GRANTS__FK_OAUTH_GRANTS_CONNECTION: ForeignKey<OAuthConnectionGrantsRecord, OAuthConnectionsRecord> = Internal.createForeignKey(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, DSL.name("fk_oauth_grants_connection"), arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.CONNECTION_ID), generated.jooq.keys.OAUTH_CONNECTIONS_PKEY, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_USER: ForeignKey<OAuthConnectionsRecord, UsersRecord> = Internal.createForeignKey(OAuthConnections.OAUTH_CONNECTIONS, DSL.name("fk_oauth_connections_user"), arrayOf(OAuthConnections.OAUTH_CONNECTIONS.CREATED_BY_USER_ID), generated.jooq.keys.USERS_PKEY, arrayOf(Users.USERS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val OAUTH_CONNECTIONS__FK_OAUTH_CONNECTIONS_VESSEL: ForeignKey<OAuthConnectionsRecord, VesselsRecord> = Internal.createForeignKey(OAuthConnections.OAUTH_CONNECTIONS, DSL.name("fk_oauth_connections_vessel"), arrayOf(OAuthConnections.OAUTH_CONNECTIONS.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
+val OAUTH_CREDENTIALS__FK_OAUTH_CREDENTIALS_CONNECTION: ForeignKey<OAuthCredentialsRecord, OAuthConnectionsRecord> = Internal.createForeignKey(OAuthCredentials.OAUTH_CREDENTIALS, DSL.name("fk_oauth_credentials_connection"), arrayOf(OAuthCredentials.OAUTH_CREDENTIALS.CONNECTION_ID), generated.jooq.keys.OAUTH_CONNECTIONS_PKEY, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.ID), true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION)
 val OUTBOX_EVENTS__FK_OUTBOX_CHARTER: ForeignKey<OutboxEventsRecord, ChartersRecord> = Internal.createForeignKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("fk_outbox_charter"), arrayOf(OutboxEvents.OUTBOX_EVENTS.CHARTER_ID), generated.jooq.keys.CHARTERS_PKEY, arrayOf(Charters.CHARTERS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val OUTBOX_EVENTS__FK_OUTBOX_PROJECT: ForeignKey<OutboxEventsRecord, CharterProjectsRecord> = Internal.createForeignKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("fk_outbox_project"), arrayOf(OutboxEvents.OUTBOX_EVENTS.PROJECT_ID), generated.jooq.keys.CHARTER_PROJECTS_PKEY, arrayOf(CharterProjects.CHARTER_PROJECTS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)
 val OUTBOX_EVENTS__FK_OUTBOX_VESSEL: ForeignKey<OutboxEventsRecord, VesselsRecord> = Internal.createForeignKey(OutboxEvents.OUTBOX_EVENTS, DSL.name("fk_outbox_vessel"), arrayOf(OutboxEvents.OUTBOX_EVENTS.VESSEL_ID), generated.jooq.keys.VESSELS_PKEY, arrayOf(Vessels.VESSELS.ID), true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION)

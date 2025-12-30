@@ -86,7 +86,7 @@
         </label>
       </UIFormField>
     </div>
-    <div class="form-footer">
+    <div class="form-footer justify-between">
       <p>All fields marked with an asterisk (*) are required</p>
       <UIButton :leading-addon="Clipboard" type="submit">Enter the Security Screening</UIButton>
     </div>

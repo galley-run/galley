@@ -17,6 +17,9 @@ import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.MvLogbookRecent
 import generated.jooq.tables.MvOutboxReady
+import generated.jooq.tables.OAuthConnectionGrants
+import generated.jooq.tables.OAuthConnections
+import generated.jooq.tables.OAuthCredentials
 import generated.jooq.tables.OutboxEvents
 import generated.jooq.tables.ProjectApiGateway
 import generated.jooq.tables.ProjectApplications
@@ -99,6 +102,19 @@ val IDX_NODES_PROVISIONING_TIME: Index = Internal.createIndex(DSL.name("idx_node
 val IDX_NODES_REGION: Index = Internal.createIndex(DSL.name("idx_nodes_region"), VesselEngineNodes.VESSEL_ENGINE_NODES, arrayOf(VesselEngineNodes.VESSEL_ENGINE_NODES.VESSEL_ENGINE_REGION_ID), false)
 val IDX_NODES_TYPE_MODE: Index = Internal.createIndex(DSL.name("idx_nodes_type_mode"), VesselEngineNodes.VESSEL_ENGINE_NODES, arrayOf(VesselEngineNodes.VESSEL_ENGINE_NODES.NODE_TYPE, VesselEngineNodes.VESSEL_ENGINE_NODES.DEPLOY_MODE), false)
 val IDX_NODES_VESSEL: Index = Internal.createIndex(DSL.name("idx_nodes_vessel"), VesselEngineNodes.VESSEL_ENGINE_NODES, arrayOf(VesselEngineNodes.VESSEL_ENGINE_NODES.VESSEL_ID), false)
+val IDX_OAUTH_CONNECTIONS_CHARTER_ID: Index = Internal.createIndex(DSL.name("idx_oauth_connections_charter_id"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.CHARTER_ID), false)
+val IDX_OAUTH_CONNECTIONS_CREATED_BY: Index = Internal.createIndex(DSL.name("idx_oauth_connections_created_by"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.CREATED_BY_USER_ID), false)
+val IDX_OAUTH_CONNECTIONS_PROVIDER: Index = Internal.createIndex(DSL.name("idx_oauth_connections_provider"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.PROVIDER), false)
+val IDX_OAUTH_CONNECTIONS_STATUS: Index = Internal.createIndex(DSL.name("idx_oauth_connections_status"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.STATUS), false)
+val IDX_OAUTH_CONNECTIONS_TYPE: Index = Internal.createIndex(DSL.name("idx_oauth_connections_type"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.TYPE), false)
+val IDX_OAUTH_CONNECTIONS_VESSEL_ID: Index = Internal.createIndex(DSL.name("idx_oauth_connections_vessel_id"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.VESSEL_ID), false)
+val IDX_OAUTH_CONNECTIONS_VESSEL_STATUS: Index = Internal.createIndex(DSL.name("idx_oauth_connections_vessel_status"), OAuthConnections.OAUTH_CONNECTIONS, arrayOf(OAuthConnections.OAUTH_CONNECTIONS.VESSEL_ID, OAuthConnections.OAUTH_CONNECTIONS.STATUS), false)
+val IDX_OAUTH_CREDENTIALS_CONNECTION_ID: Index = Internal.createIndex(DSL.name("idx_oauth_credentials_connection_id"), OAuthCredentials.OAUTH_CREDENTIALS, arrayOf(OAuthCredentials.OAUTH_CREDENTIALS.CONNECTION_ID), false)
+val IDX_OAUTH_CREDENTIALS_EXPIRES_AT: Index = Internal.createIndex(DSL.name("idx_oauth_credentials_expires_at"), OAuthCredentials.OAUTH_CREDENTIALS, arrayOf(OAuthCredentials.OAUTH_CREDENTIALS.EXPIRES_AT), false)
+val IDX_OAUTH_CREDENTIALS_INSTALLATION_ID: Index = Internal.createIndex(DSL.name("idx_oauth_credentials_installation_id"), OAuthCredentials.OAUTH_CREDENTIALS, arrayOf(OAuthCredentials.OAUTH_CREDENTIALS.INSTALLATION_ID), false)
+val IDX_OAUTH_GRANTS_CONNECTION_ID: Index = Internal.createIndex(DSL.name("idx_oauth_grants_connection_id"), OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.CONNECTION_ID), false)
+val IDX_OAUTH_GRANTS_PERMISSION: Index = Internal.createIndex(DSL.name("idx_oauth_grants_permission"), OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PERMISSION), false)
+val IDX_OAUTH_GRANTS_PRINCIPAL: Index = Internal.createIndex(DSL.name("idx_oauth_grants_principal"), OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS, arrayOf(OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PRINCIPAL_TYPE, OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS.PRINCIPAL_ID), false)
 val IDX_OUTBOX_AGGREGATE_TIME: Index = Internal.createIndex(DSL.name("idx_outbox_aggregate_time"), OutboxEvents.OUTBOX_EVENTS, arrayOf(OutboxEvents.OUTBOX_EVENTS.AGGREGATE_TABLE, OutboxEvents.OUTBOX_EVENTS.AGGREGATE_ID, OutboxEvents.OUTBOX_EVENTS.CREATED_AT), false)
 val IDX_OUTBOX_CHARTER_TIME: Index = Internal.createIndex(DSL.name("idx_outbox_charter_time"), OutboxEvents.OUTBOX_EVENTS, arrayOf(OutboxEvents.OUTBOX_EVENTS.CHARTER_ID, OutboxEvents.OUTBOX_EVENTS.CREATED_AT), false)
 val IDX_OUTBOX_METADATA_GIN: Index = Internal.createIndex(DSL.name("idx_outbox_metadata_gin"), OutboxEvents.OUTBOX_EVENTS, arrayOf(OutboxEvents.OUTBOX_EVENTS.METADATA), false)

@@ -16,6 +16,9 @@ import generated.jooq.tables.Locker
 import generated.jooq.tables.Logbook
 import generated.jooq.tables.MvLogbookRecent
 import generated.jooq.tables.MvOutboxReady
+import generated.jooq.tables.OAuthConnectionGrants
+import generated.jooq.tables.OAuthConnections
+import generated.jooq.tables.OAuthCredentials
 import generated.jooq.tables.OutboxEvents
 import generated.jooq.tables.PgpArmorHeaders
 import generated.jooq.tables.ProjectApiGateway
@@ -126,6 +129,25 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
      * The table <code>public.mv_outbox_ready</code>.
      */
     val MV_OUTBOX_READY: MvOutboxReady get() = MvOutboxReady.MV_OUTBOX_READY
+
+    /**
+     * Permission grants for OAuth connections. Defines who can use, manage, or
+     * revoke each connection.
+     */
+    val OAUTH_CONNECTION_GRANTS: OAuthConnectionGrants get() = OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS
+
+    /**
+     * OAuth integrations at charter/vessel level. Contains connection metadata
+     * and display information. Credentials are stored separately in
+     * oauth_credentials.
+     */
+    val OAUTH_CONNECTIONS: OAuthConnections get() = OAuthConnections.OAUTH_CONNECTIONS
+
+    /**
+     * Encrypted OAuth credentials and tokens. Separated from connections to
+     * allow fine-grained access control.
+     */
+    val OAUTH_CREDENTIALS: OAuthCredentials get() = OAuthCredentials.OAUTH_CREDENTIALS
 
     /**
      * The table <code>public.outbox_events</code>.
@@ -247,11 +269,9 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
           configuration: Configuration
         , __1: String?
         , __2: String?
-        , __3: String?
     ): Result<RegexpSplitToTableRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
           __1
         , __2
-        , __3
     )).fetch()
 
     /**
@@ -260,11 +280,9 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
     fun REGEXP_SPLIT_TO_TABLE(
           __1: String?
         , __2: String?
-        , __3: String?
     ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
         __1,
-        __2,
-        __3
+        __2
     )
 
     /**
@@ -273,11 +291,9 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
     fun REGEXP_SPLIT_TO_TABLE(
           __1: Field<String?>
         , __2: Field<String?>
-        , __3: Field<String?>
     ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
         __1,
-        __2,
-        __3
+        __2
     )
 
     /**
@@ -365,6 +381,9 @@ open class Public : SchemaImpl(DSL.name("public"), DefaultCatalog.DEFAULT_CATALO
         Logbook.LOGBOOK,
         MvLogbookRecent.MV_LOGBOOK_RECENT,
         MvOutboxReady.MV_OUTBOX_READY,
+        OAuthConnectionGrants.OAUTH_CONNECTION_GRANTS,
+        OAuthConnections.OAUTH_CONNECTIONS,
+        OAuthCredentials.OAUTH_CREDENTIALS,
         OutboxEvents.OUTBOX_EVENTS,
         PgpArmorHeaders.PGP_ARMOR_HEADERS,
         ProjectApiGateway.PROJECT_API_GATEWAY,

@@ -5414,11 +5414,9 @@ fun regexpSplitToTable(
       configuration: Configuration
     , __1: String?
     , __2: String?
-    , __3: String?
 ): Result<RegexpSplitToTableRecord> = configuration.dsl().selectFrom(generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
       __1
     , __2
-    , __3
 )).fetch()
 
 /**
@@ -5427,11 +5425,9 @@ fun regexpSplitToTable(
 fun regexpSplitToTable(
       __1: String?
     , __2: String?
-    , __3: String?
 ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
     __1,
-    __2,
-    __3
+    __2
 )
 
 /**
@@ -5440,9 +5436,7 @@ fun regexpSplitToTable(
 fun regexpSplitToTable(
       __1: Field<String?>
     , __2: Field<String?>
-    , __3: Field<String?>
 ): RegexpSplitToTable = generated.jooq.tables.RegexpSplitToTable.REGEXP_SPLIT_TO_TABLE.call(
     __1,
-    __2,
-    __3
+    __2
 )

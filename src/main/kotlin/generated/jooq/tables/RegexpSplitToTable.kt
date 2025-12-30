@@ -69,8 +69,7 @@ open class RegexpSplitToTable(
 
     private constructor(alias: Name, aliased: Table<RegexpSplitToTableRecord>?): this(alias, null, null, null, aliased, arrayOf(
         DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(null, SQLDataType.CLOB)
+        DSL.value(null, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding()))
     ), null)
     private constructor(alias: Name, aliased: Table<RegexpSplitToTableRecord>?, parameters: Array<Field<*>?>?): this(alias, null, null, null, aliased, parameters, null)
 
@@ -116,11 +115,9 @@ open class RegexpSplitToTable(
     fun call(
           __1: String?
         , __2: String?
-        , __3: String?
     ): RegexpSplitToTable = RegexpSplitToTable(DSL.name("regexp_split_to_table"), null, arrayOf(
         DSL.value(__1, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(__2, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding())),
-        DSL.value(__3, SQLDataType.CLOB)
+        DSL.value(__2, DefaultDataType.getDefaultDataType("\"public\".\"citext\"").asConvertedDataType(CitextBinding()))
     )).let { if (aliased()) it.`as`(unqualifiedName) else it }
 
     /**
@@ -129,10 +126,8 @@ open class RegexpSplitToTable(
     fun call(
           __1: Field<String?>
         , __2: Field<String?>
-        , __3: Field<String?>
     ): RegexpSplitToTable = RegexpSplitToTable(DSL.name("regexp_split_to_table"), null, arrayOf(
         __1,
-        __2,
-        __3
+        __2
     )).let { if (aliased()) it.`as`(unqualifiedName) else it }
 }

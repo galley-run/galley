@@ -17,7 +17,7 @@
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
 
-    <vertx.version>5.0.5</vertx.version>
+    <vertx.version>5.0.6</vertx.version>
     <junit-jupiter.version>5.9.1</junit-jupiter.version>
     <flyway.version>11.13.2</flyway.version>
     <jooq.version>3.20.8</jooq.version>
@@ -50,6 +50,10 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-auth-jwt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-auth-oauth2</artifactId>
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
@@ -514,7 +518,31 @@
                       <table>
                         <pojoExtends>run.galley.cloud.model.BaseModel</pojoExtends>
                       </table>
+                      <table>
+                        <expression>oauth_(.*)</expression>
+                        <tableClass>
+                          <transform>PASCAL</transform>
+                          <expression>o_auth_$1</expression>
+                        </tableClass>
+                        <recordClass>
+                          <transform>PASCAL</transform>
+                          <expression>o_auth_$1_record</expression>
+                        </recordClass>
+                        <pojoClass>
+                          <transform>PASCAL</transform>
+                          <expression>o_auth_$1</expression>
+                        </pojoClass>
+                      </table>
                     </tables>
+                    <enums>
+                      <enum>
+                        <expression>oauth_(.*)</expression>
+                        <enumClass>
+                          <transform>PASCAL</transform>
+                          <expression>o_auth_$1</expression>
+                        </enumClass>
+                      </enum>
+                    </enums>
                   </matchers>
                 </strategy>
               </generator>

@@ -69,10 +69,7 @@
         </div>
       </div>
 
-      <div
-        class="card mx-auto max-w-4xl"
-        v-if="currentStep === 2 && deploymentMethod === 'git'"
-      >
+      <div class="card mx-auto max-w-4xl" v-if="currentStep === 2 && deploymentMethod === 'git'">
         <h2>Connect to a Git Provider</h2>
         <p class="mb-6">Authenticate with your Git provider to access repositories</p>
 
@@ -146,10 +143,7 @@
         </div>
       </div>
 
-      <div
-        class="card mx-auto max-w-4xl"
-        v-if="currentStep === 2 && deploymentMethod === 'docker'"
-      >
+      <div class="card mx-auto max-w-4xl" v-if="currentStep === 2 && deploymentMethod === 'docker'">
         <h2>Connect to a Docker Registry</h2>
         <p class="mb-6">Authenticate with your Docker registry to access your Docker images</p>
 
@@ -168,7 +162,7 @@
               "
               name="dockerProvider"
               required
-              value="git"
+              value="github"
               v-model="dockerProvider"
             >
               <template v-slot:icon>
@@ -177,14 +171,10 @@
             </UIRadioCard>
             <UIRadioCard
               title="Docker Hub"
-              :description="
-                getConnectionForProvider('dockerhub', 'registry')
-                  ? '✓ Connected - Deploy from Docker Hub.'
-                  : 'Deploy from a Docker container image in Docker Hub.'
-              "
+              description="Deploy from public Docker Hub images."
               name="dockerProvider"
               required
-              value="docker"
+              value="dockerhub"
               v-model="dockerProvider"
             >
               <template v-slot:icon>
@@ -207,10 +197,7 @@
         </div>
       </div>
 
-      <div
-        class="card mx-auto max-w-4xl"
-        v-if="currentStep === 3 && deploymentMethod === 'git'"
-      >
+      <div class="card mx-auto max-w-4xl" v-if="currentStep === 3 && deploymentMethod === 'git'">
         <h2>Select Repository</h2>
         <p class="mb-6">Choose a repository from your connected {{ gitProvider }} account</p>
 
@@ -222,25 +209,111 @@
           No repositories found. Make sure your connection has access to repositories.
         </div>
 
-        <UIFormField v-else>
-          <div class="grid grid-cols-1 gap-4">
-            <UIRadioCard
-              v-for="repo in repositories"
-              :key="repo.id"
-              :title="repo.full_name"
-              :description="repo.description || 'No description available'"
-              name="repository"
-              required
-              :value="repo.id"
-              v-model="selectedRepository"
-            >
-              <template v-slot:icon>
-                <IconBranch class="text-navy-600" />
-              </template>
-            </UIRadioCard>
+        <div v-else>
+          <div class="grid grid-cols-3 gap-4 mb-4">
+            <UIFormField v-if="uniqueAccounts.length > 1">
+              <label class="form-field__label">Account</label>
+              <UIDropDown
+                v-model="selectedAccount"
+                :items="accountDropdownItems"
+                placeholder="All accounts"
+                @change="filterRepositoriesByAccount"
+              />
+            </UIFormField>
+
+            <UIFormField class="col-span-2">
+              <label class="form-field__label">Repository</label>
+              <UIAutoComplete
+                v-model="repositorySearch"
+                :items="repositoryAutocompleteItems"
+                placeholder="Search repositories..."
+                auto-open
+                :icon="IconBranch"
+              />
+              <label for="repository" class="form-field__error-message">
+                Please select a repository before you continue.
+              </label>
+            </UIFormField>
           </div>
-          <label for="repository" class="form-field__error-message">
-            Please select a repository before you continue.
+
+          <UIRadioCard
+            v-if="selectedRepositoryObject"
+            :title="selectedRepositoryObject.full_name"
+            :description="selectedRepositoryObject.description || 'No description available'"
+            name="selectedRepository"
+            :value="selectedRepositoryObject.id"
+            :model-value="selectedRepositoryObject.id"
+            checked
+          >
+            <template v-slot:icon>
+              <IconBranch class="text-navy-600" />
+            </template>
+          </UIRadioCard>
+        </div>
+
+        <div class="card__footer form-footer">
+          <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" @click="currentStep--">
+            Back
+          </UIButton>
+          <UIButton type="submit" :trailing-addon="ArrowRight" :disabled="!selectedRepository">
+            Continue
+          </UIButton>
+        </div>
+      </div>
+
+      <div class="card mx-auto max-w-4xl" v-if="currentStep === 3 && deploymentMethod === 'docker'">
+        <h2>Container Image</h2>
+        <p class="mb-6">Specify the container image and tag to deploy</p>
+
+        <div class="grid grid-cols-3 gap-4">
+          <UIFormField class="col-span-2">
+            <label class="form-field__label" for="containerImage">Container Image</label>
+            <UITextInput
+              id="containerImage"
+              name="containerImage"
+              v-model="containerImage"
+              :placeholder="
+                dockerProvider === 'github' ? 'e.g. ghcr.io/owner/image' : 'e.g. nginx, myorg/myapp'
+              "
+              required
+            />
+            <label for="containerImage" class="form-field__error-message">
+              Please enter a container image name.
+            </label>
+          </UIFormField>
+
+          <UIFormField>
+            <label class="form-field__label" for="containerTag">Container Tag</label>
+            <UITextInput
+              id="containerTag"
+              name="containerTag"
+              v-model="containerTag"
+              placeholder="latest"
+              required
+            />
+            <label for="containerTag" class="form-field__error-message">
+              Please enter a container tag.
+            </label>
+          </UIFormField>
+        </div>
+
+        <div class="card__footer form-footer">
+          <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" @click="currentStep--">
+            Back
+          </UIButton>
+          <UIButton type="submit" :trailing-addon="ArrowRight"> Continue </UIButton>
+        </div>
+      </div>
+
+      <div class="card mx-auto max-w-4xl" v-if="currentStep === 4 && deploymentMethod === 'git'">
+        <h2>Configure Branch</h2>
+        <p class="mb-6">Specify the branch to deploy from</p>
+
+        <UIFormField>
+          <label class="form-field__label" for="branch">Branch</label>
+          <UITextInput id="branch" name="branch" v-model="branch" placeholder="main" required />
+          <label for="branch" class="form-field__error-message">
+            Please enter a branch name.
           </label>
         </UIFormField>
 
@@ -248,33 +321,38 @@
           <UIButton ghost variant="neutral" :leading-addon="ArrowLeft" @click="currentStep--">
             Back
           </UIButton>
-          <UIButton type="submit" :trailing-addon="ArrowRight">Continue</UIButton>
+          <UIButton type="submit" :trailing-addon="ArrowRight"> Continue </UIButton>
         </div>
       </div>
     </form>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft, ArrowRight, Box, CheckCircle } from '@solar-icons/vue'
 import UIRadioCard from '@/components/FormField/UIRadioCard.vue'
 import UIButton from '@/components/UIButton.vue'
 import IconBranch from '@/components/CustomIcon/IconBranch.vue'
 import UIFormField from '@/components/FormField/UIFormField.vue'
+import UIAutoComplete from '@/components/FormField/UIAutoComplete.vue'
+import UIDropDown from '@/components/FormField/UIDropDown.vue'
+import UITextInput from '@/components/FormField/UITextInput.vue'
 import IconGitHub from '@/components/CustomIcon/IconGitHub.vue'
 import IconBitbucket from '@/components/CustomIcon/IconBitbucket.vue'
 import IconGitLab from '@/components/CustomIcon/IconGitLab.vue'
-import { useVesselId, useCharterId } from '@/composables/useResourceHelpers'
-import type { OAuthProvider, OAuthConnectionType } from '@/types/oauth'
+import { useCharterId, useVesselId } from '@/composables/useResourceHelpers'
+import type { OAuthConnectionType, OAuthProvider } from '@/types/oauth'
 import axios from 'axios'
 
 const route = useRoute()
 const vesselId = useVesselId()
 const charterId = useCharterId()
 
-const steps = ref(4)
 const currentStep = ref(1)
+
+// Compute total steps based on deployment method
+const steps = ref(4)
 
 // Check if we're returning from OAuth callback
 onMounted(() => {
@@ -292,19 +370,16 @@ onMounted(() => {
   }
 })
 
-// Fetch existing connections when moving to step 2
-watch(currentStep, (newStep) => {
-  if (newStep === 2) {
-    fetchExistingConnections()
-  } else if (newStep === 3 && deploymentMethod.value === 'git') {
-    fetchRepositories()
-  }
-})
-
 const deploymentMethod = ref('')
 const gitProvider = ref('')
 const dockerProvider = ref('')
 const selectedRepository = ref('')
+const repositorySearch = ref('')
+const selectedAccount = ref('')
+const filteredRepositories = ref<any[]>([])
+const branch = ref('main')
+const containerImage = ref('')
+const containerTag = ref('latest')
 
 const formRef = ref<HTMLFormElement | null>(null)
 const isStartingOAuth = ref(false)
@@ -320,13 +395,11 @@ async function fetchExistingConnections() {
   isLoadingConnections.value = true
   try {
     const response = await axios.get(
-      `/vessels/${vesselId.value}/charters/${charterId.value}/connections`
+      `/vessels/${vesselId.value}/charters/${charterId.value}/connections`,
     )
     console.log('Fetched connections:', response)
-    // Filter for active or pending connections from data array
-    existingConnections.value = (response || []).filter(
-      (conn: any) => conn.status === 'active' || conn.status === 'pending'
-    )
+    // Filter for active connections only
+    existingConnections.value = (response || []).filter((conn: any) => conn.status === 'active')
     console.log('Active connections:', existingConnections.value)
   } catch (error) {
     console.error('Failed to fetch existing connections:', error)
@@ -338,10 +411,7 @@ async function fetchExistingConnections() {
 
 function getConnectionForProvider(provider: OAuthProvider, type: OAuthConnectionType) {
   const connection = existingConnections.value.find(
-    (conn: any) =>
-      conn.provider === provider &&
-      conn.type === type &&
-      (conn.status === 'active' || conn.status === 'pending')
+    (conn: any) => conn.provider === provider && conn.type === type && conn.status === 'active',
   )
   console.log(`Looking for connection: provider=${provider}, type=${type}, found=`, connection)
   return connection
@@ -350,9 +420,21 @@ function getConnectionForProvider(provider: OAuthProvider, type: OAuthConnection
 async function fetchRepositories() {
   if (!vesselId.value || !charterId.value) return
 
-  // Get the active connection
-  const provider = gitProvider.value as OAuthProvider
-  const connection = getConnectionForProvider(provider, 'git')
+  // Get the active connection based on deployment method
+  let provider: OAuthProvider
+  let type: OAuthConnectionType
+
+  if (deploymentMethod.value === 'git') {
+    provider = gitProvider.value as OAuthProvider
+    type = 'git'
+  } else if (deploymentMethod.value === 'docker' && dockerProvider.value === 'github') {
+    provider = 'github'
+    type = 'registry'
+  } else {
+    return
+  }
+
+  const connection = getConnectionForProvider(provider, type)
 
   if (!connection) {
     console.error('No active connection found')
@@ -364,19 +446,132 @@ async function fetchRepositories() {
 
   try {
     const response = await axios.get(
-      `/vessels/${vesselId.value}/charters/${charterId.value}/connections/${connection.id}/repositories`
+      `/vessels/${vesselId.value}/charters/${charterId.value}/connections/${connection.id}/repositories`,
     )
     console.log('Fetched repositories:', response)
-    repositories.value = response || []
+    // Axios interceptor unwraps response.data.data ?? response.data
+    // If API returns { data: [...], meta: {...} }, response will be the data array
+    repositories.value = Array.isArray(response) ? response : response?.data || []
+    filteredRepositories.value = repositories.value
   } catch (error) {
     console.error('Failed to fetch repositories:', error)
     repositories.value = []
+    filteredRepositories.value = []
   } finally {
     isLoadingRepositories.value = false
   }
 }
 
-function openOAuthPopup(provider: string): { popup: Window | null; promise: Promise<void>; navigate: (url: string) => void } {
+// Extract unique accounts from repositories
+const uniqueAccounts = computed(() => {
+  const accounts = new Set<string>()
+  repositories.value.forEach((repo) => {
+    // Extract account/owner from full_name (e.g., "owner/repo-name")
+    const owner = repo.full_name?.split('/')[0]
+    if (owner) accounts.add(owner)
+  })
+  return Array.from(accounts).sort()
+})
+
+// Format accounts for dropdown
+const accountDropdownItems = computed(() => {
+  return [
+    { label: 'All accounts', value: '' },
+    ...uniqueAccounts.value.map((account) => ({
+      label: account,
+      value: account,
+    })),
+  ]
+})
+
+// Format repositories for autocomplete
+const repositoryAutocompleteItems = computed(() => {
+  return filteredRepositories.value.map((repo) => ({
+    label: repo.full_name,
+    value: repo.id,
+  }))
+})
+
+// Get the selected repository object
+const selectedRepositoryObject = computed(() => {
+  return repositories.value.find((repo) => repo.id === repositorySearch.value)
+})
+
+// Watch for changes to selectedRepositoryObject to update selectedRepository
+watch(repositorySearch, (value) => {
+  selectedRepository.value = value
+})
+
+// Fetch existing connections when moving to step 2
+watch(currentStep, (newStep) => {
+  if (newStep === 2) {
+    fetchExistingConnections()
+  } else if (newStep === 3 && deploymentMethod.value === 'git') {
+    fetchRepositories()
+  }
+})
+
+// Auto-continue when deployment method is selected
+watch(deploymentMethod, (newValue) => {
+  if (newValue && currentStep.value === 1) {
+    currentStep.value = 2
+  }
+})
+
+// Track if we should auto-continue after connections load
+const shouldAutoContinue = ref(false)
+
+// Auto-continue when git provider is selected
+watch(gitProvider, (newValue) => {
+  if (newValue && currentStep.value === 2 && deploymentMethod.value === 'git') {
+    if (isLoadingConnections.value) {
+      // Still loading, flag to continue after load
+      shouldAutoContinue.value = true
+    } else {
+      // Already loaded, continue immediately
+      onSubmit()
+    }
+  }
+})
+
+// Auto-continue when docker provider is selected
+watch(dockerProvider, (newValue) => {
+  if (newValue && currentStep.value === 2 && deploymentMethod.value === 'docker') {
+    if (isLoadingConnections.value) {
+      // Still loading, flag to continue after load
+      shouldAutoContinue.value = true
+    } else {
+      // Already loaded, continue immediately
+      onSubmit()
+    }
+  }
+})
+
+// Auto-continue after connections finish loading (if flagged)
+watch(isLoadingConnections, (newValue, oldValue) => {
+  if (oldValue && !newValue && shouldAutoContinue.value) {
+    shouldAutoContinue.value = false
+    onSubmit()
+  }
+})
+
+function filterRepositoriesByAccount() {
+  if (selectedAccount.value === '') {
+    filteredRepositories.value = repositories.value
+  } else {
+    filteredRepositories.value = repositories.value.filter((repo) =>
+      repo.full_name?.startsWith(selectedAccount.value + '/'),
+    )
+  }
+  // Reset search when account changes
+  repositorySearch.value = ''
+}
+
+function openOAuthPopup(provider: string): {
+  popup: Window | null
+  promise: Promise<void>
+  navigate: (url: string) => void
+} {
   const width = 600
   const height = 700
   const left = window.screenX + (window.outerWidth - width) / 2
@@ -386,7 +581,7 @@ function openOAuthPopup(provider: string): { popup: Window | null; promise: Prom
   const popup = window.open(
     'about:blank',
     `oauth-${provider}`,
-    `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`
+    `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes`,
   )
 
   let checkClosedInterval: number | null = null
@@ -399,7 +594,9 @@ function openOAuthPopup(provider: string): { popup: Window | null; promise: Prom
 
     // Show loading message
     try {
-      popup.document.write('<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><div>Loading OAuth...</div></body></html>')
+      popup.document.write(
+        '<html><body style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;"><div>Loading OAuth...</div></body></html>',
+      )
       popup.document.close()
     } catch (e) {
       console.error('Failed to write to popup:', e)
@@ -423,7 +620,7 @@ function openOAuthPopup(provider: string): { popup: Window | null; promise: Prom
             {
               provider: event.data.provider,
               ...event.data.params,
-            }
+            },
           )
           console.log('Approval successful:', response)
           resolve()
@@ -493,14 +690,20 @@ async function onSubmit() {
 
   // If we're on step 2 and a provider is selected, start OAuth flow
   if (currentStep.value === 2) {
+    // Docker Hub doesn't require OAuth - skip directly to step 3
+    if (deploymentMethod.value === 'docker' && dockerProvider.value === 'dockerhub') {
+      currentStep.value = 3
+      return
+    }
+
     let provider: string | null = null
     let type: OAuthConnectionType | null = null
 
     if (deploymentMethod.value === 'git' && gitProvider.value) {
       provider = gitProvider.value
       type = 'git'
-    } else if (deploymentMethod.value === 'docker' && dockerProvider.value) {
-      provider = dockerProvider.value === 'git' ? 'github' : 'dockerhub'
+    } else if (deploymentMethod.value === 'docker' && dockerProvider.value === 'github') {
+      provider = 'github'
       type = 'registry'
     }
 
@@ -530,13 +733,28 @@ async function onSubmit() {
           return
         }
 
+        // Determine required scopes based on provider and type
+        let scopes: string[] = []
+        if (provider === 'github') {
+          if (type === 'git') {
+            scopes = ['repo']
+          } else if (type === 'registry') {
+            scopes = ['read:packages']
+          }
+        } else if (provider === 'gitlab') {
+          scopes = ['read_api', 'read_repository']
+        } else if (provider === 'bitbucket') {
+          scopes = ['repository']
+        }
+
         // Create OAuth connection and get authorization URL
         const response = await axios.post(
           `/vessels/${vesselId.value}/charters/${charterId.value}/connections`,
           {
             type,
             provider,
-          }
+            scopes,
+          },
         )
 
         console.log('OAuth connection response:', response)

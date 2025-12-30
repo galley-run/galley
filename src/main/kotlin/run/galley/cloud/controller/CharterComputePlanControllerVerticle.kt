@@ -3,6 +3,7 @@ package run.galley.cloud.controller
 import generated.jooq.tables.pojos.CharterComputePlans
 import generated.jooq.tables.references.CHARTER_COMPUTE_PLANS
 import io.vertx.core.eventbus.Message
+import io.vertx.core.internal.logging.LoggerFactory
 import io.vertx.core.json.JsonArray
 import io.vertx.kotlin.coroutines.coAwait
 import nl.clicqo.api.ApiStatusReplyException

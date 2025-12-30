@@ -16,6 +16,7 @@ const {
   disabled,
   maxHeightPx,
   icon,
+  autoOpen = false,
   menuPosition = 'left',
   id,
 } = defineProps<{
@@ -24,6 +25,7 @@ const {
   placeholder?: string
   id?: string
   disabled?: boolean
+  autoOpen?: boolean
   maxHeightPx?: number
   icon?: FunctionalComponent<IconProps>
   menuPosition?: 'left' | 'right'
@@ -70,6 +72,7 @@ const menuStyle = computed(() => {
 })
 
 const filteredItems = computed(() => {
+  if (!inputValue.value && autoOpen) return items
   if (!inputValue.value) return []
   const search = inputValue.value.toLowerCase()
 
@@ -129,8 +132,8 @@ function onInput(e: Event) {
   inputValue.value = value
   emit('update:modelValue', value)
 
-  // Only open dropdown if there's input
-  if (value && filteredItems.value.length > 0) {
+  // Open dropdown if there are items to show
+  if ((value || autoOpen) && filteredItems.value.length > 0) {
     if (!isOpen.value) {
       open()
     } else {
@@ -142,7 +145,10 @@ function onInput(e: Event) {
 }
 
 function onFocus() {
-  // Don't open on focus, only when typing
+  // Open dropdown on focus to show all items
+  if (autoOpen && filteredItems.value.length > 0) {
+    open()
+  }
 }
 
 function onKeydown(e: KeyboardEvent) {

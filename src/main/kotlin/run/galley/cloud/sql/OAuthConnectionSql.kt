@@ -45,35 +45,7 @@ object OAuthConnectionSql {
     return Jooq.postgres
       .insertInto(OAUTH_CONNECTIONS)
       .set(OAuthConnectionFactory.toRecord(payload))
-      .onConflictOnConstraint(
-        org.jooq.impl.DSL
-          .name("uq_oauth_connections_vessel_charter_provider_type"),
-      ).doUpdate()
-      .set(
-        OAUTH_CONNECTIONS.STATUS,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.STATUS),
-      ).set(
-        OAUTH_CONNECTIONS.DISPLAY_NAME,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.DISPLAY_NAME),
-      ).set(
-        OAUTH_CONNECTIONS.CREATED_BY_USER_ID,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.CREATED_BY_USER_ID),
-      ).set(
-        OAUTH_CONNECTIONS.SCOPES,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.SCOPES),
-      ).set(
-        OAUTH_CONNECTIONS.PROVIDER_ACCOUNT_ID,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.PROVIDER_ACCOUNT_ID),
-      ).set(
-        OAUTH_CONNECTIONS.LAST_VALIDATED_AT,
-        org.jooq.impl.DSL
-          .excluded(OAUTH_CONNECTIONS.LAST_VALIDATED_AT),
-      ).returning()
+      .returning()
   }
 
   fun patchOAuthConnection(request: EventBusCmdDataRequest): Query {
@@ -122,6 +94,12 @@ object OAuthConnectionSql {
       ).doNothing()
       .returning()
   }
+
+  fun getOAuthCredentialsByConnectionId(connectionId: UUID): Query =
+    Jooq.postgres
+      .selectFrom(OAUTH_CREDENTIALS)
+      .where(OAUTH_CREDENTIALS.CONNECTION_ID.eq(connectionId))
+      .limit(1)
 
   private fun buildConditions(filters: Map<String, List<String>>): Array<Condition> =
     filters

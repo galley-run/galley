@@ -1,6 +1,7 @@
 package run.galley.cloud.data
 
 import generated.jooq.tables.pojos.OAuthConnections
+import generated.jooq.tables.pojos.OAuthCredentials
 import io.vertx.core.eventbus.Message
 import io.vertx.core.json.JsonObject
 import nl.clicqo.api.ApiStatusReplyException
@@ -12,6 +13,7 @@ import nl.clicqo.eventbus.EventBusQueryDataRequest
 import nl.clicqo.ext.coroutineEventBus
 import run.galley.cloud.ApiStatus
 import run.galley.cloud.model.factory.OAuthConnectionFactory
+import run.galley.cloud.model.factory.OAuthCredentialFactory
 import run.galley.cloud.sql.OAuthConnectionSql
 
 class OAuthConnectionDataVerticle : PostgresDataVerticle() {
@@ -23,6 +25,7 @@ class OAuthConnectionDataVerticle : PostgresDataVerticle() {
     const val DELETE = "data.oauth_connection.cmd.delete"
     const val CREATE_CREDENTIAL = "data.oauth_credential.cmd.create"
     const val DELETE_CREDENTIALS = "data.oauth_credential.cmd.delete_by_connection"
+    const val GET_CREDENTIALS = "data.oauth_credential.query.get_by_connection"
     const val CREATE_GRANT = "data.oauth_grant.cmd.create"
   }
 
@@ -37,6 +40,7 @@ class OAuthConnectionDataVerticle : PostgresDataVerticle() {
       vertx.eventBus().coConsumer(DELETE, handler = ::delete)
       vertx.eventBus().coConsumer(CREATE_CREDENTIAL, handler = ::createCredential)
       vertx.eventBus().coConsumer(DELETE_CREDENTIALS, handler = ::deleteCredentials)
+      vertx.eventBus().coConsumer(GET_CREDENTIALS, handler = ::getCredentials)
       vertx.eventBus().coConsumer(CREATE_GRANT, handler = ::createGrant)
     }
   }
@@ -119,6 +123,25 @@ class OAuthConnectionDataVerticle : PostgresDataVerticle() {
     val request = message.body()
     pool.execute(OAuthConnectionSql.deleteOAuthCredentialsByConnectionId(request.identifier!!))
     message.reply(EventBusDataResponse.noContent<OAuthConnections>())
+  }
+
+  private suspend fun getCredentials(message: Message<EventBusQueryDataRequest>) {
+    val request = message.body()
+    val connectionId =
+      request.identifiers["connection_id"]?.let { java.util.UUID.fromString(it) }
+        ?: throw ApiStatusReplyException(ApiStatus.ID_MISSING)
+
+    val results = pool.execute(OAuthConnectionSql.getOAuthCredentialsByConnectionId(connectionId))
+    val row = results?.firstOrNull()
+
+    if (row == null) {
+      message.reply(EventBusDataResponse.noContent<OAuthCredentials>())
+      return
+    }
+
+    val credentials = OAuthCredentialFactory.from(row)
+
+    message.reply(EventBusDataResponse(DataPayload.one(credentials)))
   }
 
   private suspend fun createGrant(message: Message<EventBusCmdDataRequest>) {

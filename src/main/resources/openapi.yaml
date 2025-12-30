@@ -1179,7 +1179,6 @@ paths:
               - gitlab
               - bitbucket
               - dockerhub
-              - ghcr
         - name: type
           in: query
           required: false
@@ -1254,7 +1253,6 @@ paths:
                     - gitlab
                     - bitbucket
                     - dockerhub
-                    - ghcr
                   description: OAuth provider identifier
       responses:
         '201':
@@ -1307,7 +1305,6 @@ paths:
                     - gitlab
                     - bitbucket
                     - dockerhub
-                    - ghcr
                   description: OAuth provider identifier
                 code:
                   type: string
@@ -1349,6 +1346,186 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/connections/{oauthConnectionId}/repositories:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - name: oauthConnectionId
+        in: path
+        required: true
+        description: OAuth connection ID
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - connections
+      summary: List repositories for a Git OAuth connection
+      description: Fetches repositories accessible through the specified OAuth connection. Only works for git-type connections (GitHub, GitLab, Bitbucket).
+      operationId: charter.connection.repositories.list
+      security:
+        - any: []
+      parameters:
+        - name: visibility
+          in: query
+          required: false
+          description: Filter by repository visibility
+          schema:
+            type: string
+            enum:
+              - public
+              - private
+              - internal
+        - name: archived
+          in: query
+          required: false
+          description: Filter by archived status
+          schema:
+            type: boolean
+        - name: sort
+          in: query
+          required: false
+          description: Sort order
+          schema:
+            type: string
+            enum:
+              - name
+              - updated
+              - created
+              - pushed
+              - stars
+            default: updated
+        - name: direction
+          in: query
+          required: false
+          description: Sort direction
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+        - name: search
+          in: query
+          required: false
+          description: Search query for repository name
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          description: Page number for pagination
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          required: false
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 30
+      responses:
+        '200':
+          description: List of repositories from the OAuth connection
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GitRepositorySummary'
+                  pagination:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      per_page:
+                        type: integer
+                      total_pages:
+                        type: integer
+        '400':
+          description: Bad request (e.g., OAuth connection is not a git type)
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: This OAuth connection is not a git provider
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+  /vessels/{vesselId}/charters/{charterId}/connections/{oauthConnectionId}/repositories/{repositoryId}:
+    parameters:
+      - $ref: '#/components/parameters/vesselId'
+      - $ref: '#/components/parameters/charterId'
+      - name: oauthConnectionId
+        in: path
+        required: true
+        description: OAuth connection ID
+        schema:
+          type: string
+          format: uuid
+      - name: repositoryId
+        in: path
+        required: true
+        description: Repository ID (provider-specific)
+        schema:
+          type: string
+    get:
+      tags:
+        - connections
+      summary: Get repository details
+      description: Fetches detailed information about a specific repository through the OAuth connection.
+      operationId: charter.connection.repositories.get
+      security:
+        - any: []
+      responses:
+        '200':
+          description: Repository details
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GitRepository'
+        '400':
+          description: Bad request (e.g., OAuth connection is not a git type)
+          content:
+            application/vnd.galley.v1+json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: This OAuth connection is not a git provider
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /auth/refresh-token:
@@ -3522,7 +3699,6 @@ components:
         - type
         - provider
         - status
-        - display_name
         - created_by_user_id
         - created_at
       properties:
@@ -3555,7 +3731,6 @@ components:
             - gitlab
             - bitbucket
             - dockerhub
-            - ghcr
           description: OAuth provider
         status:
           type: string
@@ -3565,9 +3740,6 @@ components:
             - revoked
             - error
           description: Current status of the connection
-        display_name:
-          type: string
-          description: Display name for this connection (e.g., "GitHub (Acme Org)")
         created_by_user_id:
           type: string
           format: uuid
@@ -3670,7 +3842,6 @@ components:
                     - gitlab
                     - bitbucket
                     - dockerhub
-                    - ghcr
                   description: OAuth provider
                 status:
                   type: string
@@ -3680,6 +3851,196 @@ components:
                     - revoked
                     - error
                   description: Current status of the connection
+    GitRepositorySummary:
+      type: object
+      description: A simplified representation of a Git repository, typically used in list views
+      required:
+        - id
+        - name
+        - full_name
+        - provider
+        - visibility
+        - html_url
+        - default_branch
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the repository (provider-specific)
+          examples:
+            - '123456789'
+        name:
+          type: string
+          description: Repository name
+          examples:
+            - my-repo
+        full_name:
+          type: string
+          description: Full repository name including owner/org
+          examples:
+            - acme-corp/my-repo
+        description:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: Repository description
+        provider:
+          type: string
+          enum:
+            - github
+            - gitlab
+            - bitbucket
+          description: Git provider
+        visibility:
+          type: string
+          enum:
+            - public
+            - private
+            - internal
+          description: Repository visibility
+        default_branch:
+          type: string
+          description: Default branch name
+          examples:
+            - main
+        html_url:
+          type: string
+          format: uri
+          description: URL to view the repository in browser
+          examples:
+            - https://github.com/acme-corp/my-repo
+        language:
+          oneOf:
+            - type: string
+            - type: 'null'
+          description: Primary programming language
+          examples:
+            - TypeScript
+        archived:
+          type: boolean
+          description: Whether the repository is archived
+        fork:
+          type: boolean
+          description: Whether the repository is a fork
+        updated_at:
+          type: string
+          format: date-time
+          description: When the repository was last updated
+    GitRepository:
+      allOf:
+        - $ref: '#/components/schemas/JSONAPIResource'
+        - type: object
+          description: A Git repository from a connected OAuth provider
+          required:
+            - id
+            - type
+            - attributes
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the repository (provider-specific)
+              examples:
+                - '123456789'
+            type:
+              type: string
+              enum:
+                - GitRepository
+              description: Resource type
+            attributes:
+              type: object
+              required:
+                - name
+                - full_name
+                - provider
+                - visibility
+                - html_url
+              properties:
+                name:
+                  type: string
+                  description: Repository name
+                  examples:
+                    - my-repo
+                full_name:
+                  type: string
+                  description: Full repository name including owner/org
+                  examples:
+                    - acme-corp/my-repo
+                description:
+                  oneOf:
+                    - type: string
+                    - type: 'null'
+                  description: Repository description
+                provider:
+                  type: string
+                  enum:
+                    - github
+                    - gitlab
+                    - bitbucket
+                  description: Git provider
+                visibility:
+                  type: string
+                  enum:
+                    - public
+                    - private
+                    - internal
+                  description: Repository visibility
+                default_branch:
+                  type: string
+                  description: Default branch name
+                  examples:
+                    - main
+                html_url:
+                  type: string
+                  format: uri
+                  description: URL to view the repository in browser
+                  examples:
+                    - https://github.com/acme-corp/my-repo
+                clone_url:
+                  type: string
+                  format: uri
+                  description: HTTPS clone URL
+                  examples:
+                    - https://github.com/acme-corp/my-repo.git
+                ssh_url:
+                  type: string
+                  description: SSH clone URL
+                  examples:
+                    - git@github.com:acme-corp/my-repo.git
+                language:
+                  oneOf:
+                    - type: string
+                    - type: 'null'
+                  description: Primary programming language
+                  examples:
+                    - TypeScript
+                archived:
+                  type: boolean
+                  description: Whether the repository is archived
+                fork:
+                  type: boolean
+                  description: Whether the repository is a fork
+                stars_count:
+                  type: integer
+                  description: Number of stars/likes
+                forks_count:
+                  type: integer
+                  description: Number of forks
+                open_issues_count:
+                  type: integer
+                  description: Number of open issues
+                created_at:
+                  type: string
+                  format: date-time
+                  description: When the repository was created on the provider
+                updated_at:
+                  type: string
+                  format: date-time
+                  description: When the repository was last updated
+                pushed_at:
+                  oneOf:
+                    - type: string
+                      format: date-time
+                    - type: 'null'
+                  description: When the last push occurred
     RefreshToken:
       type: object
       required:

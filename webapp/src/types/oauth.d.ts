@@ -1,6 +1,6 @@
 export type OAuthConnectionType = 'git' | 'registry'
 
-export type OAuthProvider = 'github' | 'gitlab' | 'bitbucket' | 'dockerhub' | 'ghcr'
+export type OAuthProvider = 'github' | 'gitlab' | 'bitbucket' | 'dockerhub'
 
 export type OAuthConnectionStatus = 'pending' | 'active' | 'revoked' | 'error'
 

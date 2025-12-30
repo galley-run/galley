@@ -92,7 +92,7 @@ class AgentWebSocketServer(
     reconnectCount++
 
     // After 10 reconnects, reduce backoff by 5s until minimum of 1 minute
-    if (reconnectCount > 10 && backoff > minBackoff) {
+    if (reconnectCount > 3 && backoff > minBackoff) {
       backoff = maxOf(backoff - 5000L, minBackoff)
       logger.info("Reconnect attempt #$reconnectCount: Reducing backoff to ${backoff}ms")
     }

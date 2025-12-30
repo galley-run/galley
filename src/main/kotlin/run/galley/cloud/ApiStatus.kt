@@ -86,4 +86,20 @@ object ApiStatus {
   val OAUTH_CODE_MISSING = ApiStatus(2606, "The oauth authorization code is missing")
   val OAUTH_STATE_MISSING = ApiStatus(2607, "The oauth state is missing")
   val OAUTH_CONNECTION_NOT_FOUND = ApiStatus(2608, "The oauth connection could not be found", HttpStatus.NotFound)
+  val OAUTH_CONNECTION_INACTIVE = ApiStatus(2609, "The oauth connection is not active", HttpStatus.BadRequest)
+  val OAUTH_CREDENTIALS_NOT_FOUND = ApiStatus(2610, "The oauth credentials could not be found", HttpStatus.NotFound)
+  val OAUTH_PROVIDER_API_ERROR = ApiStatus(2611, "Failed to fetch data from the OAuth provider", HttpStatus.BadGateway)
+  val OAUTH_CONNECTION_TYPE_NOT_GIT = ApiStatus(2612, "The oauth connection is not of type 'git'", HttpStatus.BadRequest)
+  val OAUTH_CONNECTION_TYPE_NOT_REGISTRY = ApiStatus(2613, "The oauth connection is not of type 'registry'", HttpStatus.BadRequest)
+  val OAUTH_TYPE_MISMATCH = ApiStatus(2614, "The oauth connection is of incorrect type", HttpStatus.BadRequest)
+  val OAUTH_CONFIG_MISSING = ApiStatus(2615, "OAuth configuration is missing in the config file", HttpStatus.ServiceUnavailable)
+  val OAUTH_PROVIDER_CONFIG_MISSING =
+    ApiStatus(
+      2616,
+      "OAuth provider configuration is missing. Please add the provider configuration to the config file.",
+      HttpStatus.ServiceUnavailable,
+    )
+  val OAUTH_CLIENT_ID_MISSING = ApiStatus(2617, "OAuth client_id is missing in the provider configuration", HttpStatus.ServiceUnavailable)
+  val OAUTH_CLIENT_SECRET_MISSING =
+    ApiStatus(2618, "OAuth client_secret is missing in the provider configuration", HttpStatus.ServiceUnavailable)
 }

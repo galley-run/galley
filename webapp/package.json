@@ -22,7 +22,7 @@
     "@solar-icons/vue": "^1.1.0",
     "@tailwindcss/vite": "^4.1.16",
     "@tanstack/vue-query": "^5.90.5",
-    "axios": "^1.13.1",
+    "axios": "^1.13.5",
     "dayjs": "^1.11.19",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.16",
